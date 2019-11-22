@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.github.chenlijia1111.commonModule.dao.ClientAddressMapper">
+  <resultMap id="BaseResultMap" type="com.github.chenlijia1111.commonModule.entity.ClientAddress">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="client_id" jdbcType="INTEGER" property="clientId" />
+    <result column="receiver_name" jdbcType="VARCHAR" property="receiverName" />
+    <result column="receive_sex" jdbcType="INTEGER" property="receiveSex" />
+    <result column="receiver_telephone" jdbcType="VARCHAR" property="receiverTelephone" />
+    <result column="province" jdbcType="VARCHAR" property="province" />
+    <result column="city" jdbcType="VARCHAR" property="city" />
+    <result column="area" jdbcType="VARCHAR" property="area" />
+    <result column="address_code" jdbcType="VARCHAR" property="addressCode" />
+    <result column="detail_address" jdbcType="VARCHAR" property="detailAddress" />
+    <result column="is_common_address" jdbcType="INTEGER" property="isCommonAddress" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="is_delete" jdbcType="INTEGER" property="isDelete" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, client_id, receiver_name, receive_sex, receiver_telephone, province, city, area, 
+    address_code, detail_address, is_common_address, update_time, is_delete
+  </sql>
+  <update id="updateClientCommonAddressByClient">
+    UPDATE s_client_address
+    SET is_common_address = 0
+    WHERE client_id = #{clientId}
+  </update>
+</mapper>

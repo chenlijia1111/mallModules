@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.github.chenlijia1111.commonModule.dao.ReturnGoodsOrderMapper">
+  <resultMap id="BaseResultMap" type="com.github.chenlijia1111.commonModule.entity.ReturnGoodsOrder">
+    <id column="re_order_no" jdbcType="VARCHAR" property="reOrderNo" />
+    <result column="custom" jdbcType="VARCHAR" property="custom" />
+    <result column="shops" jdbcType="VARCHAR" property="shops" />
+    <result column="re_create_time" jdbcType="TIMESTAMP" property="reCreateTime" />
+    <result column="re_explain" jdbcType="VARCHAR" property="reExplain" />
+    <result column="re_fund" jdbcType="DOUBLE" property="reFund" />
+    <result column="check_status" jdbcType="INTEGER" property="checkStatus" />
+    <result column="re_handle_time" jdbcType="TIMESTAMP" property="reHandleTime" />
+    <result column="re_reason" jdbcType="VARCHAR" property="reReason" />
+    <result column="shopping_order" jdbcType="VARCHAR" property="shoppingOrder" />
+    <result column="front_order" jdbcType="VARCHAR" property="frontOrder" />
+    <result column="re_fund_status" jdbcType="INTEGER" property="reFundStatus" />
+    <result column="state" jdbcType="INTEGER" property="state" />
+    <result column="return_pay_no" jdbcType="VARCHAR" property="returnPayNo" />
+    <result column="re_type" jdbcType="INTEGER" property="reType" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    re_order_no, custom, shops, re_create_time, re_explain, re_fund, check_status, re_handle_time, 
+    re_reason, shopping_order, front_order, re_fund_status, state, return_pay_no, re_type
+  </sql>
+
+</mapper>

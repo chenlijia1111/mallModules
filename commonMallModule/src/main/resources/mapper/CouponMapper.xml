@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.github.chenlijia1111.commonModule.dao.CouponMapper">
+  <resultMap id="BaseResultMap" type="com.github.chenlijia1111.commonModule.entity.Coupon">
+    <id column="id" jdbcType="VARCHAR" property="id" />
+    <id column="coupon_name" jdbcType="VARCHAR" property="couponName" />
+    <id column="coupon_count" jdbcType="VARCHAR" property="couponCount" />
+    <id column="coupon_total_count" jdbcType="VARCHAR" property="couponTotalCount" />
+    <result column="coupon_type" jdbcType="INTEGER" property="couponType" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="create_user_type" jdbcType="INTEGER" property="createUserType" />
+    <result column="create_user_id" jdbcType="VARCHAR" property="createUserId" />
+    <result column="delete_status" jdbcType="VARCHAR" property="deleteStatus" />
+  </resultMap>
+  <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.github.chenlijia1111.commonModule.entity.Coupon">
+    <result column="coupon_json" jdbcType="LONGVARCHAR" property="couponJson" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, coupon_name, coupon_count, coupon_total_count, coupon_type, create_time, update_time, create_user_type, create_user_id, delete_status
+  </sql>
+  <sql id="Blob_Column_List">
+    coupon_json
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="ResultMapWithBLOBs">
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from s_coupon
+    where id = #{id,jdbcType=VARCHAR}
+  </select>
+  <select id="listByIdSet" resultMap="ResultMapWithBLOBs">
+    select
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from s_coupon
+    <foreach collection="idSet" item="id" open="WHERE id IN (" close=")" separator=",">
+      #{id}
+    </foreach>
+  </select>
+</mapper>

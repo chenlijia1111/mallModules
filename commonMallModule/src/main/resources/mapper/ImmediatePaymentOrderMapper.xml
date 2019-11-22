@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.github.chenlijia1111.commonModule.dao.ImmediatePaymentOrderMapper">
+  <resultMap id="BaseResultMap" type="com.github.chenlijia1111.commonModule.entity.ImmediatePaymentOrder">
+    <id column="order_no" jdbcType="VARCHAR" property="orderNo" />
+    <result column="custom" jdbcType="VARCHAR" property="custom" />
+    <result column="shops" jdbcType="VARCHAR" property="shops" />
+    <result column="state" jdbcType="INTEGER" property="state" />
+    <result column="rec_user" jdbcType="VARCHAR" property="recUser" />
+    <result column="star_user" jdbcType="VARCHAR" property="starUser" />
+    <result column="rec_tel" jdbcType="VARCHAR" property="recTel" />
+    <result column="star_tel" jdbcType="VARCHAR" property="starTel" />
+    <result column="rec_addr" jdbcType="VARCHAR" property="recAddr" />
+    <result column="star_addr" jdbcType="VARCHAR" property="starAddr" />
+    <result column="express_no" jdbcType="VARCHAR" property="expressNo" />
+    <result column="express_com" jdbcType="VARCHAR" property="expressCom" />
+    <result column="express_name" jdbcType="VARCHAR" property="expressName" />
+    <result column="front_order" jdbcType="VARCHAR" property="frontOrder" />
+    <result column="shopping_order" jdbcType="VARCHAR" property="shoppingOrder" />
+    <result column="send_time" jdbcType="TIMESTAMP" property="sendTime" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="rec_province" jdbcType="VARCHAR" property="recProvince" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    order_no, custom, shops, state, rec_user, star_user, rec_tel, star_tel, rec_addr, 
+    star_addr, express_no, express_com, express_name, front_order, shopping_order, send_time, 
+    create_time,rec_province
+  </sql>
+  <select id="listByFrontOrderNoSet" resultMap="BaseResultMap">
+    SELECT
+    order_no, custom, shops, state, rec_user, star_user, rec_tel, star_tel, rec_addr, star_addr, express_no,
+    express_com, express_name, front_order, shopping_order, send_time, create_time,rec_province
+    FROM
+    s_immediate_payment_order
+    <foreach collection="frontNoSet" item="frontNo" open="WHERE front_order IN (" close=")" separator=",">
+      #{frontNo}
+    </foreach>
+  </select>
+</mapper>

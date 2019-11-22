@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.github.chenlijia1111.commonModule.dao.ShoppingOrderMapper">
+  <resultMap id="BaseResultMap" type="com.github.chenlijia1111.commonModule.entity.ShoppingOrder">
+    <id column="order_no" jdbcType="VARCHAR" property="orderNo" />
+    <result column="custom" jdbcType="VARCHAR" property="custom" />
+    <result column="shops" jdbcType="VARCHAR" property="shops" />
+    <result column="goods_id" jdbcType="VARCHAR" property="goodsId" />
+    <result column="count" jdbcType="INTEGER" property="count" />
+    <result column="state" jdbcType="INTEGER" property="state" />
+    <result column="product_amount_total" jdbcType="DOUBLE" property="productAmountTotal" />
+    <result column="pay_channel" jdbcType="VARCHAR" property="payChannel" />
+    <result column="pay_record" jdbcType="VARCHAR" property="payRecord" />
+    <result column="transaction_id" jdbcType="VARCHAR" property="transactionId" />
+    <result column="good_price" jdbcType="DOUBLE" property="goodPrice" />
+    <result column="order_amount_total" jdbcType="DOUBLE" property="orderAmountTotal" />
+    <result column="pay_time" jdbcType="TIMESTAMP" property="payTime" />
+    <result column="group_id" jdbcType="VARCHAR" property="groupId" />
+    <result column="payable" jdbcType="DOUBLE" property="payable" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="remarks" jdbcType="VARCHAR" property="remarks" />
+    <result column="shop_remarks" jdbcType="VARCHAR" property="shopRemarks" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    order_no, custom, shops, goods_id, count, state, product_amount_total, pay_channel, 
+    pay_record, transaction_id, good_price, order_amount_total, pay_time, group_id, payable, create_time,
+    remarks, shop_remarks, details_json, order_coupon
+  </sql>
+
+</mapper>

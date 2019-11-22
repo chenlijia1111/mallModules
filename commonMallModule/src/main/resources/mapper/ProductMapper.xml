@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.github.chenlijia1111.commonModule.dao.ProductMapper">
+  <resultMap id="BaseResultMap" type="com.github.chenlijia1111.commonModule.entity.Product">
+    <id column="id" jdbcType="VARCHAR" property="id" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="shops" jdbcType="VARCHAR" property="shops" />
+    <result column="product_no" jdbcType="VARCHAR" property="productNo" />
+    <result column="brand" jdbcType="VARCHAR" property="brand" />
+    <result column="content_url" jdbcType="VARCHAR" property="contentUrl" />
+    <result column="description" jdbcType="VARCHAR" property="description" />
+    <result column="small_pic" jdbcType="VARCHAR" property="smallPic" />
+    <result column="category_id" jdbcType="VARCHAR" property="categoryId" />
+    <result column="title" jdbcType="VARCHAR" property="title" />
+    <result column="video" jdbcType="VARCHAR" property="video" />
+    <result column="unit" jdbcType="VARCHAR" property="unit" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="delete_status" jdbcType="INTEGER" property="deleteStatus" />
+    <result column="shelf_status" jdbcType="INTEGER" property="shelfStatus" />
+    <result column="sort_number" jdbcType="INTEGER" property="sortNumber" />
+  </resultMap>
+  <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.github.chenlijia1111.commonModule.entity.Product">
+    <result column="content" jdbcType="LONGVARCHAR" property="content" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, name, shops, product_no, brand, content_url, description, small_pic, category_id, 
+    title, video, unit, create_time, update_time, delete_status, shelf_status,sort_number
+  </sql>
+  <sql id="Blob_Column_List">
+    content
+  </sql>
+  <select id="adminListPage" parameterType="com.github.chenlijia1111.commonModule.common.requestVo.product.AdminProductQueryParams"
+          resultType="com.github.chenlijia1111.commonModule.common.responseVo.product.AdminProductListVo">
+    SELECT
+    small_pic smallPic,
+    id,
+    name,
+    sort_number sortNumber,
+    shelf_status shelfStatus
+    FROM
+    s_product
+    WHERE s_product.delete_status = 0
+    <if test="productNo != null and productNo != ''">
+      AND s_product.id = #{productNo}
+    </if>
+    <if test="productName != null and productName != ''">
+      AND s_product.name LIKE '%${productName}%'
+    </if>
+    ORDER BY s_product.create_time DESC
+  </select>
+  <select id="appListPage" parameterType="com.github.chenlijia1111.commonModule.common.requestVo.product.AppProductQueryParams"
+          resultType="com.github.chenlijia1111.commonModule.common.responseVo.product.AppProductListVo">
+    SELECT
+    id,
+    name,
+    small_pic smallPic
+    FROM
+    s_product
+    WHERE s_product.delete_status = 0
+    ORDER BY s_product.create_time DESC
+  </select>
+</mapper>

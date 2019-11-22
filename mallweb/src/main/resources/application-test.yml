@@ -1,0 +1,11 @@
+spring:
+  datasource:
+    url: jdbc:mysql://127.0.0.1:3306/commonMall?serverTimezone=Asia/Shanghai&useSSL=false&characterEncoding=UTF-8&zeroDateTimeBehavior=CONVERT_TO_NULL
+    username: root
+    password: root
+  redis:
+    host: 192.168.1.134
+    password: 123
+upload:
+  imgSavePath: "C:/upload/img"
+  fileSavePath: "C:/upload/file"

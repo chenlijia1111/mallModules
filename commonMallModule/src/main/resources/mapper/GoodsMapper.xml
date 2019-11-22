@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.github.chenlijia1111.commonModule.dao.GoodsMapper">
+  <resultMap id="BaseResultMap" type="com.github.chenlijia1111.commonModule.entity.Goods">
+    <id column="id" jdbcType="VARCHAR" property="id" />
+    <result column="product_id" jdbcType="VARCHAR" property="productId" />
+    <result column="good_no" jdbcType="VARCHAR" property="goodNo" />
+    <result column="stock_count" jdbcType="INTEGER" property="stockCount" />
+    <result column="price" jdbcType="DOUBLE" property="price" />
+    <result column="vip_price" jdbcType="DOUBLE" property="vipPrice" />
+    <result column="market_price" jdbcType="DOUBLE" property="marketPrice" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="delete_status" jdbcType="INTEGER" property="deleteStatus" />
+  </resultMap>
+  <resultMap id="BaseResultMapVo" type="com.github.chenlijia1111.commonModule.common.responseVo.product.GoodVo" extends="BaseResultMap"></resultMap>
+  <sql id="Base_Column_List">
+    id, product_id, good_no, stock_count, price, vip_price, market_price, create_time, 
+    update_time, delete_status
+  </sql>
+  <update id="batchDelete">
+    UPDATE s_goods
+    SET delete_status = 1
+    WHERE 1=1
+    <foreach collection="goodIdSet" item="goodId" open="AND id IN (" close=")" separator=",">
+      #{goodId}
+    </foreach>
+  </update>
+  <select id="listByProductIdSet" resultMap="BaseResultMapVo">
+    SELECT
+    <include refid="Base_Column_List"/>
+    FROM
+    s_goods
+    WHERE s_goods.delete_status = 0
+    <foreach collection="productIdSet" item="productId" open="AND s_goods.product_id IN (" close=")" separator=",">
+      #{productId}
+    </foreach>
+  </select>
+  <select id="listByGoodIdSet" resultMap="BaseResultMapVo">
+    SELECT
+    <include refid="Base_Column_List"/>
+    FROM
+    s_goods
+    WHERE s_goods.delete_status = 0
+    <foreach collection="goodIdSet" item="goodId" open="AND s_goods.id IN (" close=")" separator=",">
+      #{goodId}
+    </foreach>
+  </select>
+</mapper>
