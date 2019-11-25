@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.github.chenlijia1111.commonModule.dao.EvaluationMapper">
+  <resultMap id="BaseResultMap" type="com.github.chenlijia1111.commonModule.entity.Evaluation">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="client_id" jdbcType="INTEGER" property="clientId" />
+    <result column="order_item" jdbcType="VARCHAR" property="orderItem" />
+    <result column="product_id" jdbcType="VARCHAR" property="productId" />
+    <result column="goods_id" jdbcType="VARCHAR" property="goodsId" />
+    <result column="images" jdbcType="VARCHAR" property="images" />
+    <result column="comment" jdbcType="VARCHAR" property="comment" />
+    <result column="back_comment" jdbcType="VARCHAR" property="backComment" />
+    <result column="service_level" jdbcType="INTEGER" property="serviceLevel" />
+    <result column="seller_level" jdbcType="INTEGER" property="sellerLevel" />
+    <result column="parent_evalua" jdbcType="INTEGER" property="parentEvalua" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="w_delete" jdbcType="INTEGER" property="wDelete" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, client_id, order_item, product_id, goods_id, images, comment, back_comment, service_level, 
+    seller_level, parent_evalua, create_time, w_delete
+  </sql>
+</mapper>

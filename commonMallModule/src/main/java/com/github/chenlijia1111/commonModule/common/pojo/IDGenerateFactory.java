@@ -32,4 +32,19 @@ public class IDGenerateFactory {
      **/
     public static final IDUtil ORDER_ID_UTIL = new IDUtil(3, 3);
 
+    /**
+     * 评价id生成器
+     *
+     * @since 下午 2:46 2019/11/1 0001
+     **/
+    public static final IDUtil EVALUATION_ID_UTIL = new IDUtil(4, 1);
+
+
+    /**
+     * 评价标签id生成器
+     *
+     * @since 下午 2:46 2019/11/1 0001
+     **/
+    public static final IDUtil EVALUATION_LABEL_ID_UTIL = new IDUtil(4, 2);
+
 }

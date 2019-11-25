@@ -21,7 +21,6 @@ import com.github.chenlijia1111.utils.core.PropertyCheckUtil;
 import com.github.chenlijia1111.utils.core.StringUtils;
 import com.github.chenlijia1111.utils.list.Lists;
 import com.github.chenlijia1111.utils.list.Sets;
-import com.sun.org.apache.regexp.internal.RE;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -29,7 +28,9 @@ import java.util.*;
 
 /**
  * 退货退款
- * 用户相对于一个订单逻辑上可以申请多个退货，一直申请一直申请
+ * 用户相对于一个订单逻辑上可以申请多个退货，一直申请一直申请,
+ * 所以调用者需要在申请退货的时候做限制,只有申请处理了才可以继续下一个申请
+ * 在查询订单的退货状态的时候都是直接根据最后一个退货单的状态来进行判断的
  * 对于发货、收货，对于大部分的商城来说，这个发货收货都是可有可无，
  * 可以在线下沟通完成
  *
@@ -417,7 +418,7 @@ public class ReturnOrderBiz {
     public Result shopReceiveExpress(String returnOrderNo) {
 
         //校验参数
-        if(StringUtils.isEmpty(returnOrderNo)){
+        if (StringUtils.isEmpty(returnOrderNo)) {
             return Result.failure("退货单单号为空");
         }
 
@@ -441,7 +442,7 @@ public class ReturnOrderBiz {
         }
         ImmediatePaymentOrder immediatePaymentOrder = immediatePaymentOrders.get(0);
         //判断是否发货,未发货时不允许收货的
-        if(!Objects.equals(CommonMallConstants.ORDER_COMPLETE,immediatePaymentOrder.getState())){
+        if (!Objects.equals(CommonMallConstants.ORDER_COMPLETE, immediatePaymentOrder.getState())) {
             return Result.failure("退货订单未发货,无法收货");
         }
         //查询收货单
@@ -466,6 +467,7 @@ public class ReturnOrderBiz {
 
     /**
      * 商家退款
+     *
      * @param params
      * @return com.github.chenlijia1111.utils.common.Result
      * @since 下午 5:15 2019/11/22 0022
@@ -474,7 +476,7 @@ public class ReturnOrderBiz {
 
         //校验参数
         Result result = PropertyCheckUtil.checkProperty(params);
-        if(!result.getSuccess()){
+        if (!result.getSuccess()) {
             return result;
         }
 
@@ -488,7 +490,7 @@ public class ReturnOrderBiz {
         ReturnGoodsOrder returnOrderCondition = new ReturnGoodsOrder().setFrontOrder(returnGoodsOrder.getFrontOrder());
         List<ReturnGoodsOrder> returnGoodsOrders = returnGoodsOrderService.listByCondition(returnOrderCondition);
         Optional<ReturnGoodsOrder> any = returnGoodsOrders.stream().filter(e -> Objects.equals(e.getReFundStatus(), CommonMallConstants.ORDER_COMPLETE)).findAny();
-        if(any.isPresent()){
+        if (any.isPresent()) {
             return Result.failure("该订单已退款,不允许重复退款");
         }
 

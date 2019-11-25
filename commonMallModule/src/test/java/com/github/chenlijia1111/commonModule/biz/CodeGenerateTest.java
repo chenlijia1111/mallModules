@@ -34,7 +34,7 @@ public class CodeGenerateTest {
         mybatisCodeGeneratorUtil.setCommonCode(false);
 
         Map<String, String> tableToDomain = mybatisCodeGeneratorUtil.getTableToDoMain();
-        tableToDomain.put("s_coupon", "Coupon");
+        tableToDomain.put("s_evaluation", "Evaluation");
 
         List<String> ignoreDoMainToBusiness = mybatisCodeGeneratorUtil.getIgnoreDoMainToBusiness();
     }
