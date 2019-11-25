@@ -17,5 +17,6 @@ public class CommonMallConstants {
     //订单状态 完成状态
     public static final Integer ORDER_COMPLETE = 0XF0002;
 
-
+    //注入spring的bean的前缀名称
+    public static final String BEAN_SUFFIX = "commonModule";
 }

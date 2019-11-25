@@ -1,10 +1,12 @@
 package com.github.chenlijia1111.commonModule.service.impl;
 
+import com.github.chenlijia1111.commonModule.common.pojo.CommonMallConstants;
 import com.github.chenlijia1111.commonModule.common.responseVo.product.GoodSpecVo;
 import com.github.chenlijia1111.commonModule.common.responseVo.product.GoodVo;
 import com.github.chenlijia1111.commonModule.dao.GoodSpecMapper;
 import com.github.chenlijia1111.commonModule.dao.GoodsMapper;
 import com.github.chenlijia1111.commonModule.entity.Goods;
+import com.github.chenlijia1111.commonModule.service.GoodsServiceI;
 import com.github.chenlijia1111.utils.common.Result;
 import com.github.chenlijia1111.utils.core.PropertyCheckUtil;
 import com.github.chenlijia1111.utils.core.StringUtils;
@@ -25,8 +27,8 @@ import java.util.stream.Collectors;
  * @author chenLiJia
  * @since 2019-11-01 13:46:54
  **/
-@Service
-public class GoodsServiceImpl implements com.github.chenlijia1111.commonModule.service.GoodsServiceI {
+@Service(CommonMallConstants.BEAN_SUFFIX + "GoodsServiceI")
+public class GoodsServiceImpl implements GoodsServiceI {
 
 
     @Resource

@@ -1,5 +1,6 @@
 package com.github.chenlijia1111.commonModule.service.impl;
 
+import com.github.chenlijia1111.commonModule.common.pojo.CommonMallConstants;
 import com.github.chenlijia1111.commonModule.common.requestVo.product.AdminProductQueryParams;
 import com.github.chenlijia1111.commonModule.common.responseVo.product.*;
 import com.github.chenlijia1111.commonModule.dao.*;
@@ -26,7 +27,7 @@ import java.util.stream.Collectors;
  * @author chenLiJia
  * @since 2019-11-01 13:46:54
  **/
-@Service
+@Service(CommonMallConstants.BEAN_SUFFIX + "ProductServiceI")
 public class ProductServiceImpl implements ProductServiceI {
 
 

@@ -5,10 +5,11 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.experimental.Accessors;
+
+import java.util.List;
 
 /**
- * 订单发货参数
+ * 订单批量发货参数
  * @author chenlijia
  * @version 1.0
  * @since 2019/11/8 0008 上午 9:15
@@ -16,16 +17,15 @@ import lombok.experimental.Accessors;
 @ApiModel
 @Setter
 @Getter
-@Accessors(chain = true)
-public class ShipParams {
+public class BatchShipParams {
 
     /**
-     * 订单编号
+     * 订单编号集合
      * @since 上午 9:22 2019/11/8 0008
      **/
-    @ApiModelProperty(value = "订单编号")
-    @PropertyCheck(name = "订单编号")
-    private String orderNo;
+    @ApiModelProperty(value = "订单编号集合")
+    @PropertyCheck(name = "订单编号集合")
+    private List<String> orderNos;
 
     /**
      * 快递公司

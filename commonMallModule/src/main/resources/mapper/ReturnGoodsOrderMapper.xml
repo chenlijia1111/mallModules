@@ -17,10 +17,11 @@
     <result column="state" jdbcType="INTEGER" property="state" />
     <result column="return_pay_no" jdbcType="VARCHAR" property="returnPayNo" />
     <result column="re_type" jdbcType="INTEGER" property="reType" />
+    <result column="return_pay_time" jdbcType="TIMESTAMP" property="returnPayTime" />
   </resultMap>
   <sql id="Base_Column_List">
     re_order_no, custom, shops, re_create_time, re_explain, re_fund, check_status, re_handle_time, 
-    re_reason, shopping_order, front_order, re_fund_status, state, return_pay_no, re_type
+    re_reason, shopping_order, front_order, re_fund_status, state, return_pay_no, re_type,return_pay_time
   </sql>
 
 </mapper>

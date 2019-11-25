@@ -44,29 +44,32 @@ public interface ShoppingOrderServiceI {
 
     /**
      * 条件统计数量
-     * @since 上午 11:58 2019/11/21 0021
+     *
      * @param condition 1
      * @return java.lang.Integer
+     * @since 上午 11:58 2019/11/21 0021
      **/
     Integer countByCondition(ShoppingOrder condition);
 
 
     /**
      * 通过订单编号集合查询订单状态
-     * 订单状态定义 1初始状态 2已付款 3已发货 4已收货 5已取消
+     * 订单状态定义 1初始化 2取消 3已付款 4已发货 5已收货 6已评价 7已完成
      *
      * @param orderNoSet 1
      * @return java.util.Map<java.lang.String, java.lang.Integer>
+     * @see com.github.chenlijia1111.commonModule.common.enums.OrderStatusEnum
      * @since 下午 3:38 2019/11/7 0007
      **/
     Map<String, Integer> findOrderStateByOrderNoSet(Set<String> orderNoSet);
 
     /**
      * 通过组订单id集合查询组订单状态
-     * 订单状态定义 1初始状态 2已付款 3已发货 4已收货 5已取消
+     * 订单状态定义 1初始化 2取消 3已付款 4已发货 5已收货 6已评价 7已完成
      *
      * @param groupIdSet 1
      * @return java.util.Map<java.lang.String, java.lang.Integer>
+     * @see com.github.chenlijia1111.commonModule.common.enums.OrderStatusEnum
      * @since 下午 3:39 2019/11/7 0007
      **/
     Map<String, Integer> findGroupStateByGroupIdSet(Set<String> groupIdSet);

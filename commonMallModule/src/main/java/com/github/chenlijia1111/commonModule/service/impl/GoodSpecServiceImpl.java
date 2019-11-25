@@ -1,5 +1,7 @@
 package com.github.chenlijia1111.commonModule.service.impl;
 
+import com.github.chenlijia1111.commonModule.common.pojo.CommonMallConstants;
+import com.github.chenlijia1111.commonModule.service.GoodSpecServiceI;
 import com.github.chenlijia1111.utils.common.Result;
 import com.github.chenlijia1111.utils.core.StringUtils;
 import com.github.chenlijia1111.commonModule.dao.GoodSpecMapper;
@@ -14,8 +16,8 @@ import javax.annotation.Resource;
  * @author chenLiJia
  * @since 2019-11-01 14:34:10
  **/
-@Service
-public class GoodSpecServiceImpl implements com.github.chenlijia1111.commonModule.service.GoodSpecServiceI {
+@Service(CommonMallConstants.BEAN_SUFFIX + "GoodSpecServiceI")
+public class GoodSpecServiceImpl implements GoodSpecServiceI {
 
 
     @Resource

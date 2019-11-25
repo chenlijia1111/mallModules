@@ -1,4 +1,4 @@
-package com.github.chenlijia1111.commonModule.common.requestVo.order;
+package com.github.chenlijia1111.commonModule.common.requestVo.returnOrder;
 
 import com.github.chenlijia1111.utils.core.annos.PropertyCheck;
 import io.swagger.annotations.ApiModel;
@@ -8,7 +8,7 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 /**
- * 订单发货参数
+ * 退货订单发货参数
  * @author chenlijia
  * @version 1.0
  * @since 2019/11/8 0008 上午 9:15
@@ -17,15 +17,15 @@ import lombok.experimental.Accessors;
 @Setter
 @Getter
 @Accessors(chain = true)
-public class ShipParams {
+public class ReturnShipParams {
 
     /**
-     * 订单编号
+     * 退货订单编号
      * @since 上午 9:22 2019/11/8 0008
      **/
-    @ApiModelProperty(value = "订单编号")
-    @PropertyCheck(name = "订单编号")
-    private String orderNo;
+    @ApiModelProperty(value = "退货订单编号")
+    @PropertyCheck(name = "退货订单编号")
+    private String returnOrderNo;
 
     /**
      * 快递公司

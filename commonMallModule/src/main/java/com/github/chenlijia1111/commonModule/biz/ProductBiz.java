@@ -1,5 +1,6 @@
 package com.github.chenlijia1111.commonModule.biz;
 
+import com.github.chenlijia1111.commonModule.common.pojo.CommonMallConstants;
 import com.github.chenlijia1111.commonModule.common.pojo.IDGenerateFactory;
 import com.github.chenlijia1111.commonModule.common.requestVo.product.*;
 import com.github.chenlijia1111.commonModule.common.responseVo.product.AdminProductVo;
@@ -26,7 +27,7 @@ import java.util.stream.Collectors;
  * @author chenLiJia
  * @since 2019-11-01 13:46:54
  **/
-@Service
+@Service(CommonMallConstants.BEAN_SUFFIX + "ProductBiz")
 public class ProductBiz {
 
     @Autowired
@@ -453,6 +454,7 @@ public class ProductBiz {
      * @return com.github.chenlijia1111.utils.common.Result
      * @since 下午 2:50 2019/11/13 0013
      **/
+    @Transactional
     public Result batchDelete(List<String> productIdList) {
 
         //校验参数

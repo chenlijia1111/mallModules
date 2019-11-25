@@ -1,5 +1,6 @@
 package com.github.chenlijia1111.commonModule.service.impl;
 
+import com.github.chenlijia1111.commonModule.common.pojo.CommonMallConstants;
 import com.github.chenlijia1111.utils.common.Result;
 import com.github.chenlijia1111.utils.list.Lists;
 import com.github.chenlijia1111.utils.list.Sets;
@@ -18,7 +19,7 @@ import java.util.Set;
  * @author chenLiJia
  * @since 2019-11-05 16:39:24
  **/
-@Service
+@Service(CommonMallConstants.BEAN_SUFFIX + "ReceivingGoodsOrderServiceI")
 public class ReceivingGoodsOrderServiceImpl implements ReceivingGoodsOrderServiceI {
 
 

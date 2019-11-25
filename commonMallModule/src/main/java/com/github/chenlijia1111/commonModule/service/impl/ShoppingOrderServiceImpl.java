@@ -1,5 +1,6 @@
 package com.github.chenlijia1111.commonModule.service.impl;
 
+import com.github.chenlijia1111.commonModule.common.enums.OrderStatusEnum;
 import com.github.chenlijia1111.commonModule.common.pojo.CommonMallConstants;
 import com.github.chenlijia1111.commonModule.dao.*;
 import com.github.chenlijia1111.commonModule.entity.ImmediatePaymentOrder;
@@ -22,7 +23,7 @@ import java.util.stream.Collectors;
  * @author chenLiJia
  * @since 2019-11-05 16:39:24
  **/
-@Service
+@Service(CommonMallConstants.BEAN_SUFFIX + "ShoppingOrderServiceI")
 public class ShoppingOrderServiceImpl implements ShoppingOrderServiceI {
 
 
@@ -97,10 +98,11 @@ public class ShoppingOrderServiceImpl implements ShoppingOrderServiceI {
 
     /**
      * 通过订单编号集合查询订单状态
-     * 订单状态定义 1初始状态 2已付款 3已发货 4已收货 5已取消
+     * 订单状态定义 1初始化 2取消 3已付款 4已发货 5已收货 6已评价 7已完成
      *
      * @param orderNoSet 1
      * @return java.util.Map<java.lang.String, java.lang.Integer>
+     * @see com.github.chenlijia1111.commonModule.common.enums.OrderStatusEnum
      * @since 下午 3:38 2019/11/7 0007
      **/
     @Override
@@ -126,9 +128,11 @@ public class ShoppingOrderServiceImpl implements ShoppingOrderServiceI {
                     ShoppingOrder shoppingOrder = any.get();
                     Integer state = shoppingOrder.getState();
                     if (Objects.equals(state, CommonMallConstants.ORDER_INIT)) {
-                        map.put(orderNo, 1);
+                        //初始状态
+                        map.put(orderNo, OrderStatusEnum.INIT.getOrderStatus());
                     } else if (Objects.equals(state, CommonMallConstants.ORDER_CANCEL)) {
-                        map.put(orderNo, 5);
+                        //取消
+                        map.put(orderNo, OrderStatusEnum.CANCEL.getOrderStatus());
                     } else if (Objects.equals(state, CommonMallConstants.ORDER_COMPLETE)) {
                         //已支付
                         //判断有没有发货
@@ -138,10 +142,10 @@ public class ShoppingOrderServiceImpl implements ShoppingOrderServiceI {
                             Integer sendState = immediatePaymentOrder.getState();
                             if (Objects.equals(CommonMallConstants.ORDER_INIT, sendState)) {
                                 //未发货
-                                map.put(orderNo, 2);
+                                map.put(orderNo, OrderStatusEnum.PAYED.getOrderStatus());
                             } else if (Objects.equals(CommonMallConstants.ORDER_COMPLETE, sendState)) {
                                 //已发货
-                                map.put(orderNo, 3);
+                                map.put(orderNo, OrderStatusEnum.SEND.getOrderStatus());
                             }
 
                             //判断是否已收货
@@ -151,7 +155,7 @@ public class ShoppingOrderServiceImpl implements ShoppingOrderServiceI {
                                 Integer receiveState = receivingGoodsOrder.getState();
                                 if (Objects.equals(CommonMallConstants.ORDER_COMPLETE, receiveState)) {
                                     //已收货
-                                    map.put(orderNo, 4);
+                                    map.put(orderNo, OrderStatusEnum.RECEIVED.getOrderStatus());
                                 }
                             }
                         }
@@ -166,9 +170,11 @@ public class ShoppingOrderServiceImpl implements ShoppingOrderServiceI {
 
     /**
      * 通过组订单id集合查询组订单状态
+     * 订单状态定义 1初始化 2取消 3已付款 4已发货 5已收货 6已评价 7已完成
      *
      * @param groupIdSet 1
      * @return java.util.Map<java.lang.String, java.lang.Integer>
+     * @see com.github.chenlijia1111.commonModule.common.enums.OrderStatusEnum
      * @since 下午 3:39 2019/11/7 0007
      **/
     @Override

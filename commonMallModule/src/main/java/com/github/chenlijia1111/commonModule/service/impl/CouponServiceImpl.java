@@ -1,5 +1,6 @@
 package com.github.chenlijia1111.commonModule.service.impl;
 
+import com.github.chenlijia1111.commonModule.common.pojo.CommonMallConstants;
 import com.github.chenlijia1111.commonModule.dao.CouponMapper;
 import com.github.chenlijia1111.commonModule.entity.Coupon;
 import com.github.chenlijia1111.commonModule.service.CouponServiceI;
@@ -19,7 +20,7 @@ import java.util.Set;
  * @author chenLiJia
  * @since 2019-11-21 15:29:01
  **/
-@Service
+@Service(CommonMallConstants.BEAN_SUFFIX + "CouponServiceI")
 public class CouponServiceImpl implements CouponServiceI {
 
 
@@ -73,13 +74,14 @@ public class CouponServiceImpl implements CouponServiceI {
 
     /**
      * 通过优惠券id集合查询优惠券集合
-     * @since 上午 11:19 2019/11/22 0022
+     *
      * @param idSet 1
      * @return java.util.List<com.github.chenlijia1111.commonModule.entity.Coupon>
+     * @since 上午 11:19 2019/11/22 0022
      **/
     @Override
     public List<Coupon> listByIdSet(Set<String> idSet) {
-        if(Sets.isNotEmpty(idSet)){
+        if (Sets.isNotEmpty(idSet)) {
             return couponMapper.listByIdSet(idSet);
         }
         return Lists.newArrayList();

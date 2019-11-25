@@ -1,5 +1,7 @@
 package com.github.chenlijia1111.commonModule.service.impl;
 
+import com.github.chenlijia1111.commonModule.common.pojo.CommonMallConstants;
+import com.github.chenlijia1111.commonModule.service.ProductSpecValueServiceI;
 import com.github.chenlijia1111.utils.common.Result;
 import com.github.chenlijia1111.utils.list.Lists;
 import com.github.chenlijia1111.commonModule.dao.ProductSpecValueMapper;
@@ -15,8 +17,8 @@ import java.util.List;
  * @author chenLiJia
  * @since 2019-11-01 14:34:10
  **/
-@Service
-public class ProductSpecValueServiceImpl implements com.github.chenlijia1111.commonModule.service.ProductSpecValueServiceI {
+@Service(CommonMallConstants.BEAN_SUFFIX + "ProductSpecValueServiceI")
+public class ProductSpecValueServiceImpl implements ProductSpecValueServiceI {
 
 
     @Resource

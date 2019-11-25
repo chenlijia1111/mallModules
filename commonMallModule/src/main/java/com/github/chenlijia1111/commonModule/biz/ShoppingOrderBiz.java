@@ -1,12 +1,11 @@
 package com.github.chenlijia1111.commonModule.biz;
 
 import com.github.chenlijia1111.commonModule.common.enums.CouponTypeEnum;
+import com.github.chenlijia1111.commonModule.common.enums.OrderStatusEnum;
 import com.github.chenlijia1111.commonModule.common.pojo.CommonMallConstants;
 import com.github.chenlijia1111.commonModule.common.pojo.IDGenerateFactory;
 import com.github.chenlijia1111.commonModule.common.pojo.coupon.AbstractCoupon;
-import com.github.chenlijia1111.commonModule.common.requestVo.order.CouponWithGoodIds;
-import com.github.chenlijia1111.commonModule.common.requestVo.order.OrderAddParams;
-import com.github.chenlijia1111.commonModule.common.requestVo.order.SingleOrderAddParams;
+import com.github.chenlijia1111.commonModule.common.requestVo.order.*;
 import com.github.chenlijia1111.commonModule.common.responseVo.order.CalculateOrderPriceVo;
 import com.github.chenlijia1111.commonModule.common.responseVo.product.AdminProductVo;
 import com.github.chenlijia1111.commonModule.common.responseVo.product.GoodVo;
@@ -19,6 +18,7 @@ import com.github.chenlijia1111.utils.core.NumberUtil;
 import com.github.chenlijia1111.utils.core.PropertyCheckUtil;
 import com.github.chenlijia1111.utils.core.StringUtils;
 import com.github.chenlijia1111.utils.list.Lists;
+import com.github.chenlijia1111.utils.list.Sets;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,11 +30,15 @@ import java.util.stream.Collectors;
 
 /**
  * 订单
+ * 订单付款以及付款之后的回调,需要调用者自己实现
+ * <p>
+ * 调用者在调用这些方法前可以对这些方法再进行一次封装,进行其他的一些定制操作,
+ * 比如在订单之后计算分销等等
  *
  * @author chenLiJia
  * @since 2019-11-05 16:39:24
  **/
-@Service
+@Service(CommonMallConstants.BEAN_SUFFIX + "ShoppingOrderBiz")
 @Slf4j
 public class ShoppingOrderBiz {
 
@@ -480,6 +484,176 @@ public class ShoppingOrderBiz {
 
 
         return Result.success("操作成功", vo);
+    }
+
+    /**
+     * 客户取消订单
+     * 客户主动取消订单,只能是待支付的订单
+     * 并且是组订单全部取消
+     *
+     * @param groupId 1
+     * @return com.github.chenlijia1111.utils.common.Result
+     * @since 下午 5:51 2019/11/22 0022
+     **/
+    public Result customCancelOrder(String groupId) {
+
+        //组订单id为空
+        if (StringUtils.isEmpty(groupId)) {
+            return Result.failure("组订单id为空");
+        }
+
+        //查询订单是否存在
+        ShoppingOrder shoppingOrderCondition = new ShoppingOrder().
+                setGroupId(groupId);
+        List<ShoppingOrder> shoppingOrders = shoppingOrderService.listByCondition(shoppingOrderCondition);
+        if (Lists.isEmpty(shoppingOrders)) {
+            return Result.failure("订单不存在");
+        }
+
+        //判断订单状态
+        //1初始化 2取消 3已付款 4已发货 5已收货 6已评价 7已完成
+        Map<String, Integer> groupStateMap = shoppingOrderService.findGroupStateByGroupIdSet(Sets.asSets(groupId));
+        Integer groupState = groupStateMap.get(groupId);
+        if (!Objects.equals(OrderStatusEnum.INIT.getOrderStatus(), groupState)) {
+            return Result.failure("订单已付款,不允许取消");
+        }
+
+        //取消订单
+        for (ShoppingOrder order : shoppingOrders) {
+            order.setState(CommonMallConstants.ORDER_CANCEL);
+            shoppingOrderService.update(order);
+        }
+
+        return Result.success("操作成功");
+    }
+
+    /**
+     * 商家发货
+     *
+     * @param params
+     * @return com.github.chenlijia1111.utils.common.Result
+     * @since 下午 5:51 2019/11/22 0022
+     **/
+    public Result shopSendExpress(ShipParams params) {
+        //校验参数
+        Result result = PropertyCheckUtil.checkProperty(params);
+        if (!result.getSuccess()) {
+            return result;
+        }
+
+        //判断订单是否存在
+        ShoppingOrder shoppingOrder = shoppingOrderService.findByOrderNo(params.getOrderNo());
+        if (Objects.isNull(shoppingOrder)) {
+            return Result.failure("订单不存在");
+        }
+
+        //查询该订单的发货单
+        List<ImmediatePaymentOrder> immediatePaymentOrders = immediatePaymentOrderService.listByFrontNoSet(Sets.asSets(params.getOrderNo()));
+        if (Lists.isEmpty(immediatePaymentOrders)) {
+            //如果发货单不存在,说明这个订单有问题，可能是下单的时候重启或者其他状况导致发货单不存在
+            return Result.failure("发货单不存在");
+        }
+
+        ImmediatePaymentOrder immediatePaymentOrder = immediatePaymentOrders.get(0);
+
+        //判断是不是已经发过货了
+        if (Objects.equals(CommonMallConstants.ORDER_COMPLETE, immediatePaymentOrder.getState())) {
+            return Result.failure("该订单已经发过货了");
+        }
+
+        //发货
+        immediatePaymentOrder.setState(CommonMallConstants.ORDER_COMPLETE);
+        immediatePaymentOrder.setExpressName(params.getExpressName());
+        immediatePaymentOrder.setExpressCom(params.getExpressCom());
+        immediatePaymentOrder.setExpressNo(params.getExpressNo());
+        immediatePaymentOrder.setSendTime(new Date());
+
+        return immediatePaymentOrderService.update(immediatePaymentOrder);
+    }
+
+    /**
+     * 商家批量发货
+     *
+     * @param params
+     * @return com.github.chenlijia1111.utils.common.Result
+     * @since 下午 5:51 2019/11/22 0022
+     **/
+    @Transactional
+    public Result shopBatchSendExpress(BatchShipParams params) {
+        //校验参数
+        Result result = PropertyCheckUtil.checkProperty(params);
+        if (!result.getSuccess()) {
+            return result;
+        }
+
+        List<String> orderNos = params.getOrderNos();
+        for (String orderNo : orderNos) {
+            ShipParams shipParams = new ShipParams().setOrderNo(orderNo).
+                    setExpressCom(params.getExpressCom()).
+                    setExpressName(params.getExpressName()).
+                    setExpressNo(params.getExpressNo());
+            Result sendExpress = shopSendExpress(shipParams);
+            if (!sendExpress.getSuccess()) {
+                //回滚
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                return sendExpress;
+            }
+        }
+
+        return Result.success("操作成功");
+    }
+
+    /**
+     * 客户收货
+     *
+     * @param orderNo 订单编号
+     * @return com.github.chenlijia1111.utils.common.Result
+     * @since 下午 5:51 2019/11/22 0022
+     **/
+    public Result customReceiveExpress(String orderNo) {
+
+        if (Objects.isNull(orderNo)) {
+            return Result.failure("订单编号为空");
+        }
+
+        //查询订单判断是否存在
+        ShoppingOrder shoppingOrder = shoppingOrderService.findByOrderNo(orderNo);
+        if (Objects.isNull(shoppingOrder)) {
+            return Result.failure("订单不存在");
+        }
+
+        //查询发货单与收货单,判断收货单是否已收货,在本系统中收货就是完成的意思
+        //查询发货单
+        List<ImmediatePaymentOrder> immediatePaymentOrders = immediatePaymentOrderService.listByFrontNoSet(Sets.asSets(orderNo));
+        if (Lists.isEmpty(immediatePaymentOrders)) {
+            //如果发货单不存在,说明这个订单有问题，可能是下单的时候重启或者其他状况导致发货单不存在
+            return Result.failure("发货单不存在");
+        }
+
+        ImmediatePaymentOrder immediatePaymentOrder = immediatePaymentOrders.get(0);
+        //判断是否已发货,没有发货是不允许收货的
+        if(!Objects.equals(CommonMallConstants.ORDER_COMPLETE,immediatePaymentOrder.getState())){
+            return Result.failure("订单未发货,无法收货");
+        }
+
+        //查询收货单
+        List<ReceivingGoodsOrder> receivingGoodsOrders = receivingGoodsOrderService.listByFrontNoSet(Sets.asSets(immediatePaymentOrder.getOrderNo()));
+        if (Lists.isEmpty(receivingGoodsOrders)) {
+            //如果收货单不存在,说明这个订单有问题，可能是下单的时候重启或者其他状况导致发货单不存在
+            return Result.failure("收货单不存在");
+        }
+
+        ReceivingGoodsOrder receivingGoodsOrder = receivingGoodsOrders.get(0);
+
+        //判断是否已经收过货了
+        if (Objects.equals(CommonMallConstants.ORDER_COMPLETE, receivingGoodsOrder.getState())) {
+            return Result.failure("该订单已收货,请勿重复请求");
+        }
+
+        receivingGoodsOrder.setState(CommonMallConstants.ORDER_COMPLETE);
+
+        Result update = receivingGoodsOrderService.update(receivingGoodsOrder);
+        return update;
     }
 
 

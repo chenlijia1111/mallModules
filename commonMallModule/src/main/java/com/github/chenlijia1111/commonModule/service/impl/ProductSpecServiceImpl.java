@@ -1,5 +1,7 @@
 package com.github.chenlijia1111.commonModule.service.impl;
 
+import com.github.chenlijia1111.commonModule.common.pojo.CommonMallConstants;
+import com.github.chenlijia1111.commonModule.service.ProductSpecServiceI;
 import com.github.chenlijia1111.utils.common.Result;
 import com.github.chenlijia1111.utils.core.StringUtils;
 import com.github.chenlijia1111.utils.list.Lists;
@@ -23,8 +25,8 @@ import java.util.stream.Collectors;
  * @author chenLiJia
  * @since 2019-11-01 14:34:10
  **/
-@Service
-public class ProductSpecServiceImpl implements com.github.chenlijia1111.commonModule.service.ProductSpecServiceI {
+@Service(CommonMallConstants.BEAN_SUFFIX + "ProductSpecServiceI")
+public class ProductSpecServiceImpl implements ProductSpecServiceI {
 
 
     @Resource
