@@ -143,6 +143,7 @@ public class ShoppingOrderBiz {
                     setCount(count).
                     setState(CommonMallConstants.ORDER_INIT).
                     setProductAmountTotal(goodVo.getPrice() * count).
+                    setGoodPrice(goodVo.getPrice()).
                     setOrderAmountTotal(goodVo.getPrice() * count).
                     setGroupId(groupId).
                     setCreateTime(currentTime).setRemarks(params.getRemarks());
@@ -355,39 +356,6 @@ public class ShoppingOrderBiz {
 
             //订单备注
             shoppingOrder.setRemarks(params.getRemarks());
-
-            //添加发货单
-            //发货单单号
-            String sendOrderNo = String.valueOf(IDGenerateFactory.ORDER_ID_UTIL.nextId());
-            ImmediatePaymentOrder immediatePaymentOrder = new ImmediatePaymentOrder().
-                    setOrderNo(sendOrderNo).
-                    setCustom(userId).
-                    setShops(product.getShops() + "").
-                    setState(CommonMallConstants.ORDER_INIT).
-                    setRecUser(params.getReceiverName()).
-                    setRecTel(params.getReceiverTelephone()).
-                    setRecAddr(params.getReceiverAddress()).
-                    setRecProvince(params.getReceiveProvince()).
-                    setFrontOrder(orderNo).
-                    setShoppingOrder(orderNo).
-                    setCreateTime(currentTime);
-
-            shoppingOrder.setImmediatePaymentOrder(immediatePaymentOrder);
-
-            //添加收货单
-            //收货单单号
-            String receiveOrderNo = String.valueOf(IDGenerateFactory.ORDER_ID_UTIL.nextId());
-            ReceivingGoodsOrder receivingGoodsOrder = new ReceivingGoodsOrder().
-                    setOrderNo(receiveOrderNo).
-                    setCustom(userId).
-                    setShops(product.getShops() + "").
-                    setState(CommonMallConstants.ORDER_INIT).
-                    setShoppingOrder(orderNo).
-                    setImmediatePaymentOrder(sendOrderNo).
-                    setFrontOrder(sendOrderNo).
-                    setRecUser(params.getReceiverName()).
-                    setCreateTime(currentTime);
-            immediatePaymentOrder.setReceivingGoodsOrder(receivingGoodsOrder);
 
             orderList.add(shoppingOrder);
         }

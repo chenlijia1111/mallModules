@@ -13,7 +13,6 @@
     <modules>
         <module>mallweb</module>
         <module>commonMallModule</module>
-        <module>couponModule</module>
         <module>fightGroupModule</module>
         <module>spikeModule</module>
     </modules>
@@ -93,7 +92,7 @@
             <version>${tk.mybatis.version}</version>
         </dependency>
 
-        <!--spring事物注解-->
+        <!--spring事务注解-->
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-tx</artifactId>
