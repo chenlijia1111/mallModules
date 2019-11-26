@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.github.chenlijia1111.spike.dao.SpikeOrderRecodeMapper">
+  <resultMap id="BaseResultMap" type="com.github.chenlijia1111.spike.entity.SpikeOrderRecode">
+    <id column="order_no" jdbcType="VARCHAR" property="orderNo" />
+    <result column="spike_id" jdbcType="VARCHAR" property="spikeId" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    order_no, spike_id
+  </sql>
+</mapper>
