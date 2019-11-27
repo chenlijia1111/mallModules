@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.github.chenlijia1111.fightGroup.dao.FightGroupProductMapper">
+  <resultMap id="BaseResultMap" type="com.github.chenlijia1111.fightGroup.entity.FightGroupProduct">
+    <id column="id" jdbcType="VARCHAR" property="id" />
+    <result column="product_id" jdbcType="VARCHAR" property="productId" />
+    <result column="good_id" jdbcType="VARCHAR" property="goodId" />
+    <result column="start_time" jdbcType="TIMESTAMP" property="startTime" />
+    <result column="end_time" jdbcType="TIMESTAMP" property="endTime" />
+    <result column="fight_price" jdbcType="DOUBLE" property="fightPrice" />
+    <result column="total_stock_count" jdbcType="INTEGER" property="totalStockCount" />
+    <result column="stock_count" jdbcType="INTEGER" property="stockCount" />
+    <result column="group_person_count" jdbcType="INTEGER" property="groupPersonCount" />
+    <result column="person_limit_count" jdbcType="INTEGER" property="personLimitCount" />
+    <result column="max_fight_time" jdbcType="INTEGER" property="maxFightTime" />
+    <result column="sort_number" jdbcType="INTEGER" property="sortNumber" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="update_version" jdbcType="VARCHAR" property="updateVersion" />
+    <result column="delete_status" jdbcType="INTEGER" property="deleteStatus" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, product_id, good_id, start_time, end_time, fight_price, total_stock_count, stock_count, 
+    group_person_count, person_limit_count, max_fight_time, sort_number, create_time, 
+    update_time, update_version, delete_status
+  </sql>
+  <select id="findByTimeRange" resultMap="BaseResultMap">
+    SELECT
+    <include refid="Base_Column_List"/>
+    FROM
+    s_fight_group_product
+    WHERE delete_status = 0
+    <if test="startTime != null and startTime != ''">
+      AND date_format(s_fight_group_product.start_time, '%Y-%m-%d %H:%i:%s') &lt;= #{startTime}
+      AND date_format(s_fight_group_product.end_time) &gt; #{startTime}
+    </if>
+    <if test="endTime != null and endTime != ''">
+      AND date_format(s_fight_group_product.start_time, '%Y-%m-%d %H:%i:%s') &lt; #{endTime}
+      AND date_format(s_fight_group_product.end_time) &gt;= #{endTime}
+    </if>
+    <if test="productId != null and productId != ''">
+      AND s_fight_group_product.product_id = #{productId}
+    </if>
+    <if test="goodId != null and goodId != ''">
+      AND s_fight_group_product.good_id = #{goodId}
+    </if>
+    LIMIT 1
+  </select>
+  <update id="updateStockByVersion">
+    UPDATE
+    s_fight_group_product
+    SET
+    stock_count = #{stockCount},
+    update_version = #{newVersionNo}
+    WHERE id = #{id}
+    AND update_version = #{oldVersionNo}
+  </update>
+</mapper>

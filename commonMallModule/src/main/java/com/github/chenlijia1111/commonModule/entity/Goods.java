@@ -1,7 +1,7 @@
 package com.github.chenlijia1111.commonModule.entity;
 
-import com.github.chenlijia1111.utils.core.annos.PropertyCheck;
 import com.github.chenlijia1111.commonModule.common.checkFunction.PriceCheck;
+import com.github.chenlijia1111.utils.core.annos.PropertyCheck;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
@@ -12,6 +12,7 @@ import javax.persistence.Column;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import java.util.Date;
+import java.util.Objects;
 
 /**
  * 商品表
@@ -108,4 +109,12 @@ public class Goods {
     private Integer deleteStatus;
 
 
+    public Goods setStockCount(Integer stockCount) {
+        if (Objects.isNull(stockCount) || stockCount < 0) {
+            this.stockCount = 0;
+        } else {
+            this.stockCount = stockCount;
+        }
+        return this;
+    }
 }

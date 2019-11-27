@@ -54,9 +54,17 @@ public class ProductBiz {
     public Result add(ProductAddParams params) {
 
         //校验参数
-        Result result = PropertyCheckUtil.checkPropertyWithIgnore(params, Lists.asList("content"));
+        Result result = PropertyCheckUtil.checkProperty(params);
         if (!result.getSuccess()) {
             return result;
+        }
+        //校验商品
+        List<GoodAddParams> goodList = params.getGoodList();
+        for (GoodAddParams goodAddParams : goodList) {
+            result = PropertyCheckUtil.checkProperty(goodAddParams);
+            if (!result.getSuccess()) {
+                return result;
+            }
         }
 
         //当前商家id,为了适配有些系统可能不需要商家这个角色，直接就是后台添加商品,所以这里不做限制
@@ -105,7 +113,6 @@ public class ProductBiz {
         }
 
         //添加商品
-        List<GoodAddParams> goodList = params.getGoodList();
         for (GoodAddParams goodAddParams : goodList) {
             //商品id
             String goodId = IDGenerateFactory.GOOD_ID_UTIL.nextId() + "";

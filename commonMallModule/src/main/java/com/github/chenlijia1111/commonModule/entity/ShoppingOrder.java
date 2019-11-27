@@ -1,6 +1,7 @@
 package com.github.chenlijia1111.commonModule.entity;
 
 import com.github.chenlijia1111.commonModule.common.pojo.coupon.AbstractCoupon;
+import com.github.chenlijia1111.commonModule.common.responseVo.product.GoodVo;
 import com.github.chenlijia1111.utils.core.annos.PropertyCheck;
 import com.github.chenlijia1111.utils.list.Lists;
 import io.swagger.annotations.ApiModel;
@@ -202,8 +203,8 @@ public class ShoppingOrder {
 
     /**
      * 订单使用的券
-     * @see #orderCoupon
      *
+     * @see #orderCoupon
      * @since 下午 1:43 2019/11/22 0022
      **/
     private List<AbstractCoupon> couponList;
@@ -215,6 +216,12 @@ public class ShoppingOrder {
      **/
     private ImmediatePaymentOrder immediatePaymentOrder;
 
+    /**
+     * 订单对应的商品详情
+     *
+     * @since 上午 10:28 2019/11/26 0026
+     **/
+    private GoodVo goodsVO;
 
     public List<AbstractCoupon> getCouponList() {
         return couponList == null ? Lists.newArrayList() : couponList;

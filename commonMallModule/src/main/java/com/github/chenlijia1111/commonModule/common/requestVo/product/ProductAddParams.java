@@ -75,7 +75,6 @@ public class ProductAddParams {
      * 内容 富文本内容
      */
     @ApiModelProperty("商品详情")
-    @PropertyCheck(name = "商品详情")
     private String content;
 
     /**

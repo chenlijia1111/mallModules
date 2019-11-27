@@ -33,6 +33,8 @@ import java.util.stream.Collectors;
  * 秒杀采用乐观锁对库存进行控制
  * 商品参加秒杀之后,会有一个版本号{@link SpikeProduct#getUpdateVersion()}
  * 修改库存的时候需要比对版本号
+ * <p>
+ * 在订单待支付取消的时候需要退回库存,由于取消规则不同,调用者实现
  *
  * @author chenLiJia
  * @since 2019-11-25 15:06:11
@@ -91,7 +93,7 @@ public class SpikeOrderBiz {
 
         //判断商品参与秒杀记录,判断时间段是否与当前时间相符合
         SpikeProduct spikeProduct = spikeProductService.findById(params.getSpikeProductId());
-        if (Objects.isNull(spikeProduct)) {
+        if (Objects.isNull(spikeProduct) || Objects.equals(BooleanConstant.YES_INTEGER, spikeProduct.getDeleteStatus())) {
             return Result.failure("无法查询到秒杀信息");
         }
 
@@ -107,7 +109,7 @@ public class SpikeOrderBiz {
             Result.failure("秒杀还未开始");
         }
         if (currentTime.getTime() >= spikeProduct.getEndTime().getTime()) {
-            return Result.failure("秒杀以结束");
+            return Result.failure("秒杀已结束");
         }
         //判断库存
         if (spikeProduct.getStockCount() < params.getCount()) {
@@ -143,6 +145,7 @@ public class SpikeOrderBiz {
         String orderNo = String.valueOf(IDGenerateFactory.ORDER_ID_UTIL.nextId());
 
         //添加秒杀订单记录
+        //新版本号
         String newUpdateVersion = RandomUtil.createUUID();
         //减去之后的库存
         int newStockCount = spikeProduct.getStockCount() - params.getCount();

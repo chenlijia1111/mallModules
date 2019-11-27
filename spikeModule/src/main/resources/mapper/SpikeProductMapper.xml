@@ -8,19 +8,22 @@
     <result column="start_time" jdbcType="TIMESTAMP" property="startTime" />
     <result column="end_time" jdbcType="TIMESTAMP" property="endTime" />
     <result column="spike_price" jdbcType="DOUBLE" property="spikePrice" />
+    <result column="total_stock_count" jdbcType="INTEGER" property="totalStockCount" />
     <result column="stock_count" jdbcType="INTEGER" property="stockCount" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
     <result column="update_version" jdbcType="VARCHAR" property="updateVersion" />
     <result column="order_number" jdbcType="INTEGER" property="orderNumber" />
+    <result column="delete_status" jdbcType="INTEGER" property="deleteStatus" />
   </resultMap>
   <sql id="Base_Column_List">
-    id, product_id, good_id, start_time, end_time, spike_price, stock_count, create_time, update_time,
-    update_version, order_number
+    id, product_id, good_id, start_time, end_time, total_stock_count,
+    spike_price, stock_count, create_time, update_time,
+    update_version, order_number, delete_status
   </sql>
   <update id="updateStockByVersion">
     UPDATE
-    s_s_spike_product
+    s_spike_product
     SET
     stock_count = #{stockCount},
     update_version = #{newVersionNo}
@@ -32,7 +35,7 @@
     <include refid="Base_Column_List"/>
     FROM
     s_spike_product
-    WHERE 1=1
+    WHERE s_spike_product.delete_status = 0
     <if test="startTime != null and startTime != ''">
       AND date_format(s_spike_product.start_time, '%Y-%m-%d %H:%i:%s') &lt;= #{startTime}
       AND date_format(s_spike_product.end_time) &gt; #{startTime}

@@ -1,10 +1,11 @@
 package com.github.chenlijia1111.spike.biz;
 
-import com.github.chenlijia1111.spike.common.pojo.IDGenerateFactory;
+import com.github.chenlijia1111.commonModule.common.pojo.IDGenerateFactory;
 import com.github.chenlijia1111.spike.common.requestVo.spikeProduct.SpikeProductAddParams;
 import com.github.chenlijia1111.spike.entity.SpikeProduct;
 import com.github.chenlijia1111.spike.service.SpikeProductServiceI;
 import com.github.chenlijia1111.utils.common.Result;
+import com.github.chenlijia1111.utils.common.constant.BooleanConstant;
 import com.github.chenlijia1111.utils.common.constant.TimeConstant;
 import com.github.chenlijia1111.utils.core.PropertyCheckUtil;
 import com.github.chenlijia1111.utils.core.RandomUtil;
@@ -104,10 +105,13 @@ public class SpikeProductBiz {
                 setStartTime(params.getStartTime()).
                 setEndTime(params.getEndTime()).
                 setSpikePrice(params.getSpikePrice()).
+                setTotalStockCount(params.getStockCount()).
+                setStockCount(params.getStockCount()).
                 setCreateTime(new Date()).
                 setUpdateTime(new Date()).
                 setUpdateVersion(RandomUtil.createUUID()).
-                setOrderNumber(params.getOrderNumber());
+                setOrderNumber(params.getOrderNumber()).
+                setDeleteStatus(BooleanConstant.NO_INTEGER);
 
         return spikeProductService.add(spikeProduct);
     }

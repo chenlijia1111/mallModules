@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.github.chenlijia1111.fightGroup.dao.FightGroupMapper">
+  <resultMap id="BaseResultMap" type="com.github.chenlijia1111.fightGroup.entity.FightGroup">
+    <id column="id" jdbcType="VARCHAR" property="id" />
+    <result column="fight_group_product_id" jdbcType="VARCHAR" property="fightGroupProductId" />
+    <result column="create_user" jdbcType="VARCHAR" property="createUser" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="group_person_count" jdbcType="INTEGER" property="groupPersonCount" />
+    <result column="current_group_count" jdbcType="INTEGER" property="currentGroupCount" />
+    <result column="fight_status" jdbcType="INTEGER" property="fightStatus" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, fight_group_product_id, create_user, create_time, group_person_count, current_group_count, 
+    fight_status
+  </sql>
+</mapper>

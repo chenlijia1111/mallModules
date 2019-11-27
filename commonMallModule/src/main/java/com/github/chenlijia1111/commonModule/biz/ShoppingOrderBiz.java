@@ -133,6 +133,11 @@ public class ShoppingOrderBiz {
                 return Result.failure("产品未上架");
             }
 
+            //判断库存是否充足
+            if (goodVo.getStockCount() < addParams.getCount()) {
+                return Result.failure("商品库存不足");
+            }
+
             //订单编号
             String orderNo = String.valueOf(IDGenerateFactory.ORDER_ID_UTIL.nextId());
 
@@ -155,6 +160,8 @@ public class ShoppingOrderBiz {
 
             //订单备注
             shoppingOrder.setRemarks(params.getRemarks());
+            //订单对应的商品详情
+            shoppingOrder.setGoodsVO(goodVo);
 
             //添加发货单
             //发货单单号
@@ -265,6 +272,12 @@ public class ShoppingOrderBiz {
             immediatePaymentOrderService.add(immediatePaymentOrder);
             ReceivingGoodsOrder receivingGoodsOrder = immediatePaymentOrder.getReceivingGoodsOrder();
             receivingGoodsOrderService.add(receivingGoodsOrder);
+
+            //下单成功之后,减库存
+            GoodVo goodsVO = order.getGoodsVO();
+            Goods goods = new Goods().setId(goodsVO.getId()).
+                    setStockCount(goodsVO.getStockCount() - order.getCount());
+            goodsService.update(goods);
         }
 
 
@@ -356,6 +369,8 @@ public class ShoppingOrderBiz {
 
             //订单备注
             shoppingOrder.setRemarks(params.getRemarks());
+            //订单对应的商品详情
+            shoppingOrder.setGoodsVO(goodVo);
 
             orderList.add(shoppingOrder);
         }
@@ -600,7 +615,7 @@ public class ShoppingOrderBiz {
 
         ImmediatePaymentOrder immediatePaymentOrder = immediatePaymentOrders.get(0);
         //判断是否已发货,没有发货是不允许收货的
-        if(!Objects.equals(CommonMallConstants.ORDER_COMPLETE,immediatePaymentOrder.getState())){
+        if (!Objects.equals(CommonMallConstants.ORDER_COMPLETE, immediatePaymentOrder.getState())) {
             return Result.failure("订单未发货,无法收货");
         }
 

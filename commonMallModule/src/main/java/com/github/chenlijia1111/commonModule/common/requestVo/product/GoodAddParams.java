@@ -1,7 +1,8 @@
 package com.github.chenlijia1111.commonModule.common.requestVo.product;
 
-import com.github.chenlijia1111.utils.core.annos.PropertyCheck;
+import com.github.chenlijia1111.commonModule.common.checkFunction.PositiveNumberCheck;
 import com.github.chenlijia1111.commonModule.common.checkFunction.PriceCheck;
+import com.github.chenlijia1111.utils.core.annos.PropertyCheck;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
@@ -41,28 +42,27 @@ public class GoodAddParams {
      * 会员价
      */
     @ApiModelProperty("会员价")
-    @PropertyCheck(name = "会员价", checkFunction = PriceCheck.class)
     private Double vipPrice;
 
     /**
      * 市场价
      */
     @ApiModelProperty("市场价")
-    @PropertyCheck(name = "市场价", checkFunction = PriceCheck.class)
     private Double marketPrice;
 
     /**
      * 商品编号
      */
     @ApiModelProperty("商品编号")
-    @PropertyCheck(name = "商品编号")
     private String goodNo;
 
     /**
      * 库存
+     *
      * @since 下午 2:50 2019/11/21 0021
      **/
     @ApiModelProperty(value = "库存")
+    @PropertyCheck(name = "库存", checkFunction = PositiveNumberCheck.class)
     private Integer stockCount;
 
 }

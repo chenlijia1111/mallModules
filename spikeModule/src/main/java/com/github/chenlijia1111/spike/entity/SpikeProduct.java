@@ -76,6 +76,14 @@ public class SpikeProduct {
      */
     @ApiModelProperty("参与秒杀的库存数量")
     @PropertyCheck(name = "参与秒杀的库存数量")
+    @Column(name = "total_stock_count")
+    private Integer totalStockCount;
+
+    /**
+     * 当前库存数量
+     */
+    @ApiModelProperty("当前库存数量")
+    @PropertyCheck(name = "当前库存数量")
     @Column(name = "stock_count")
     private Integer stockCount;
 
@@ -111,6 +119,15 @@ public class SpikeProduct {
     @PropertyCheck(name = "排序值")
     @Column(name = "order_number")
     private String orderNumber;
+
+
+    /**
+     * 是否删除 0否 1是
+     */
+    @ApiModelProperty("是否删除 0否 1是")
+    @PropertyCheck(name = "是否删除 0否 1是")
+    @Column(name = "delete_status")
+    private Integer deleteStatus;
 
 
 }
