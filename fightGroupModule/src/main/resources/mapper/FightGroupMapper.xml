@@ -14,4 +14,17 @@
     id, fight_group_product_id, create_user, create_time, group_person_count, current_group_count, 
     fight_status
   </sql>
+  <update id="scheduleCancelFightGroup">
+    UPDATE
+    s_fight_group
+    SET s_fight_group.fight_status = 2
+    WHERE s_fight_group.fight_status = 0
+    AND s_fight_group.current_group_count &lt; s_fight_group.group_person_count
+                                            AND EXISTS(
+    SELECT s_fight_group_product.id
+    FROM s_fight_group_product
+    WHERE s_fight_group_product.id = s_fight_group.fight_group_product_id
+    AND TIMESTAMPDIFF(SECOND, s_fight_group.create_time, now()) &gt; s_fight_group_product.max_fight_time
+    )
+  </update>
 </mapper>

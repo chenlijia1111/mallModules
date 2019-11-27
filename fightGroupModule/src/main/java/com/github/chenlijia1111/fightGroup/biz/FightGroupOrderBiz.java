@@ -221,7 +221,8 @@ public class FightGroupOrderBiz {
                 setId(String.valueOf(IDGenerateFactory.FIGHT_GROUP_USER_ORDER_ID_UTIL.nextId())).
                 setOrderNo(orderNo).
                 setFightGroupId(fightGroup.getId()).
-                setGroupUserId(userId).setCreateTime(new Date());
+                setGroupUserId(userId).
+                setCreateTime(new Date());
         fightGroupUserOrderService.add(fightGroupUserOrder);
 
         //构建订单
@@ -351,5 +352,36 @@ public class FightGroupOrderBiz {
         return Result.success("操作成功", groupId);
     }
 
+    /**
+     * 拼团支付回调
+     * 只处理关于拼团的事情,不处理其他不相关的东西,如订单状态等等,这些都不处理,职责分离(这些放在通用订单里面处理)
+     *
+     * @param payRecode 商家支付订单号
+     * @return void
+     * @since 上午 9:57 2019/11/27 0027
+     **/
+    public void payNotify(String payRecode) {
+        ShoppingOrder shoppingOrderCondition = new ShoppingOrder().setPayRecord(payRecode);
+        List<ShoppingOrder> shoppingOrders = shoppingOrderService.listByCondition(shoppingOrderCondition);
+        if (Lists.isNotEmpty(shoppingOrders)) {
+            ShoppingOrder shoppingOrder = shoppingOrders.get(0);
+            //查询拼团-团信息,修改拼团团人数
+            //拼团订单关联记录
+            FightGroupUserOrder fightGroupUserOrder = fightGroupUserOrderService.findByOrderNo(shoppingOrder.getOrderNo());
+            if (Objects.nonNull(fightGroupUserOrder)) {
+                //查询团信息
+                FightGroup fightGroup = fightGroupService.findById(fightGroupUserOrder.getFightGroupId());
+                if (Objects.nonNull(fightGroup)) {
+                    Integer currentGroupCount = fightGroup.getCurrentGroupCount();
+                    currentGroupCount += 1;
+                    fightGroup.setCurrentGroupCount(currentGroupCount);
+                    if (currentGroupCount >= fightGroup.getGroupPersonCount()) {
+                        fightGroup.setFightStatus(FightGroupStstusEnum.FIGHT_SUCCESS.getStatus());
+                    }
+                    fightGroupService.update(fightGroup);
+                }
+            }
+        }
+    }
 
 }

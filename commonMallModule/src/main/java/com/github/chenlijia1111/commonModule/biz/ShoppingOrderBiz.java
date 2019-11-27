@@ -640,4 +640,29 @@ public class ShoppingOrderBiz {
     }
 
 
+    /**
+     * 拼团支付回调
+     * 只处理关于普通订单的回调业务,不处理其他不相关业务(拼团、秒杀)
+     *
+     * @param payRecode     商家支付订单号
+     * @param transactionId 第三方支付交易流水号
+     * @param payChannel    支付渠道
+     * @return void
+     * @since 上午 9:57 2019/11/27 0027
+     **/
+    public void payNotify(String payRecode, String transactionId, String payChannel) {
+        ShoppingOrder shoppingOrderCondition = new ShoppingOrder().setPayRecord(payRecode);
+        List<ShoppingOrder> shoppingOrders = shoppingOrderService.listByCondition(shoppingOrderCondition);
+        if (Lists.isNotEmpty(shoppingOrders)) {
+            Date currentTime = new Date();
+            for (ShoppingOrder shoppingOrder : shoppingOrders) {
+                shoppingOrder.setTransactionId(transactionId);
+                shoppingOrder.setPayChannel(payChannel);
+                shoppingOrder.setPayTime(currentTime);
+                shoppingOrder.setState(CommonMallConstants.ORDER_COMPLETE);
+                shoppingOrderService.update(shoppingOrder);
+            }
+        }
+    }
+
 }

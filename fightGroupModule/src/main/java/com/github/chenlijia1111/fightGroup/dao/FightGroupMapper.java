@@ -10,5 +10,11 @@ import tk.mybatis.mapper.common.Mapper;
  * @version 1.0
  **/
 public interface FightGroupMapper extends Mapper<FightGroup> {
-    FightGroup selectByPrimaryKey(String id);
+
+    /**
+     * 定时取消那些达到指定时间还没有成功拼团的团
+     * @since 上午 9:38 2019/11/27 0027
+     * @return 返回取消的团的数量
+     **/
+    Integer scheduleCancelFightGroup();
 }

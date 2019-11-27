@@ -30,5 +30,12 @@ public interface FightGroupUserOrderServiceI {
      **/
     Result update(FightGroupUserOrder params);
 
-
+    /**
+     * 通过订单编号查询拼团订单记录
+     * 因为订单编号是唯一的,所以可以直接用订单编号进行查询
+     * @since 上午 10:01 2019/11/27 0027
+     * @param orderNo 订单编号
+     * @return com.github.chenlijia1111.fightGroup.entity.FightGroupUserOrder
+     **/
+    FightGroupUserOrder findByOrderNo(String orderNo);
 }
