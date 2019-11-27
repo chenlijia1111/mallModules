@@ -3,7 +3,7 @@
 <mapper namespace="com.github.chenlijia1111.commonModule.dao.ClientAddressMapper">
   <resultMap id="BaseResultMap" type="com.github.chenlijia1111.commonModule.entity.ClientAddress">
     <id column="id" jdbcType="INTEGER" property="id" />
-    <result column="client_id" jdbcType="INTEGER" property="clientId" />
+    <result column="client_id" jdbcType="VARCHAR" property="clientId" />
     <result column="receiver_name" jdbcType="VARCHAR" property="receiverName" />
     <result column="receive_sex" jdbcType="INTEGER" property="receiveSex" />
     <result column="receiver_telephone" jdbcType="VARCHAR" property="receiverTelephone" />
@@ -12,13 +12,13 @@
     <result column="area" jdbcType="VARCHAR" property="area" />
     <result column="address_code" jdbcType="VARCHAR" property="addressCode" />
     <result column="detail_address" jdbcType="VARCHAR" property="detailAddress" />
-    <result column="is_common_address" jdbcType="INTEGER" property="isCommonAddress" />
+    <result column="common_address" jdbcType="INTEGER" property="commonAddress" />
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
-    <result column="is_delete" jdbcType="INTEGER" property="isDelete" />
+    <result column="delete_status" jdbcType="INTEGER" property="deleteStatus" />
   </resultMap>
   <sql id="Base_Column_List">
-    id, client_id, receiver_name, receive_sex, receiver_telephone, province, city, area, 
-    address_code, detail_address, is_common_address, update_time, is_delete
+    id, client_id, receiver_name, receive_sex, receiver_telephone, province, city, area,
+    address_code, detail_address, common_address, update_time, delete_status
   </sql>
   <update id="updateClientCommonAddressByClient">
     UPDATE s_client_address

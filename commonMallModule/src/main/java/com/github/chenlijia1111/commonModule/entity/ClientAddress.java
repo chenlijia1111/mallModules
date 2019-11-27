@@ -7,16 +7,15 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
-import javax.persistence.Column;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.util.Date;
 
 /**
  * 用户地址信息表
+ *
  * @author chenLiJia
- * @since 2019-11-05 13:52:16
  * @version 1.0
+ * @since 2019-11-27 10:39:55
  **/
 @ApiModel("用户地址信息表")
 @Table(name = "s_client_address")
@@ -30,6 +29,7 @@ public class ClientAddress {
     @ApiModelProperty("主键id")
     @PropertyCheck(name = "主键id")
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Integer id;
 
@@ -39,7 +39,7 @@ public class ClientAddress {
     @ApiModelProperty("用户id")
     @PropertyCheck(name = "用户id")
     @Column(name = "client_id")
-    private Integer clientId;
+    private String clientId;
 
     /**
      * 收货人姓名
@@ -110,8 +110,8 @@ public class ClientAddress {
      */
     @ApiModelProperty("是否常用地址 0否 1是")
     @PropertyCheck(name = "是否常用地址 0否 1是")
-    @Column(name = "is_common_address")
-    private Integer isCommonAddress;
+    @Column(name = "common_address")
+    private Integer commonAddress;
 
     /**
      * 更新时间
@@ -126,8 +126,8 @@ public class ClientAddress {
      */
     @ApiModelProperty("是否删除 0未删除 1已删除")
     @PropertyCheck(name = "是否删除 0未删除 1已删除")
-    @Column(name = "is_delete")
-    private Integer isDelete;
+    @Column(name = "delete_status")
+    private Integer deleteStatus;
 
 
 }

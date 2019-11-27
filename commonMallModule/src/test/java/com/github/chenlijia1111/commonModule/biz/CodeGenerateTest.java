@@ -34,7 +34,7 @@ public class CodeGenerateTest {
         mybatisCodeGeneratorUtil.setCommonCode(false);
 
         Map<String, String> tableToDomain = mybatisCodeGeneratorUtil.getTableToDoMain();
-        tableToDomain.put("s_evaluation", "Evaluation");
+        tableToDomain.put("s_client_address", "ClientAddress");
 
         List<String> ignoreDoMainToBusiness = mybatisCodeGeneratorUtil.getIgnoreDoMainToBusiness();
     }
@@ -49,7 +49,7 @@ public class CodeGenerateTest {
     //生成controller,biz,service
     @Test
     public void test2WithChen() {
-        mybatisCodeGeneratorUtil.setTargetControllerPackage(null).setTargetBizPackage(null);
+        mybatisCodeGeneratorUtil.setTargetControllerPackage(null);
         mybatisCodeGeneratorUtil.generateWithBusinssCode();
     }
 
