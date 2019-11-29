@@ -19,6 +19,7 @@ import com.github.chenlijia1111.utils.list.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -38,7 +39,7 @@ public class EvaluationBiz {
     private EvaluationServiceI evaluationService;//评价
     @Autowired
     private EvaluationLabelServiceI evaluationLabelService;//评价标签
-    @Autowired
+    @Resource
     private CommonModuleUserServiceI userService;//用户
     @Autowired
     private ShoppingOrderServiceI shoppingOrderService;//订单

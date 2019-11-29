@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
+import javax.annotation.Resource;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -52,7 +53,7 @@ public class ShoppingOrderBiz {
     private GoodsServiceI goodsService;//商品
     @Autowired
     private ProductServiceI productService;//产品
-    @Autowired
+    @Resource
     private CommonModuleUserServiceI commonModuleUserService;//用户
     @Autowired
     private CouponServiceI couponService;//优惠券
@@ -122,7 +123,7 @@ public class ShoppingOrderBiz {
             }
             //判断产品是否存在且上架
             Product product = productService.findByProductId(goodVo.getProductId());
-            if (Objects.isNull(product)) {
+            if (Objects.isNull(product) || Objects.equals(BooleanConstant.YES_INTEGER, product.getDeleteStatus())) {
                 //回滚
                 TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                 return Result.failure("产品不存在");
@@ -447,22 +448,22 @@ public class ShoppingOrderBiz {
             }
         }
         //满数量折扣优惠券抵扣金额
-        vo.setCountDiscountPrice(abstractCouponList.stream().filter(e -> Objects.equals(CouponTypeEnum.CountDiscountCoupon.getType(), e.getType())).
+        vo.setCountDiscountPrice(abstractCouponList.stream().filter(e -> Objects.equals(CouponTypeEnum.CountDiscountCoupon.getType(), e.type())).
                 collect(Collectors.summingDouble(AbstractCoupon::getEffectiveMoney)));
         //满数量减优惠券抵扣金额
-        vo.setCountSubPrice(abstractCouponList.stream().filter(e -> Objects.equals(CouponTypeEnum.CountSubCoupon.getType(), e.getType())).
+        vo.setCountSubPrice(abstractCouponList.stream().filter(e -> Objects.equals(CouponTypeEnum.CountSubCoupon.getType(), e.type())).
                 collect(Collectors.summingDouble(AbstractCoupon::getEffectiveMoney)));
         //满价格折扣优惠券抵扣金额
-        vo.setPriceDiscountPrice(abstractCouponList.stream().filter(e -> Objects.equals(CouponTypeEnum.PriceDiscountCoupon.getType(), e.getType())).
+        vo.setPriceDiscountPrice(abstractCouponList.stream().filter(e -> Objects.equals(CouponTypeEnum.PriceDiscountCoupon.getType(), e.type())).
                 collect(Collectors.summingDouble(AbstractCoupon::getEffectiveMoney)));
         //满价格减优惠券抵扣金额
-        vo.setPriceSubPrice(abstractCouponList.stream().filter(e -> Objects.equals(CouponTypeEnum.PriceSubCoupon.getType(), e.getType())).
+        vo.setPriceSubPrice(abstractCouponList.stream().filter(e -> Objects.equals(CouponTypeEnum.PriceSubCoupon.getType(), e.type())).
                 collect(Collectors.summingDouble(AbstractCoupon::getEffectiveMoney)));
         //积分抵扣金额
-        vo.setScorePrice(abstractCouponList.stream().filter(e -> Objects.equals(CouponTypeEnum.ScoreCoupon.getType(), e.getType())).
+        vo.setScorePrice(abstractCouponList.stream().filter(e -> Objects.equals(CouponTypeEnum.ScoreCoupon.getType(), e.type())).
                 collect(Collectors.summingDouble(AbstractCoupon::getEffectiveMoney)));
         //物流费用
-        vo.setExpressPrice(abstractCouponList.stream().filter(e -> Objects.equals(CouponTypeEnum.ExpressCoupon.getType(), e.getType())).
+        vo.setExpressPrice(abstractCouponList.stream().filter(e -> Objects.equals(CouponTypeEnum.ExpressCoupon.getType(), e.type())).
                 collect(Collectors.summingDouble(AbstractCoupon::getEffectiveMoney)));
 
 

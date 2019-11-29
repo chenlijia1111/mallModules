@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
+import javax.annotation.Resource;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -40,7 +41,7 @@ public class ProductBiz {
     private ProductSpecValueServiceI productSpecValueService;//产品规格值
     @Autowired
     private GoodSpecServiceI goodSpecService;//商品规格
-    @Autowired
+    @Resource
     private CommonModuleShopServiceI shopService;//商家
 
     /**

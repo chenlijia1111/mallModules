@@ -25,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -61,7 +62,7 @@ public class FightGroupOrderBiz {
     private GoodsServiceI goodsService;//商品
     @Autowired
     private ProductServiceI productService;//产品
-    @Autowired
+    @Resource
     private CommonModuleUserServiceI commonModuleUserService;//用户
     @Autowired
     private CouponServiceI couponService;//优惠券 主要用于计算物流费,一般拼团无法使用优惠券,但也有例外

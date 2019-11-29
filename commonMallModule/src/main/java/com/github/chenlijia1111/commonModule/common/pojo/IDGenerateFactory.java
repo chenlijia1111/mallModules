@@ -39,13 +39,6 @@ public class IDGenerateFactory {
      **/
     public static final IDUtil EVALUATION_ID_UTIL = new IDUtil(4, 1);
 
-    /**
-     * 产品参与秒杀id生成器
-     *
-     * @since 下午 2:45 2019/11/1 0001
-     **/
-    public static final IDUtil SPIKE_PRODUCT_ID_UTIL = new IDUtil(5, 1);
-
 
     /**
      * 评价标签id生成器
@@ -53,6 +46,14 @@ public class IDGenerateFactory {
      * @since 下午 2:46 2019/11/1 0001
      **/
     public static final IDUtil EVALUATION_LABEL_ID_UTIL = new IDUtil(4, 2);
+
+
+    /**
+     * 产品参与秒杀id生成器
+     *
+     * @since 下午 2:45 2019/11/1 0001
+     **/
+    public static final IDUtil SPIKE_PRODUCT_ID_UTIL = new IDUtil(5, 1);
 
     /**
      * 产品参与拼团id生成器
@@ -75,6 +76,14 @@ public class IDGenerateFactory {
      * @since 下午 2:45 2019/11/1 0001
      **/
     public static final IDUtil FIGHT_GROUP_USER_ORDER_ID_UTIL = new IDUtil(6, 3);
+
+
+    /**
+     * 优惠券id生成器
+     *
+     * @since 下午 2:45 2019/11/1 0001
+     **/
+    public static final IDUtil COUPON_ID_UTIL = new IDUtil(7, 1);
 
 
 }

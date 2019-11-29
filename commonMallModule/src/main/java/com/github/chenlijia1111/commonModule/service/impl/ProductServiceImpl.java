@@ -107,7 +107,7 @@ public class ProductServiceImpl implements ProductServiceI {
     @Override
     public AdminProductVo findAdminProductVoByProductId(String productId) {
 
-        if (Objects.nonNull(productId)) {
+        if (StringUtils.isNotEmpty(productId)) {
             Product product = productMapper.selectByPrimaryKey(productId);
             if (Objects.nonNull(product) && Objects.equals(product.getDeleteStatus(), BooleanConstant.NO_INTEGER)) {
                 AdminProductVo productVo = new AdminProductVo();

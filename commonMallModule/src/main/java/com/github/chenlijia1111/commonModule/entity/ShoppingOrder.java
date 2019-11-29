@@ -224,6 +224,7 @@ public class ShoppingOrder {
     private GoodVo goodsVO;
 
     public List<AbstractCoupon> getCouponList() {
-        return couponList == null ? Lists.newArrayList() : couponList;
+        couponList = couponList == null ? Lists.newArrayList() : couponList;
+        return couponList;
     }
 }

@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 
 import javax.persistence.Column;
 import javax.persistence.Id;
@@ -22,6 +23,7 @@ import java.util.Date;
 @Table(name = "s_coupon")
 @Setter
 @Getter
+@Accessors(chain = true)
 public class Coupon {
     /**
      * 优惠券id
@@ -37,7 +39,7 @@ public class Coupon {
      *
      * @since 下午 4:43 2019/11/21 0021
      **/
-    @ApiModelProperty
+    @ApiModelProperty(value = "优惠券名称")
     @PropertyCheck(name = "优惠券名称")
     @Column(name = "coupon_name")
     private String couponName;
@@ -47,7 +49,7 @@ public class Coupon {
      *
      * @since 下午 4:43 2019/11/21 0021
      **/
-    @ApiModelProperty
+    @ApiModelProperty(value = "优惠券剩余数量")
     @PropertyCheck(name = "优惠券剩余数量")
     @Column(name = "coupon_count")
     private Integer couponCount;
@@ -57,13 +59,14 @@ public class Coupon {
      *
      * @since 下午 4:43 2019/11/21 0021
      **/
-    @ApiModelProperty
+    @ApiModelProperty(value = "优惠券总数")
     @PropertyCheck(name = "优惠券总数")
     @Column(name = "coupon_total_count")
     private Integer couponTotalCount;
 
     /**
      * 优惠券类型 1满价格减优惠券 2满价格折扣优惠券 3满数量减优惠券 4满数量折扣优惠券 5积分券 6物流券 其他待扩展
+     *
      * @see com.github.chenlijia1111.commonModule.common.enums.CouponTypeEnum
      */
     @ApiModelProperty("优惠券类型 1满价格减优惠券 2满价格折扣优惠券 3满数量减优惠券 4满数量折扣优惠券 5积分券 6物流券 其他待扩展")
@@ -109,7 +112,7 @@ public class Coupon {
     @ApiModelProperty("是否删除 0未删除 1删除")
     @PropertyCheck(name = "是否删除 0未删除 1删除")
     @Column(name = "delete_status")
-    private String deleteStatus;
+    private Integer deleteStatus;
 
     /**
      * 优惠券json

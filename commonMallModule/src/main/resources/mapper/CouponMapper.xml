@@ -11,7 +11,7 @@
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
     <result column="create_user_type" jdbcType="INTEGER" property="createUserType" />
     <result column="create_user_id" jdbcType="VARCHAR" property="createUserId" />
-    <result column="delete_status" jdbcType="VARCHAR" property="deleteStatus" />
+    <result column="delete_status" jdbcType="INTEGER" property="deleteStatus" />
   </resultMap>
   <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.github.chenlijia1111.commonModule.entity.Coupon">
     <result column="coupon_json" jdbcType="LONGVARCHAR" property="couponJson" />

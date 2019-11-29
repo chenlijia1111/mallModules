@@ -12,6 +12,15 @@ import java.util.Optional;
 
 /**
  * 抽象优惠券
+ * 目前已经实现的券
+ * {@link CountDiscountCoupon} 满数量折扣优惠券
+ * {@link CountSubCoupon} 满数量减优惠券
+ * {@link PriceDiscountCoupon} 满价格折扣优惠券
+ * {@link PriceSubCoupon} 满价格减优惠券
+ * {@link ExpressCoupon} 物流券
+ * {@link ScoreCoupon} 积分券
+ * <p>
+ * 如果还需要其他的自定义的优惠券,只需要实现本类即可,请参考订单中处理优惠券的策略
  *
  * @author chenlijia
  * @version 1.0
@@ -42,7 +51,7 @@ public abstract class AbstractCoupon {
      * @return java.lang.Double 返回具体抵扣的金额
      * @since 上午 11:51 2019/11/22 0022
      **/
-    public Double getEffectiveMoney(){
+    public Double getEffectiveMoney() {
         return effectiveMoney;
     }
 
@@ -56,7 +65,7 @@ public abstract class AbstractCoupon {
      * @return java.lang.Integer
      * @since 下午 4:02 2019/11/22 0022
      **/
-    public Integer getType() {
+    public Integer type() {
         Optional<CouponTypeEnum> any = Lists.asList(CouponTypeEnum.values()).stream().filter(e -> Objects.equals(this.getClass(), e.getCouponClass())).findAny();
         if (any.isPresent()) {
             CouponTypeEnum couponTypeEnum = any.get();
