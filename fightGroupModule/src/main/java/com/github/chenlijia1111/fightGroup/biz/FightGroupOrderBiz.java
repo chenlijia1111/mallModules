@@ -24,6 +24,7 @@ import com.github.chenlijia1111.utils.list.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import javax.annotation.Resource;
 import java.util.*;
@@ -125,8 +126,11 @@ public class FightGroupOrderBiz {
             return Result.failure("拼团已结束");
         }
         //判断库存
-        if (fightGroupProduct.getStockCount() < params.getCount()) {
+        if (fightGroupProduct.getStockCount() == 0) {
             return Result.failure("商品已被拼完");
+        }
+        if (fightGroupProduct.getStockCount() < params.getCount()) {
+            return Result.failure("商品库存不足");
         }
 
         //可以进行拼团
@@ -173,6 +177,8 @@ public class FightGroupOrderBiz {
                 newStockCount = fightGroupProduct.getStockCount() - params.getCount();
                 //判断库存
                 if (fightGroupProduct.getStockCount() < params.getCount()) {
+                    //回滚
+                    TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                     return Result.failure("商品已被秒杀完");
                 }
                 updateStockByVersion = fightGroupProductService.updateStockByVersion(fightGroupProduct.getId(), newStockCount, fightGroupProduct.getUpdateVersion(), newUpdateVersion);
@@ -186,23 +192,37 @@ public class FightGroupOrderBiz {
 
             //重试后还是失败
             if (!updateStockByVersion.getSuccess()) {
+                //回滚
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                 return Result.failure("当前人数太多,请稍后重试");
             }
         }
 
         //如果是加入其他人的拼团,判断这个拼团是否已经成功,如果该拼团已经拼团成功了就不允许再加入拼团了
         FightGroup fightGroup = null;
-        if (Objects.nonNull(params.getFightGroupId())) {
+        if (StringUtils.isNotEmpty(params.getFightGroupId())) {
             fightGroup = fightGroupService.findById(params.getFightGroupId());
             if (Objects.isNull(fightGroup)) {
+                //回滚
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                 return Result.failure("团信息不存在");
             }
             //判断该团状态,判断该团是否已经拼团成功
             if (Objects.equals(FightGroupStstusEnum.FIGHT_SUCCESS.getStatus(), fightGroup.getFightStatus())) {
+                //回滚
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                 return Result.failure("该团已拼团成功,请重新开团或选择其他团");
             }
             if (Objects.equals(FightGroupStstusEnum.FIGHT_FAUILE.getStatus(), fightGroup.getFightStatus())) {
+                //回滚
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                 return Result.failure("该团解散,请重新开团或选择其他团");
+            }
+            //不可以加入自己的团
+            if (Objects.equals(fightGroup.getCreateUser(), userId)) {
+                //回滚
+                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+                return Result.failure("无法加入自己创建的团");
             }
         } else {
             //创建一个新团

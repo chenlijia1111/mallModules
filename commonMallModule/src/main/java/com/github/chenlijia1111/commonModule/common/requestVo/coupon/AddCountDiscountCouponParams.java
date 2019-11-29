@@ -33,7 +33,7 @@ public class AddCountDiscountCouponParams {
      *
      * @since 下午 4:43 2019/11/21 0021
      **/
-    @ApiModelProperty
+    @ApiModelProperty(value = "优惠券总数")
     @PropertyCheck(name = "优惠券总数",checkFunction = PositiveNumberCheck.class)
     private Integer couponTotalCount;
 

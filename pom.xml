@@ -24,7 +24,7 @@
         <lombok.version>1.18.10</lombok.version>
         <junit.version>4.12</junit.version>
         <pagehelper.version>3.7.4</pagehelper.version>
-        <springfox-swagger2.version>2.9.2</springfox-swagger2.version>
+        <springfox-swagger2.version>2.7.0</springfox-swagger2.version>
         <swagger-bootstrap-ui.version>1.9.5</swagger-bootstrap-ui.version>
         <mapper-spring-boot-starter.version>2.1.5</mapper-spring-boot-starter.version>
         <tk.mybatis.version>4.1.5</tk.mybatis.version>
@@ -60,18 +60,18 @@
             <artifactId>pagehelper</artifactId>
             <version>${pagehelper.version}</version>
         </dependency>
-        <!-- swagger -->
-        <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger2</artifactId>
-            <version>${springfox-swagger2.version}</version>
-        </dependency>
         <!-- swagger-ui -->
         <!-- https://mvnrepository.com/artifact/com.github.xiaoymin/swagger-bootstrap-ui -->
         <dependency>
             <groupId>com.github.xiaoymin</groupId>
             <artifactId>swagger-bootstrap-ui</artifactId>
             <version>${swagger-bootstrap-ui.version}</version>
+        </dependency>
+        <!-- swagger 2.9.2的版本有问题,不要升级 -->
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger2</artifactId>
+            <version>${springfox-swagger2.version}</version>
         </dependency>
         <!-- servlet api 依赖于具体环境 必须要一起打包走 只需要调用方有这个包就行了-->
         <dependency>

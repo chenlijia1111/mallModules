@@ -38,11 +38,11 @@
     WHERE s_spike_product.delete_status = 0
     <if test="startTime != null and startTime != ''">
       AND date_format(s_spike_product.start_time, '%Y-%m-%d %H:%i:%s') &lt;= #{startTime}
-      AND date_format(s_spike_product.end_time) &gt; #{startTime}
+      AND date_format(s_spike_product.end_time, '%Y-%m-%d %H:%i:%s') &gt; #{startTime}
     </if>
     <if test="endTime != null and endTime != ''">
       AND date_format(s_spike_product.start_time, '%Y-%m-%d %H:%i:%s') &lt; #{endTime}
-      AND date_format(s_spike_product.end_time) &gt;= #{endTime}
+      AND date_format(s_spike_product.end_time, '%Y-%m-%d %H:%i:%s') &gt;= #{endTime}
     </if>
     <if test="productId != null and productId != ''">
       AND s_spike_product.product_id = #{productId}

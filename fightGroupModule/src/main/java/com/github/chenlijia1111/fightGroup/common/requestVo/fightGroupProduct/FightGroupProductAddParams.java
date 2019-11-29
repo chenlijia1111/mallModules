@@ -79,7 +79,7 @@ public class FightGroupProductAddParams {
     /**
      * 最大拼团时间(分钟),超过自动解散
      */
-    @ApiModelProperty("最大拼团时间(分钟),超过自动解散")
+    @ApiModelProperty("最大拼团时间(秒),超过自动解散")
     @PropertyCheck(name = "最大拼团时间(分钟),超过自动解散", checkFunction = PositiveNumberCheck.class)
     private Integer maxFightTime;
 

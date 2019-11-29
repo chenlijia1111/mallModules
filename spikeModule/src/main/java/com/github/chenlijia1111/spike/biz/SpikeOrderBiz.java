@@ -113,8 +113,11 @@ public class SpikeOrderBiz {
             return Result.failure("秒杀已结束");
         }
         //判断库存
-        if (spikeProduct.getStockCount() < params.getCount()) {
+        if (spikeProduct.getStockCount() == 0) {
             return Result.failure("商品已被秒杀完");
+        }
+        if (spikeProduct.getStockCount() < params.getCount()) {
+            return Result.failure("商品库存不足");
         }
 
         //可以进行秒杀

@@ -92,7 +92,8 @@ public class FightGroupProductServiceImpl implements FightGroupProductServiceI {
      **/
     @Override
     public Result updateStockByVersion(String id, Integer stockCount, String oldVersionNo, String newVersionNo) {
-        return fightGroupProductMapper.updateStockByVersion(id, stockCount, oldVersionNo, newVersionNo);
+        Integer i = fightGroupProductMapper.updateStockByVersion(id, stockCount, oldVersionNo, newVersionNo);
+        return i > 0 ? Result.success("操作成功") : Result.failure("操作失败");
     }
 
 

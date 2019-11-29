@@ -76,38 +76,9 @@ public class SwaggerConf {
      * @return
      */
     @Bean
-    public Docket createApiAdmin() {
-
-        Docket docket = initCreateDocket("/admin/**", "后台");
-        docket.useDefaultResponseMessages(false);
-        createResponseMessage(docket);
-        return docket;
-    }
-
-
-    /**
-     * 注入swagger配置
-     *
-     * @return
-     */
-    @Bean
-    public Docket createClientShop() {
-
-        Docket docket = initCreateDocket("/app/**", "客户端");
-        docket.useDefaultResponseMessages(false);
-        createResponseMessage(docket);
-        return docket;
-    }
-
-    /**
-     * 注入swagger配置
-     *
-     * @return
-     */
-    @Bean
     public Docket createApiSystem() {
 
-        Docket docket = initCreateDocket("/system/**", "系统接口");
+        Docket docket = initCreateDocket("/app/**", "系统接口");
         docket.useDefaultResponseMessages(false);
         createResponseMessage(docket);
         return docket;

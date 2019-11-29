@@ -38,7 +38,7 @@ public interface FightGroupProductMapper extends Mapper<FightGroupProduct> {
      * @return com.github.chenlijia1111.utils.common.Result
      * @since 下午 3:44 2019/11/25 0025
      **/
-    Result updateStockByVersion(@Param("id") String id, @Param("stockCount") Integer stockCount,
+    Integer updateStockByVersion(@Param("id") String id, @Param("stockCount") Integer stockCount,
                                 @Param("oldVersionNo") String oldVersionNo, @Param("newVersionNo") String newVersionNo);
 
 }
