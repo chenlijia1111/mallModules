@@ -20,16 +20,19 @@
     <result column="send_time" jdbcType="TIMESTAMP" property="sendTime" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="rec_province" jdbcType="VARCHAR" property="recProvince" />
+    <result column="rec_city" jdbcType="VARCHAR" property="recCity" />
+    <result column="rec_area" jdbcType="VARCHAR" property="recArea" />
   </resultMap>
   <sql id="Base_Column_List">
     order_no, custom, shops, state, rec_user, star_user, rec_tel, star_tel, rec_addr, 
     star_addr, express_no, express_com, express_name, front_order, shopping_order, send_time, 
-    create_time,rec_province
+    create_time,rec_province, rec_city, rec_area
   </sql>
   <select id="listByFrontOrderNoSet" resultMap="BaseResultMap">
     SELECT
     order_no, custom, shops, state, rec_user, star_user, rec_tel, star_tel, rec_addr, star_addr, express_no,
-    express_com, express_name, front_order, shopping_order, send_time, create_time,rec_province
+    express_com, express_name, front_order, shopping_order, send_time, create_time,rec_province,
+    rec_city, rec_area
     FROM
     s_immediate_payment_order
     <foreach collection="frontNoSet" item="frontNo" open="WHERE front_order IN (" close=")" separator=",">

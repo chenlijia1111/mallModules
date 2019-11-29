@@ -90,13 +90,7 @@ public class ImmediatePaymentOrder {
     @Column(name = "star_tel")
     private String starTel;
 
-    /**
-     * 收货人地址
-     */
-    @ApiModelProperty("收货人地址")
-    @PropertyCheck(name = "收货人地址")
-    @Column(name = "rec_addr")
-    private String recAddr;
+
 
     /**
      * 发货人地址
@@ -163,14 +157,42 @@ public class ImmediatePaymentOrder {
     private Date createTime;
 
     /**
-     * 收货人地址-省份 用于统计查询
+     * 收货人地址-省份
      *
      * @since 下午 4:02 2019/11/12 0012
      **/
-    @ApiModelProperty(value = "收货人地址")
-    @PropertyCheck(name = "收货人地址")
+    @ApiModelProperty(value = "收货人地址省")
+    @PropertyCheck(name = "收货人地址省")
     @Column(name = "rec_province")
     private String recProvince;
+
+    /**
+     * 收货人地址-市
+     *
+     * @since 下午 4:02 2019/11/12 0012
+     **/
+    @ApiModelProperty(value = "收货人地址市")
+    @PropertyCheck(name = "收货人地址市")
+    @Column(name = "rec_city")
+    private String recCity;
+
+    /**
+     * 收货人地址区
+     *
+     * @since 下午 4:02 2019/11/12 0012
+     **/
+    @ApiModelProperty(value = "收货人地址区")
+    @PropertyCheck(name = "收货人地址区")
+    @Column(name = "rec_area")
+    private String recArea;
+
+    /**
+     * 收货人地址
+     */
+    @ApiModelProperty("收货人详细地址")
+    @PropertyCheck(name = "收货人详细地址")
+    @Column(name = "rec_addr")
+    private String recAddr;
 
     /**
      * 发货单对应的收货单

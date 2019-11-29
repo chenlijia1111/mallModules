@@ -174,8 +174,10 @@ public class ShoppingOrderBiz {
                     setState(CommonMallConstants.ORDER_INIT).
                     setRecUser(params.getReceiverName()).
                     setRecTel(params.getReceiverTelephone()).
-                    setRecAddr(params.getReceiverAddress()).
-                    setRecProvince(params.getReceiveProvince()).
+                    setRecProvince(params.getRecProvince()).
+                    setRecCity(params.getRecCity()).
+                    setRecArea(params.getRecArea()).
+                    setRecAddr(params.getRecAddr()).
                     setFrontOrder(orderNo).
                     setShoppingOrder(orderNo).
                     setCreateTime(currentTime);

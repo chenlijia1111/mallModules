@@ -80,23 +80,38 @@ public class FightGroupOrderAddParams {
     private String receiverTelephone;
 
     /**
-     * 收货人地址
+     * 收货人地址-省份
      *
-     * @since 下午 4:52 2019/11/5 0005
+     * @since 下午 4:02 2019/11/12 0012
      **/
-    @ApiModelProperty(value = "收货人地址")
-    @PropertyCheck(name = "收货人地址")
-    private String receiverAddress;
+    @ApiModelProperty(value = "收货人地址省")
+    @PropertyCheck(name = "收货人地址省")
+    private String recProvince;
 
     /**
-     * 收货人地址-省份
-     * 用于统计
+     * 收货人地址-市
      *
-     * @since 下午 4:52 2019/11/5 0005
+     * @since 下午 4:02 2019/11/12 0012
      **/
-    @ApiModelProperty(value = "收货人地址-省份")
-    @PropertyCheck(name = "收货人地址-省份")
-    private String receiveProvince;
+    @ApiModelProperty(value = "收货人地址市")
+    @PropertyCheck(name = "收货人地址市")
+    private String recCity;
+
+    /**
+     * 收货人地址区
+     *
+     * @since 下午 4:02 2019/11/12 0012
+     **/
+    @ApiModelProperty(value = "收货人地址区")
+    @PropertyCheck(name = "收货人地址区")
+    private String recArea;
+
+    /**
+     * 收货人地址
+     */
+    @ApiModelProperty("收货人详细地址")
+    @PropertyCheck(name = "收货人详细地址")
+    private String recAddr;
 
     /**
      * 备注
