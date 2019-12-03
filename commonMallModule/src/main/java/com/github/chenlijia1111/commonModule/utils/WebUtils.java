@@ -2,9 +2,11 @@ package com.github.chenlijia1111.commonModule.utils;
 
 import com.github.chenlijia1111.utils.common.Result;
 import com.github.chenlijia1111.utils.core.FileUtils;
+import com.github.chenlijia1111.utils.core.RandomUtil;
 import com.github.chenlijia1111.utils.http.HttpUtils;
 import com.github.chenlijia1111.utils.image.ReduceImageUtil;
 import com.github.chenlijia1111.utils.list.Lists;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
@@ -16,7 +18,6 @@ import java.io.*;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.Objects;
-import java.util.UUID;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -48,7 +49,7 @@ public class WebUtils {
             return Result.failure("上传路径为空");
         }
         //随机名称
-        String newFileName = UUID.randomUUID().toString().replace("-", "");
+        String newFileName = RandomUtil.createRandomName();
         String originalFilename = file.getOriginalFilename();
         //后缀
         int i = originalFilename.lastIndexOf(".");
@@ -60,8 +61,12 @@ public class WebUtils {
             return Result.failure("文件没有后缀名");
 
         FileUtils.checkDirectory(savePath);
-        File destFile = new File(savePath + "/" + newFileName + suffixName);
-
+        //保存的文件夹,以年月日进行文件夹的区分,防止一个文件夹文件数量过多
+        DateTime now = DateTime.now();
+        String saveDir = now.toString("yyyy/MM/dd");
+        File destFile = new File(savePath + "/" + saveDir + "/" + newFileName + suffixName);
+        //校验文件夹是否存在
+        FileUtils.checkDirectory(destFile.getParent());
         try {
             file.transferTo(destFile);
 
@@ -83,8 +88,8 @@ public class WebUtils {
             e.printStackTrace();
             return Result.failure("上传失败");
         }
-        String serverPath = SpringUtil.getServerPath(request);
-        String path = serverPath + "/" + downLoadApiPath + "?filePath=" + newFileName + suffixName + "&fileType=" + fileType;
+        //返回文件下载地址,不加具体的host前缀,方便迁移
+        String path = downLoadApiPath + "?filePath=" + newFileName + suffixName + "&fileType=" + fileType;
         //凡是文件的都需要源文件名
         if (isfileName) {
             path += "&fileName=" + originalFilename;
