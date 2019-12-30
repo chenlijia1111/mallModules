@@ -2,6 +2,10 @@ package com.github.chenlijia1111.mallweb.biz;
 
 import com.github.chenlijia1111.commonModule.biz.ShoppingOrderBiz;
 import com.github.chenlijia1111.commonModule.common.requestVo.order.OrderAddParams;
+import com.github.chenlijia1111.commonModule.service.impl.GroupIdGeneratorServiceImpl;
+import com.github.chenlijia1111.commonModule.service.impl.ReceiveOrderIdGeneratorServiceImpl;
+import com.github.chenlijia1111.commonModule.service.impl.SendOrderIdGeneratorServiceImpl;
+import com.github.chenlijia1111.commonModule.service.impl.ShoppingOrderIdGeneratorServiceImpl;
 import com.github.chenlijia1111.fightGroup.biz.FightGroupOrderBiz;
 import com.github.chenlijia1111.fightGroup.biz.FightGroupProductBiz;
 import com.github.chenlijia1111.fightGroup.common.requestVo.fightGroupOrder.FightGroupOrderAddParams;
@@ -37,7 +41,8 @@ public class OrderBiz {
 
 
     public Result addOrder(OrderAddParams params) {
-        return shoppingOrderBiz.add(params);
+        return shoppingOrderBiz.add(params, new GroupIdGeneratorServiceImpl(), new ShoppingOrderIdGeneratorServiceImpl(),
+                new SendOrderIdGeneratorServiceImpl(), new ReceiveOrderIdGeneratorServiceImpl());
     }
 
 
@@ -50,12 +55,12 @@ public class OrderBiz {
     }
 
 
-    public Result addFightOrder(FightGroupOrderAddParams params){
-        return fightGroupOrderBiz.addFightGroupOrder(params,3);
+    public Result addFightOrder(FightGroupOrderAddParams params) {
+        return fightGroupOrderBiz.addFightGroupOrder(params, 3);
     }
 
-    public Result addFightProduct(FightGroupProductAddParams params){
-        return fightGroupProductBiz.add(params,false);
+    public Result addFightProduct(FightGroupProductAddParams params) {
+        return fightGroupProductBiz.add(params, false);
     }
 
 }
