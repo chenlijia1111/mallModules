@@ -6,12 +6,11 @@
 
     <groupId>com.github.chenlijia1111</groupId>
     <artifactId>mallModules</artifactId>
-    <packaging>pom</packaging>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0-RELEASE</version>
     <description>商城多模块系统</description>
+    <packaging>pom</packaging>
 
     <modules>
-        <module>mallweb</module>
         <module>commonMallModule</module>
         <module>fightGroupModule</module>
         <module>spikeModule</module>
@@ -114,6 +113,48 @@
         </dependency>
     </dependencies>
 
+
+    <parent>
+        <groupId>org.sonatype.oss</groupId>
+        <artifactId>oss-parent</artifactId>
+        <version>7</version>
+    </parent>
+
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    <scm>
+        <tag>master</tag>
+        <url>git@github.com:cloudnil/marathon-client.git</url>
+        <connection>scm:git:git@github.com:chenlijia1111/utils.git</connection>
+        <developerConnection>scm:git:git@github.com:chenlijia1111</developerConnection>
+    </scm>
+    <developers>
+        <developer>
+            <name>chenlijia</name>
+            <email>571740367@qq.com</email>
+            <organization>chenlijia</organization>
+        </developer>
+    </developers>
+
+    <distributionManagement>
+        <repository>
+            <id>releases</id>
+            <name>Nexus Release Repository</name>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
+        </repository>
+        <snapshotRepository>
+            <id>snapshots</id>
+            <name>Sonatype Nexus Snapshots</name>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
+
+    <!-- 配置阿里云中央仓库下载 国内加快下载速度 -->
     <repositories>
         <repository>
             <id>maven-ali</id>
