@@ -74,9 +74,22 @@ public class ShoppingOrder {
      * 状态 0初始状态 983042成功 983041 失败或者取消
      */
     @ApiModelProperty("状态 0初始状态 983042成功 983041 失败或者取消")
-    @PropertyCheck(name = "状态 0初始状态 983042成功 983041 失败或者取消")
+    @PropertyCheck(name = "状态")
     @Column(name = "state")
     private Integer state;
+
+    /**
+     * 商品数量
+     * {@link com.github.chenlijia1111.commonModule.common.enums.OrderTypeEnum}
+     * 1 普通订单
+     * 2 秒杀订单
+     * 3 拼团订单
+     * 其他暂无定义
+     */
+    @ApiModelProperty("订单类型标识可用来区分普通订单秒杀订单等")
+    @PropertyCheck(name = "订单类型标识")
+    @Column(name = "order_type")
+    private Integer orderType;
 
     /**
      * 商品金额

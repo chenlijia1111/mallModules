@@ -1,6 +1,7 @@
 package com.github.chenlijia1111.spike.biz;
 
 import com.github.chenlijia1111.commonModule.common.enums.CouponTypeEnum;
+import com.github.chenlijia1111.commonModule.common.enums.OrderTypeEnum;
 import com.github.chenlijia1111.commonModule.common.pojo.CommonMallConstants;
 import com.github.chenlijia1111.commonModule.common.pojo.IDGenerateFactory;
 import com.github.chenlijia1111.commonModule.common.pojo.coupon.AbstractCoupon;
@@ -198,6 +199,7 @@ public class SpikeOrderBiz {
                 setGoodsId(goodId).
                 setCount(count).
                 setState(CommonMallConstants.ORDER_INIT).
+                setOrderType(OrderTypeEnum.SPIKE_ORDER.getType()).
                 setProductAmountTotal(spikeProduct.getSpikePrice() * count).
                 setGoodPrice(spikeProduct.getSpikePrice()).
                 setOrderAmountTotal(spikeProduct.getSpikePrice() * count).

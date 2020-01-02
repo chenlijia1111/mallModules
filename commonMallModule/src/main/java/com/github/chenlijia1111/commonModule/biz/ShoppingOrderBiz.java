@@ -2,6 +2,7 @@ package com.github.chenlijia1111.commonModule.biz;
 
 import com.github.chenlijia1111.commonModule.common.enums.CouponTypeEnum;
 import com.github.chenlijia1111.commonModule.common.enums.OrderStatusEnum;
+import com.github.chenlijia1111.commonModule.common.enums.OrderTypeEnum;
 import com.github.chenlijia1111.commonModule.common.pojo.CommonMallConstants;
 import com.github.chenlijia1111.commonModule.common.pojo.IDGenerateFactory;
 import com.github.chenlijia1111.commonModule.common.pojo.coupon.AbstractCoupon;
@@ -154,6 +155,7 @@ public class ShoppingOrderBiz {
                     setGoodsId(goodId).
                     setCount(count).
                     setState(CommonMallConstants.ORDER_INIT).
+                    setOrderType(OrderTypeEnum.ORDINARY_ORDER.getType()).
                     setProductAmountTotal(goodVo.getPrice() * count).
                     setGoodPrice(goodVo.getPrice()).
                     setOrderAmountTotal(goodVo.getPrice() * count).
