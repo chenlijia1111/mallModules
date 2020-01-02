@@ -220,7 +220,7 @@ public class SpikeOrderBiz {
         ImmediatePaymentOrder immediatePaymentOrder = new ImmediatePaymentOrder().
                 setOrderNo(sendOrderNo).
                 setCustom(userId).
-                setShops(product.getShops() + "").
+                setShops(product.getShops()).
                 setState(CommonMallConstants.ORDER_INIT).
                 setRecUser(params.getReceiverName()).
                 setRecTel(params.getReceiverTelephone()).
@@ -240,7 +240,7 @@ public class SpikeOrderBiz {
         ReceivingGoodsOrder receivingGoodsOrder = new ReceivingGoodsOrder().
                 setOrderNo(receiveOrderNo).
                 setCustom(userId).
-                setShops(product.getShops() + "").
+                setShops(product.getShops()).
                 setState(CommonMallConstants.ORDER_INIT).
                 setShoppingOrder(orderNo).
                 setImmediatePaymentOrder(sendOrderNo).

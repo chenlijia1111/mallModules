@@ -3,7 +3,6 @@ package com.github.chenlijia1111.commonModule.biz;
 import com.github.chenlijia1111.commonModule.common.enums.OrderStatusEnum;
 import com.github.chenlijia1111.commonModule.common.enums.ReturnTypeEnum;
 import com.github.chenlijia1111.commonModule.common.pojo.CommonMallConstants;
-import com.github.chenlijia1111.commonModule.common.pojo.IDGenerateFactory;
 import com.github.chenlijia1111.commonModule.common.requestVo.returnOrder.ReturnOrderApplyParams;
 import com.github.chenlijia1111.commonModule.common.requestVo.returnOrder.ReturnShipParams;
 import com.github.chenlijia1111.commonModule.common.requestVo.returnOrder.ShopHandleParams;
@@ -137,10 +136,14 @@ public class ReturnOrderBiz {
      * 用户申请退货
      *
      * @param params
+     * @param returnOrderNoGenerator  退货单单号生成规则
+     * @param sendOrderNoGenerator    发货单单号生成规则
+     * @param receiveOrderNoGenerator 收货单单号生成规则
      * @return com.github.chenlijia1111.utils.common.Result
      * @since 下午 5:13 2019/11/22 0022
      **/
-    public Result applyReturnGoods(ReturnOrderApplyParams params) {
+    public Result applyReturnGoods(ReturnOrderApplyParams params, OrderIdGeneratorServiceI returnOrderNoGenerator,
+                                   OrderIdGeneratorServiceI sendOrderNoGenerator, OrderIdGeneratorServiceI receiveOrderNoGenerator) {
         //校验参数
         Result result = PropertyCheckUtil.checkProperty(params);
         if (!result.getSuccess()) {
@@ -167,7 +170,7 @@ public class ReturnOrderBiz {
         Date currentTime = new Date();
 
         //退货单
-        String returnNo = String.valueOf(IDGenerateFactory.ORDER_ID_UTIL.nextId());
+        String returnNo = returnOrderNoGenerator.createOrderNo();
         ReturnGoodsOrder returnGoodsOrder = new ReturnGoodsOrder().
                 setReOrderNo(returnNo).
                 setCustom(order.getCustom()).
@@ -185,7 +188,7 @@ public class ReturnOrderBiz {
 
         //添加发货单
         //发货单单号
-        String sendOrderNo = String.valueOf(IDGenerateFactory.ORDER_ID_UTIL.nextId());
+        String sendOrderNo = sendOrderNoGenerator.createOrderNo();
         ImmediatePaymentOrder immediatePaymentOrder = new ImmediatePaymentOrder().
                 setOrderNo(sendOrderNo).
                 setCustom(order.getCustom()).
@@ -198,7 +201,7 @@ public class ReturnOrderBiz {
 
         //添加收货单
         //收货单单号
-        String receiveOrderNo = String.valueOf(IDGenerateFactory.ORDER_ID_UTIL.nextId());
+        String receiveOrderNo = receiveOrderNoGenerator.createOrderNo();
         ReceivingGoodsOrder receivingGoodsOrder = new ReceivingGoodsOrder().
                 setOrderNo(receiveOrderNo).
                 setCustom(order.getCustom()).
@@ -217,10 +220,11 @@ public class ReturnOrderBiz {
      * 用户申请退款
      *
      * @param params
+     * @param returnOrderNoGenerator 退货单单号生成规则
      * @return com.github.chenlijia1111.utils.common.Result
      * @since 下午 5:14 2019/11/22 0022
      **/
-    public Result applyReturnMoney(ReturnOrderApplyParams params) {
+    public Result applyReturnMoney(ReturnOrderApplyParams params, OrderIdGeneratorServiceI returnOrderNoGenerator) {
         //校验参数
         Result result = PropertyCheckUtil.checkProperty(params);
         if (!result.getSuccess()) {
@@ -246,7 +250,7 @@ public class ReturnOrderBiz {
         Date currentTime = new Date();
 
         //退货单
-        String returnNo = String.valueOf(IDGenerateFactory.ORDER_ID_UTIL.nextId());
+        String returnNo = returnOrderNoGenerator.createOrderNo();
         ReturnGoodsOrder returnGoodsOrder = new ReturnGoodsOrder().
                 setReOrderNo(returnNo).
                 setCustom(order.getCustom()).
@@ -473,7 +477,7 @@ public class ReturnOrderBiz {
      * @return com.github.chenlijia1111.utils.common.Result
      * @since 下午 5:15 2019/11/22 0022
      **/
-    public Result shoprefundMoney(ShopRefundParams params) {
+    public Result shopRefundMoney(ShopRefundParams params) {
 
         //校验参数
         Result result = PropertyCheckUtil.checkProperty(params);
