@@ -14,7 +14,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * 已天为单位
  * 订单类型代号 1代表组订单 2代表订单编号 3代表发货单 4代表收货单 5代表退货单
  * <p>
- * 1 + 年月日 + 6位流水
+ * 5 + 年月日 + 6位流水
  *
  * @author Chen LiJia
  * @since 2019/12/30

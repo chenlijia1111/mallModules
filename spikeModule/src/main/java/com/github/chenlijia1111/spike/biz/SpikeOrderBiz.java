@@ -67,13 +67,19 @@ public class SpikeOrderBiz {
     /**
      * 添加秒杀订单
      *
-     * @param params      下单参数
-     * @param retryLength 重试次数,这个参数可以给vip使用,也就是说普通用户只会抢一次,抢不到就失败了,而vip用户可以多抢几次
+     * @param params                 下单参数
+     * @param groupIdGenerateImpl    组订单编号生成器
+     * @param shoppingIdGenerateImpl 购物单订单编号生成器 默认实现 {@link com.github.chenlijia1111.spike.service.impl.SpikeOrderNoGeneratorServiceImpl}
+     * @param sendIdGenerateImpl     发货订单编号生成器
+     * @param receiveIdGenerateImpl  收货订单编号生成器
+     * @param retryLength            重试次数,这个参数可以给vip使用,也就是说普通用户只会抢一次,抢不到就失败了,而vip用户可以多抢几次
      * @return com.github.chenlijia1111.utils.common.Result
      * @since 下午 3:15 2019/11/25 0025
      **/
     @Transactional
-    public Result addSpikeOrder(SpikeOrderAddParams params, Integer retryLength) {
+    public Result addSpikeOrder(SpikeOrderAddParams params, OrderIdGeneratorServiceI groupIdGenerateImpl,
+                                OrderIdGeneratorServiceI shoppingIdGenerateImpl, OrderIdGeneratorServiceI sendIdGenerateImpl,
+                                OrderIdGeneratorServiceI receiveIdGenerateImpl, Integer retryLength) {
 
         //重试次数默认为0
         if (Objects.isNull(retryLength)) {
@@ -123,7 +129,7 @@ public class SpikeOrderBiz {
         //可以进行秒杀
         //下单
         //组订单Id
-        String groupId = String.valueOf(IDGenerateFactory.ORDER_ID_UTIL.nextId());
+        String groupId = groupIdGenerateImpl.createOrderNo();
 
         //开始处理订单
         //商品id
@@ -146,7 +152,7 @@ public class SpikeOrderBiz {
         }
 
         //订单编号
-        String orderNo = String.valueOf(IDGenerateFactory.ORDER_ID_UTIL.nextId());
+        String orderNo = shoppingIdGenerateImpl.createOrderNo();
 
         //添加秒杀订单记录
         //新版本号
@@ -208,7 +214,7 @@ public class SpikeOrderBiz {
 
         //添加发货单
         //发货单单号
-        String sendOrderNo = String.valueOf(IDGenerateFactory.ORDER_ID_UTIL.nextId());
+        String sendOrderNo = sendIdGenerateImpl.createOrderNo();
         ImmediatePaymentOrder immediatePaymentOrder = new ImmediatePaymentOrder().
                 setOrderNo(sendOrderNo).
                 setCustom(userId).
@@ -228,7 +234,7 @@ public class SpikeOrderBiz {
 
         //添加收货单
         //收货单单号
-        String receiveOrderNo = String.valueOf(IDGenerateFactory.ORDER_ID_UTIL.nextId());
+        String receiveOrderNo = receiveIdGenerateImpl.createOrderNo();
         ReceivingGoodsOrder receivingGoodsOrder = new ReceivingGoodsOrder().
                 setOrderNo(receiveOrderNo).
                 setCustom(userId).
