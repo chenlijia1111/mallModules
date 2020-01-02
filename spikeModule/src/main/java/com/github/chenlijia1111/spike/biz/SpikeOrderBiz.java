@@ -12,6 +12,7 @@ import com.github.chenlijia1111.commonModule.common.responseVo.product.GoodVo;
 import com.github.chenlijia1111.commonModule.entity.*;
 import com.github.chenlijia1111.commonModule.service.*;
 import com.github.chenlijia1111.spike.common.requestVo.spikeOrder.SpikeOrderAddParams;
+import com.github.chenlijia1111.spike.common.response.product.SpikeAdminProductVo;
 import com.github.chenlijia1111.spike.entity.SpikeOrderRecode;
 import com.github.chenlijia1111.spike.entity.SpikeProduct;
 import com.github.chenlijia1111.spike.service.SpikeOrderRecodeServiceI;
@@ -20,6 +21,7 @@ import com.github.chenlijia1111.utils.common.Result;
 import com.github.chenlijia1111.utils.common.constant.BooleanConstant;
 import com.github.chenlijia1111.utils.core.*;
 import com.github.chenlijia1111.utils.list.Lists;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -206,9 +208,17 @@ public class SpikeOrderBiz {
                 setGroupId(groupId).
                 setCreateTime(currentTime).setRemarks(params.getRemarks());
 
-        //订单快照
+        //秒杀订单产品快照
         AdminProductVo adminProductVo = productService.findAdminProductVoByProductId(goodVo.getProductId());
-        String productSnapshot = JSONUtil.objToStr(adminProductVo);
+        SpikeAdminProductVo spikeAdminProductVo = new SpikeAdminProductVo();
+        BeanUtils.copyProperties(adminProductVo, spikeAdminProductVo);
+        //参与场次开始时间
+        spikeAdminProductVo.setSpikeStartTime(spikeProduct.getStartTime());
+        //参与场次结束时间
+        spikeAdminProductVo.setSpikeEndTime(spikeProduct.getEndTime());
+        //秒杀价格
+        spikeAdminProductVo.setSpikePrice(spikeProduct.getSpikePrice());
+        String productSnapshot = JSONUtil.objToStr(spikeAdminProductVo);
         shoppingOrder.setDetailsJson(productSnapshot);
 
         //订单备注
@@ -409,11 +419,6 @@ public class SpikeOrderBiz {
                 setOrderAmountTotal(spikeProduct.getSpikePrice() * count).
                 setGroupId(groupId).
                 setCreateTime(currentTime).setRemarks(params.getRemarks());
-
-        //订单快照
-        AdminProductVo adminProductVo = productService.findAdminProductVoByProductId(goodVo.getProductId());
-        String productSnapshot = JSONUtil.objToStr(adminProductVo);
-        shoppingOrder.setDetailsJson(productSnapshot);
 
         //订单备注
         shoppingOrder.setRemarks(params.getRemarks());

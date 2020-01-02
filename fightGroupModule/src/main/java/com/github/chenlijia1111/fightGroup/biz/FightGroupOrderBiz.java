@@ -12,6 +12,7 @@ import com.github.chenlijia1111.commonModule.entity.*;
 import com.github.chenlijia1111.commonModule.service.*;
 import com.github.chenlijia1111.fightGroup.common.enums.FightGroupStstusEnum;
 import com.github.chenlijia1111.fightGroup.common.requestVo.fightGroupOrder.FightGroupOrderAddParams;
+import com.github.chenlijia1111.fightGroup.common.response.product.FightGroupAdminProductVo;
 import com.github.chenlijia1111.fightGroup.entity.FightGroup;
 import com.github.chenlijia1111.fightGroup.entity.FightGroupProduct;
 import com.github.chenlijia1111.fightGroup.entity.FightGroupUserOrder;
@@ -22,6 +23,7 @@ import com.github.chenlijia1111.utils.common.Result;
 import com.github.chenlijia1111.utils.common.constant.BooleanConstant;
 import com.github.chenlijia1111.utils.core.*;
 import com.github.chenlijia1111.utils.list.Lists;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -269,7 +271,22 @@ public class FightGroupOrderBiz {
 
         //订单快照
         AdminProductVo adminProductVo = productService.findAdminProductVoByProductId(goodVo.getProductId());
-        String productSnapshot = JSONUtil.objToStr(adminProductVo);
+        FightGroupAdminProductVo fightGroupAdminProductVo = new FightGroupAdminProductVo();
+        BeanUtils.copyProperties(adminProductVo, fightGroupAdminProductVo);
+        //拼团开始时间
+        fightGroupAdminProductVo.setFightStartTime(fightGroupProduct.getStartTime());
+        //拼团结束时间
+        fightGroupAdminProductVo.setFightEndTime(fightGroupProduct.getEndTime());
+        //拼团价格
+        fightGroupAdminProductVo.setFightPrice(fightGroupProduct.getFightPrice());
+        //成团人数
+        fightGroupAdminProductVo.setGroupPersonCount(fightGroupProduct.getGroupPersonCount());
+        //每人限购数量
+        fightGroupAdminProductVo.setFightGroupPersonLimitCount(fightGroupProduct.getPersonLimitCount());
+        //最大拼团时间(分钟),超过自动解散
+        fightGroupAdminProductVo.setMaxFightTime(fightGroupProduct.getMaxFightTime());
+        //转json字符串
+        String productSnapshot = JSONUtil.objToStr(fightGroupAdminProductVo);
         shoppingOrder.setDetailsJson(productSnapshot);
 
         //订单备注
