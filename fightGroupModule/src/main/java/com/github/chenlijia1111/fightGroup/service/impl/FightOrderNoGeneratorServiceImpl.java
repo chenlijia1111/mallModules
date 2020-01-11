@@ -1,6 +1,7 @@
 package com.github.chenlijia1111.fightGroup.service.impl;
 
 import com.github.chenlijia1111.commonModule.service.OrderIdGeneratorServiceI;
+import com.github.chenlijia1111.commonModule.service.impl.ShoppingOrderIdGeneratorServiceImpl;
 import com.github.chenlijia1111.utils.core.StringUtils;
 
 import java.time.LocalDate;
@@ -21,9 +22,6 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class FightOrderNoGeneratorServiceImpl implements OrderIdGeneratorServiceI {
 
-    //当前序号
-    private static AtomicInteger currentNumber = new AtomicInteger(0);
-
     //上次获取的天
     private static LocalDate lastDay = LocalDate.now();
 
@@ -35,11 +33,11 @@ public class FightOrderNoGeneratorServiceImpl implements OrderIdGeneratorService
         //判断跟上次是否是同一天
         if (!Objects.equals(nowDate, lastDay)) {
             //重新初始化
-            currentNumber = new AtomicInteger(0);
+            ShoppingOrderIdGeneratorServiceImpl.currentNumber = new AtomicInteger(0);
         }
 
         lastDay = nowDate;
-        String groupId = StringUtils.completeIntToFixedLengthStr("7" + nowDate.format(DateTimeFormatter.ofPattern("yyyyMMdd")), 6, currentNumber.addAndGet(1), '0');
+        String groupId = StringUtils.completeIntToFixedLengthStr("7" + nowDate.format(DateTimeFormatter.ofPattern("yyyyMMdd")), 6, ShoppingOrderIdGeneratorServiceImpl.currentNumber.addAndGet(1), '0');
         return groupId;
     }
 

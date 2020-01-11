@@ -10,5 +10,12 @@ import tk.mybatis.mapper.common.Mapper;
  * @version 1.0
  **/
 public interface ReturnGoodsOrderMapper extends Mapper<ReturnGoodsOrder> {
-    ReturnGoodsOrder selectByPrimaryKey(String reOrderNo);
+
+
+    /**
+     * 查找当前最大组订单号
+     * @return
+     */
+    String maxOrderNo();
+
 }

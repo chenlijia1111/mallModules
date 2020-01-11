@@ -23,4 +23,10 @@ public interface ImmediatePaymentOrderMapper extends Mapper<ImmediatePaymentOrde
      **/
     List<ImmediatePaymentOrder> listByFrontOrderNoSet(@Param("frontNoSet") Set<String> frontNoSet);
 
+    /**
+     * 获取最大订单号
+     * @return
+     */
+    String maxOrderNo();
+
 }

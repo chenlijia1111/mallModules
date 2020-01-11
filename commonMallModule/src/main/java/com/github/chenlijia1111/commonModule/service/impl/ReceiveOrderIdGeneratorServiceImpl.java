@@ -22,7 +22,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class ReceiveOrderIdGeneratorServiceImpl implements OrderIdGeneratorServiceI {
 
     //当前序号
-    private static AtomicInteger currentNumber = new AtomicInteger(0);
+    public static AtomicInteger currentNumber = new AtomicInteger(0);
 
     //上次获取的天
     private static LocalDate lastDay = LocalDate.now();

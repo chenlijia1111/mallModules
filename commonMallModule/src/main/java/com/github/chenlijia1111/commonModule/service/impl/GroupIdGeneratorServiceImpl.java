@@ -12,7 +12,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * 组订单生成策略
  * 约定
  * 已天为单位
- * 订单类型代号 1代表组订单 2代表订单编号 3代表发货单 4代表收货单 5代表退货单
+ * 订单类型代号 1代表组订单 2代表订单编号 3代表发货单 4代表收货单 5代表退货单 6拼团 7秒杀
  * <p>
  * 1 + 年月日 + 6位流水
  *
@@ -22,7 +22,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class GroupIdGeneratorServiceImpl implements OrderIdGeneratorServiceI {
 
     //当前序号
-    private static AtomicInteger currentNumber = new AtomicInteger(0);
+    public static AtomicInteger currentNumber = new AtomicInteger(0);
 
     //上次获取的天
     private static LocalDate lastDay = LocalDate.now();

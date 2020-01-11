@@ -26,5 +26,34 @@
     pay_record, transaction_id, good_price, order_amount_total, pay_time, group_id, payable, create_time,
     remarks, shop_remarks, details_json, order_coupon
   </sql>
-
+  <select id="listByGroupIdSet" resultMap="BaseResultMap">
+    SELECT
+    <include refid="Base_Column_List"></include>
+    FROM
+    s_shopping_order
+    <foreach collection="groupIdSet" item="groupId" open="WHERE group_id IN (" close=")" separator=",">
+      #{groupId}
+    </foreach>
+  </select>
+  <select id="listByOrderNoSet" resultMap="BaseResultMap">
+    SELECT
+    <include refid="Base_Column_List"></include>
+    FROM
+    s_shopping_order
+    <foreach collection="orderNoSet" item="orderNo" open="WHERE order_no IN (" close=")" separator=",">
+      #{orderNo}
+    </foreach>
+  </select>
+  <select id="maxOrderNo" resultType="java.lang.String">
+    SELECT s_shopping_order.order_no
+    FROM s_shopping_order
+    ORDER BY s_shopping_order.create_time DESC
+    LIMIT 1
+  </select>
+  <select id="maxGroupId" resultType="java.lang.String">
+    SELECT s_shopping_order.group_id
+    FROM s_shopping_order
+    ORDER BY s_shopping_order.create_time DESC
+    LIMIT 1
+  </select>
 </mapper>

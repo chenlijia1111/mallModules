@@ -23,4 +23,10 @@ public interface ReceivingGoodsOrderMapper extends Mapper<ReceivingGoodsOrder> {
      **/
     List<ReceivingGoodsOrder> listByFrontOrderNoSet(@Param("frontOrderNoSet") Set<String> frontOrderNoSet);
 
+    /**
+     * 获取最大订单号
+     * @return
+     */
+    String maxOrderNo();
+
 }

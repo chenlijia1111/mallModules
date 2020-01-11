@@ -39,4 +39,10 @@
       #{frontNo}
     </foreach>
   </select>
+  <select id="maxOrderNo" resultType="java.lang.String">
+    SELECT s_immediate_payment_order.order_no
+    FROM s_immediate_payment_order
+    ORDER BY s_immediate_payment_order.create_time DESC
+    LIMIT 1
+  </select>
 </mapper>

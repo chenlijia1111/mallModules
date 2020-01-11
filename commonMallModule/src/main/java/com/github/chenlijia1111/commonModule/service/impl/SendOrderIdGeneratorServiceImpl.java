@@ -16,13 +16,15 @@ import java.util.concurrent.atomic.AtomicInteger;
  * <p>
  * 3 + 年月日 + 6位流水
  *
+ * 在初始化的时候拿到当前的流水初始值
+ *
  * @author Chen LiJia
  * @since 2019/12/30
  */
 public class SendOrderIdGeneratorServiceImpl implements OrderIdGeneratorServiceI {
 
     //当前序号
-    private static AtomicInteger currentNumber = new AtomicInteger(0);
+    public static AtomicInteger currentNumber = new AtomicInteger(0);
 
     //上次获取的天
     private static LocalDate lastDay = LocalDate.now();
