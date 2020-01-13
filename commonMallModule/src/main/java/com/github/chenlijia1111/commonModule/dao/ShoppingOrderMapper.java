@@ -46,4 +46,11 @@ public interface ShoppingOrderMapper extends Mapper<ShoppingOrder> {
     String maxGroupId();
 
 
+    /**
+     * 查找当前最大商家组订单号
+     * @return
+     */
+    String maxShopGroupId();
+
+
 }

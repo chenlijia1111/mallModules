@@ -70,19 +70,21 @@ public class SpikeOrderBiz {
     /**
      * 添加秒杀订单
      *
-     * @param params                 下单参数
-     * @param groupIdGenerateImpl    组订单编号生成器
-     * @param shoppingIdGenerateImpl 购物单订单编号生成器 默认实现 {@link com.github.chenlijia1111.spike.service.impl.SpikeOrderNoGeneratorServiceImpl}
-     * @param sendIdGenerateImpl     发货订单编号生成器
-     * @param receiveIdGenerateImpl  收货订单编号生成器
-     * @param retryLength            重试次数,这个参数可以给vip使用,也就是说普通用户只会抢一次,抢不到就失败了,而vip用户可以多抢几次
+     * @param params                   下单参数
+     * @param groupIdGenerateImpl      组订单编号生成器
+     * @param shoppingIdGenerateImpl   购物单订单编号生成器 默认实现 {@link com.github.chenlijia1111.spike.service.impl.SpikeOrderNoGeneratorServiceImpl}
+     * @param sendIdGenerateImpl       发货订单编号生成器
+     * @param receiveIdGenerateImpl    收货订单编号生成器
+     * @param shopGroupIdGeneratorImpl 商家组订单Id生成器
+     * @param retryLength              重试次数,这个参数可以给vip使用,也就是说普通用户只会抢一次,抢不到就失败了,而vip用户可以多抢几次
      * @return com.github.chenlijia1111.utils.common.Result
      * @since 下午 3:15 2019/11/25 0025
      **/
     @Transactional
     public Result addSpikeOrder(SpikeOrderAddParams params, OrderIdGeneratorServiceI groupIdGenerateImpl,
                                 OrderIdGeneratorServiceI shoppingIdGenerateImpl, OrderIdGeneratorServiceI sendIdGenerateImpl,
-                                OrderIdGeneratorServiceI receiveIdGenerateImpl, Integer retryLength) {
+                                OrderIdGeneratorServiceI receiveIdGenerateImpl, OrderIdGeneratorServiceI shopGroupIdGeneratorImpl,
+                                Integer retryLength) {
 
         //重试次数默认为0
         if (Objects.isNull(retryLength)) {
@@ -133,6 +135,8 @@ public class SpikeOrderBiz {
         //下单
         //组订单Id
         String groupId = groupIdGenerateImpl.createOrderNo();
+        //商家组订单编号
+        String shopGroupId = shopGroupIdGeneratorImpl.createOrderNo();
 
         //开始处理订单
         //商品id
@@ -205,6 +209,7 @@ public class SpikeOrderBiz {
                 setProductAmountTotal(spikeProduct.getSpikePrice() * count).
                 setGoodPrice(spikeProduct.getSpikePrice()).
                 setOrderAmountTotal(spikeProduct.getSpikePrice() * count).
+                setShopGroupId(shopGroupId).
                 setGroupId(groupId).
                 setCreateTime(currentTime).setRemarks(params.getRemarks());
 

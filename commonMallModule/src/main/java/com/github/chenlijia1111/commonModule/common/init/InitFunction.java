@@ -52,6 +52,11 @@ public class InitFunction implements ApplicationListener<ContextRefreshedEvent> 
         AtomicInteger groupIdSerialNum = createInitOrderAtomicInteger(maxGroupId);
         GroupIdGeneratorServiceImpl.currentNumber = groupIdSerialNum;
 
+        //商家组订单编号
+        String maxShopGroupId = orderMapper.maxShopGroupId();
+        AtomicInteger shopGroupIdSerialNum = createInitOrderAtomicInteger(maxShopGroupId);
+        ShopGroupIdGeneratorServiceImpl.currentNumber = shopGroupIdSerialNum;
+
         //订单编号
         String maxOrderNo = orderMapper.maxOrderNo();
         AtomicInteger orderNoSerialNum = createInitOrderAtomicInteger(maxOrderNo);

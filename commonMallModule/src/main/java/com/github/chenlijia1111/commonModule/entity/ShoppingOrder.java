@@ -18,6 +18,15 @@ import java.util.List;
 
 /**
  * 订单
+ * 对于整个支付来说,利用 {@link #groupId} 来标记这些订单时一起支付的
+ * 对用用户来说,在一个商家支付的订单应该时一个订单 所以用 {@link #shopGroupId} 来进行标记
+ *
+ * 查询的时候看需求而定
+ * 京东对于订单查询时子订单完全分开的
+ * 而淘宝对于订单是把一起支付的同一商家的订单合并的,可以分开发货(比较复杂),也就是说用户在商家下了好多个商品一起支付,
+ * 商家可以只发一个发货单,也可以分开发货,这样的话,发货单的 frontOrderNo 就应该是 {@link #shopGroupId}
+ *
+ * 当前实现的是京东的这种模式,每一个子订单都会有发货单
  *
  * @author chenLiJia
  * @version 1.0
@@ -146,6 +155,14 @@ public class ShoppingOrder {
     @PropertyCheck(name = "支付时间")
     @Column(name = "pay_time")
     private Date payTime;
+
+    /**
+     * 商家组订单id
+     */
+    @ApiModelProperty("商家组订单id")
+    @PropertyCheck(name = "商家组订单id")
+    @Column(name = "shop_group_id")
+    private String shopGroupId;
 
     /**
      * 组订单id

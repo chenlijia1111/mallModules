@@ -56,4 +56,10 @@
     ORDER BY s_shopping_order.create_time DESC
     LIMIT 1
   </select>
+  <select id="maxShopGroupId" resultType="java.lang.String">
+    SELECT s_shopping_order.shop_group_id
+    FROM s_shopping_order
+    ORDER BY s_shopping_order.create_time DESC
+    LIMIT 1
+  </select>
 </mapper>

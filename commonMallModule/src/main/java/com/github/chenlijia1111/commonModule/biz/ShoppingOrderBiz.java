@@ -74,18 +74,19 @@ public class ShoppingOrderBiz {
      * <p>
      * 总应付金额等于所有单个订单的应付金额之和 {@link ShoppingOrder#getPayable()}
      *
-     * @param params                 1
-     * @param groupIdGenerateImpl    组订单单号生成规则
-     * @param shoppingIdGenerateImpl 购物订单单号生成规则
-     * @param sendIdGenerateImpl     发货订单单号生成规则
-     * @param receiveIdGenerateImpl  收货订单单号生成规则
+     * @param params                   1
+     * @param groupIdGenerateImpl      组订单单号生成规则
+     * @param shoppingIdGenerateImpl   购物订单单号生成规则
+     * @param sendIdGenerateImpl       发货订单单号生成规则
+     * @param receiveIdGenerateImpl    收货订单单号生成规则
+     * @param shopGroupIdGeneratorImpl 商家组订单号生成规则
      * @return com.github.chenlijia1111.utils.common.Result
      * @since 下午 4:53 2019/11/5 0005
      **/
     @Transactional
     public Result add(OrderAddParams params, OrderIdGeneratorServiceI groupIdGenerateImpl,
                       OrderIdGeneratorServiceI shoppingIdGenerateImpl, OrderIdGeneratorServiceI sendIdGenerateImpl,
-                      OrderIdGeneratorServiceI receiveIdGenerateImpl) {
+                      OrderIdGeneratorServiceI receiveIdGenerateImpl, OrderIdGeneratorServiceI shopGroupIdGeneratorImpl) {
 
         //校验参数
         Result result = PropertyCheckUtil.checkProperty(params);
@@ -112,6 +113,8 @@ public class ShoppingOrderBiz {
         String groupId = groupIdGenerateImpl.createOrderNo();
         //当前时间
         Date currentTime = new Date();
+        //商家组订单id集合-用于判断是否生成过了商家组订单号,防止重复生成
+        Map<String, String> shopGroupIdMap = new HashMap<>();
 
         //开始处理订单
         ArrayList<ShoppingOrder> orderList = Lists.newArrayList();
@@ -148,6 +151,12 @@ public class ShoppingOrderBiz {
 
             //订单编号
             String orderNo = shoppingIdGenerateImpl.createOrderNo();
+            //商家组订单编号
+            String shopGroupId = shopGroupIdMap.get(product.getShops());
+            if (Objects.isNull(shopGroupId)) {
+                shopGroupId = shopGroupIdGeneratorImpl.createOrderNo();
+                shopGroupIdMap.put(product.getShops(), shopGroupId);
+            }
 
             ShoppingOrder shoppingOrder = new ShoppingOrder().setOrderNo(orderNo).
                     setCustom(userId).
@@ -159,6 +168,7 @@ public class ShoppingOrderBiz {
                     setProductAmountTotal(goodVo.getPrice() * count).
                     setGoodPrice(goodVo.getPrice()).
                     setOrderAmountTotal(goodVo.getPrice() * count).
+                    setShopGroupId(shopGroupId).
                     setGroupId(groupId).
                     setCreateTime(currentTime).setRemarks(params.getRemarks());
 
