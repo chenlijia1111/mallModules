@@ -17,6 +17,7 @@ import com.github.chenlijia1111.spike.entity.SpikeOrderRecode;
 import com.github.chenlijia1111.spike.entity.SpikeProduct;
 import com.github.chenlijia1111.spike.service.SpikeOrderRecodeServiceI;
 import com.github.chenlijia1111.spike.service.SpikeProductServiceI;
+import com.github.chenlijia1111.spike.service.impl.SpikeNoGeneratorServiceImpl;
 import com.github.chenlijia1111.utils.common.Result;
 import com.github.chenlijia1111.utils.common.constant.BooleanConstant;
 import com.github.chenlijia1111.utils.core.*;
@@ -72,7 +73,7 @@ public class SpikeOrderBiz {
      *
      * @param params                   下单参数
      * @param groupIdGenerateImpl      组订单编号生成器
-     * @param shoppingIdGenerateImpl   购物单订单编号生成器 默认实现 {@link com.github.chenlijia1111.spike.service.impl.SpikeOrderNoGeneratorServiceImpl}
+     * @param shoppingIdGenerateImpl   购物单订单编号生成器 默认实现 {@link SpikeNoGeneratorServiceImpl}
      * @param sendIdGenerateImpl       发货订单编号生成器
      * @param receiveIdGenerateImpl    收货订单编号生成器
      * @param shopGroupIdGeneratorImpl 商家组订单Id生成器
@@ -81,9 +82,9 @@ public class SpikeOrderBiz {
      * @since 下午 3:15 2019/11/25 0025
      **/
     @Transactional
-    public Result addSpikeOrder(SpikeOrderAddParams params, OrderIdGeneratorServiceI groupIdGenerateImpl,
-                                OrderIdGeneratorServiceI shoppingIdGenerateImpl, OrderIdGeneratorServiceI sendIdGenerateImpl,
-                                OrderIdGeneratorServiceI receiveIdGenerateImpl, OrderIdGeneratorServiceI shopGroupIdGeneratorImpl,
+    public Result addSpikeOrder(SpikeOrderAddParams params, IdGeneratorServiceI groupIdGenerateImpl,
+                                IdGeneratorServiceI shoppingIdGenerateImpl, IdGeneratorServiceI sendIdGenerateImpl,
+                                IdGeneratorServiceI receiveIdGenerateImpl, IdGeneratorServiceI shopGroupIdGeneratorImpl,
                                 Integer retryLength) {
 
         //重试次数默认为0

@@ -19,6 +19,7 @@ import com.github.chenlijia1111.fightGroup.entity.FightGroupUserOrder;
 import com.github.chenlijia1111.fightGroup.service.FightGroupProductServiceI;
 import com.github.chenlijia1111.fightGroup.service.FightGroupServiceI;
 import com.github.chenlijia1111.fightGroup.service.FightGroupUserOrderServiceI;
+import com.github.chenlijia1111.fightGroup.service.impl.FightNoGeneratorServiceImpl;
 import com.github.chenlijia1111.utils.common.Result;
 import com.github.chenlijia1111.utils.common.constant.BooleanConstant;
 import com.github.chenlijia1111.utils.core.*;
@@ -83,7 +84,7 @@ public class FightGroupOrderBiz {
      *
      * @param params                   下单参数
      * @param groupIdGenerateImpl      组订单编号生成器
-     * @param shoppingIdGenerateImpl   购物单订单编号生成器 默认实现 {@link com.github.chenlijia1111.fightGroup.service.impl.FightOrderNoGeneratorServiceImpl}
+     * @param shoppingIdGenerateImpl   购物单订单编号生成器 默认实现 {@link FightNoGeneratorServiceImpl}
      * @param sendIdGenerateImpl       发货订单编号生成器
      * @param receiveIdGenerateImpl    收货订单编号生成器
      * @param shopGroupIdGeneratorImpl 商家组订单id生成器
@@ -93,9 +94,9 @@ public class FightGroupOrderBiz {
      * @since 下午 2:49 2019/11/26 0026
      **/
     @Transactional
-    public Result addFightGroupOrder(FightGroupOrderAddParams params, OrderIdGeneratorServiceI groupIdGenerateImpl,
-                                     OrderIdGeneratorServiceI shoppingIdGenerateImpl, OrderIdGeneratorServiceI sendIdGenerateImpl,
-                                     OrderIdGeneratorServiceI receiveIdGenerateImpl, OrderIdGeneratorServiceI shopGroupIdGeneratorImpl
+    public Result addFightGroupOrder(FightGroupOrderAddParams params, IdGeneratorServiceI groupIdGenerateImpl,
+                                     IdGeneratorServiceI shoppingIdGenerateImpl, IdGeneratorServiceI sendIdGenerateImpl,
+                                     IdGeneratorServiceI receiveIdGenerateImpl, IdGeneratorServiceI shopGroupIdGeneratorImpl
             , Integer retryLength) {
 
         //重试次数默认为0

@@ -60,4 +60,11 @@
     WHERE s_product.delete_status = 0
     ORDER BY s_product.create_time DESC
   </select>
+  <select id="maxProductNo" resultType="java.lang.String">
+    SELECT
+    s_product.id
+    FROM s_product
+    ORDER BY s_product.create_time DESC
+    LIMIT 1
+  </select>
 </mapper>

@@ -1,9 +1,6 @@
 package com.github.chenlijia1111.commonModule.common.init;
 
-import com.github.chenlijia1111.commonModule.dao.ImmediatePaymentOrderMapper;
-import com.github.chenlijia1111.commonModule.dao.ReceivingGoodsOrderMapper;
-import com.github.chenlijia1111.commonModule.dao.ReturnGoodsOrderMapper;
-import com.github.chenlijia1111.commonModule.dao.ShoppingOrderMapper;
+import com.github.chenlijia1111.commonModule.dao.*;
 import com.github.chenlijia1111.commonModule.service.impl.*;
 import com.github.chenlijia1111.commonModule.utils.SpringContextHolder;
 import com.github.chenlijia1111.utils.core.StringUtils;
@@ -25,7 +22,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @since 2019/11/27 0027 上午 9:19
  **/
 @Service
-public class InitFunction implements ApplicationListener<ContextRefreshedEvent> {
+public class CommonMallInitFunction implements ApplicationListener<ContextRefreshedEvent> {
 
 
     @Override
@@ -47,6 +44,8 @@ public class InitFunction implements ApplicationListener<ContextRefreshedEvent> 
         ImmediatePaymentOrderMapper immediatePaymentOrderMapper = SpringContextHolder.getBean(ImmediatePaymentOrderMapper.class);
         ReceivingGoodsOrderMapper receivingGoodsOrderMapper = SpringContextHolder.getBean(ReceivingGoodsOrderMapper.class);
         ReturnGoodsOrderMapper returnGoodsOrderMapper = SpringContextHolder.getBean(ReturnGoodsOrderMapper.class);
+        ProductMapper productMapper = SpringContextHolder.getBean(ProductMapper.class);
+
         //组订单编号
         String maxGroupId = orderMapper.maxGroupId();
         AtomicInteger groupIdSerialNum = createInitOrderAtomicInteger(maxGroupId);
@@ -60,22 +59,27 @@ public class InitFunction implements ApplicationListener<ContextRefreshedEvent> 
         //订单编号
         String maxOrderNo = orderMapper.maxOrderNo();
         AtomicInteger orderNoSerialNum = createInitOrderAtomicInteger(maxOrderNo);
-        ShoppingOrderIdGeneratorServiceImpl.currentNumber = orderNoSerialNum;
+        ShoppingIdGeneratorServiceImpl.currentNumber = orderNoSerialNum;
 
         //发货单编号
         String maxSendOrderNo = immediatePaymentOrderMapper.maxOrderNo();
         AtomicInteger sendOrderNoSerialNum = createInitOrderAtomicInteger(maxSendOrderNo);
-        SendOrderIdGeneratorServiceImpl.currentNumber = sendOrderNoSerialNum;
+        SendIdGeneratorServiceImpl.currentNumber = sendOrderNoSerialNum;
 
         //收货单编号
         String maxReceiveOrderNo = receivingGoodsOrderMapper.maxOrderNo();
         AtomicInteger receiveOrderNoSerialNum = createInitOrderAtomicInteger(maxReceiveOrderNo);
-        ReceiveOrderIdGeneratorServiceImpl.currentNumber = receiveOrderNoSerialNum;
+        ReceiveIdGeneratorServiceImpl.currentNumber = receiveOrderNoSerialNum;
 
         //退货单编号
         String maxReturnOrderNo = returnGoodsOrderMapper.maxOrderNo();
         AtomicInteger returnOrderNoSerialNum = createInitOrderAtomicInteger(maxReturnOrderNo);
-        ReturnOrderIdGeneratorServiceImpl.currentNumber = returnOrderNoSerialNum;
+        ReturnIdGeneratorServiceImpl.currentNumber = returnOrderNoSerialNum;
+
+        //产品id编号
+        String maxProductNo = productMapper.maxProductNo();
+        AtomicInteger productNoSerailNum = createInitOrderAtomicInteger(maxProductNo);
+        ProductIdGeneratorServiceImpl.currentNumber = productNoSerailNum;
     }
 
 

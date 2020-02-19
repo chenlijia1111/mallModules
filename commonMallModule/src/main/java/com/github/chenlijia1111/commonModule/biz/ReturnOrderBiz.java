@@ -57,8 +57,8 @@ public class ReturnOrderBiz {
      * @return com.github.chenlijia1111.utils.common.Result
      * @since 下午 5:13 2019/11/22 0022
      **/
-    public Result applyReturnGoodsAndMoney(ReturnOrderApplyParams params, OrderIdGeneratorServiceI returnOrderNoGenerator,
-                                           OrderIdGeneratorServiceI sendOrderNoGenerator, OrderIdGeneratorServiceI receiveOrderNoGenerator) {
+    public Result applyReturnGoodsAndMoney(ReturnOrderApplyParams params, IdGeneratorServiceI returnOrderNoGenerator,
+                                           IdGeneratorServiceI sendOrderNoGenerator, IdGeneratorServiceI receiveOrderNoGenerator) {
 
         //校验参数
         Result result = PropertyCheckUtil.checkProperty(params);
@@ -142,8 +142,8 @@ public class ReturnOrderBiz {
      * @return com.github.chenlijia1111.utils.common.Result
      * @since 下午 5:13 2019/11/22 0022
      **/
-    public Result applyReturnGoods(ReturnOrderApplyParams params, OrderIdGeneratorServiceI returnOrderNoGenerator,
-                                   OrderIdGeneratorServiceI sendOrderNoGenerator, OrderIdGeneratorServiceI receiveOrderNoGenerator) {
+    public Result applyReturnGoods(ReturnOrderApplyParams params, IdGeneratorServiceI returnOrderNoGenerator,
+                                   IdGeneratorServiceI sendOrderNoGenerator, IdGeneratorServiceI receiveOrderNoGenerator) {
         //校验参数
         Result result = PropertyCheckUtil.checkProperty(params);
         if (!result.getSuccess()) {
@@ -224,7 +224,7 @@ public class ReturnOrderBiz {
      * @return com.github.chenlijia1111.utils.common.Result
      * @since 下午 5:14 2019/11/22 0022
      **/
-    public Result applyReturnMoney(ReturnOrderApplyParams params, OrderIdGeneratorServiceI returnOrderNoGenerator) {
+    public Result applyReturnMoney(ReturnOrderApplyParams params, IdGeneratorServiceI returnOrderNoGenerator) {
         //校验参数
         Result result = PropertyCheckUtil.checkProperty(params);
         if (!result.getSuccess()) {

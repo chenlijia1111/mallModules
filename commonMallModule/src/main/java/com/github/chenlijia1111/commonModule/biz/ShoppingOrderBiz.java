@@ -84,9 +84,9 @@ public class ShoppingOrderBiz {
      * @since 下午 4:53 2019/11/5 0005
      **/
     @Transactional
-    public Result add(OrderAddParams params, OrderIdGeneratorServiceI groupIdGenerateImpl,
-                      OrderIdGeneratorServiceI shoppingIdGenerateImpl, OrderIdGeneratorServiceI sendIdGenerateImpl,
-                      OrderIdGeneratorServiceI receiveIdGenerateImpl, OrderIdGeneratorServiceI shopGroupIdGeneratorImpl) {
+    public Result add(OrderAddParams params, IdGeneratorServiceI groupIdGenerateImpl,
+                      IdGeneratorServiceI shoppingIdGenerateImpl, IdGeneratorServiceI sendIdGenerateImpl,
+                      IdGeneratorServiceI receiveIdGenerateImpl, IdGeneratorServiceI shopGroupIdGeneratorImpl) {
 
         //校验参数
         Result result = PropertyCheckUtil.checkProperty(params);

@@ -5,12 +5,17 @@
     <parent>
         <artifactId>mallModules</artifactId>
         <groupId>com.github.chenlijia1111</groupId>
-        <version>1.0-RELEASE</version>
+        <version>1.1-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>spikeModule</artifactId>
     <description>秒杀模块</description>
+
+    <properties>
+        <mall.version>1.1-SNAPSHOT</mall.version>
+    </properties>
+
     <build>
         <plugins>
             <plugin>
@@ -28,7 +33,7 @@
         <dependency>
             <groupId>com.github.chenlijia1111</groupId>
             <artifactId>commonMallModule</artifactId>
-            <version>1.0-RELEASE</version>
+            <version>${mall.version}</version>
         </dependency>
     </dependencies>
 </project>

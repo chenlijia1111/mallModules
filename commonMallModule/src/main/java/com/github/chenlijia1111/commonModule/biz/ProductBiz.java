@@ -47,12 +47,13 @@ public class ProductBiz {
     /**
      * 添加商品
      *
-     * @param params 1
+     * @param params                    1
+     * @param productIdGeneratorService 产品id生成器
      * @return com.github.chenlijia1111.utils.common.Result
      * @since 下午 2:18 2019/11/1 0001
      **/
     @Transactional
-    public Result add(ProductAddParams params) {
+    public Result add(ProductAddParams params, IdGeneratorServiceI productIdGeneratorService) {
 
         //校验参数
         Result result = PropertyCheckUtil.checkProperty(params);
@@ -74,7 +75,7 @@ public class ProductBiz {
         Date currentTime = new Date();
 
         //产品id
-        String productId = IDGenerateFactory.PRODUCT_ID_UTIL.nextId() + "";
+        String productId = productIdGeneratorService.createOrderNo();
         Product product = new Product().setId(productId).
                 setName(params.getName()).
                 setCategoryId(params.getCategoryId()).
@@ -116,7 +117,7 @@ public class ProductBiz {
         //添加商品
         for (GoodAddParams goodAddParams : goodList) {
             //商品id
-            String goodId = IDGenerateFactory.GOOD_ID_UTIL.nextId() + "";
+            String goodId = String.valueOf(IDGenerateFactory.GOOD_ID_UTIL.nextId());
             Goods goods = new Goods().setId(goodId).
                     setProductId(productId).
                     setPrice(goodAddParams.getPrice()).
@@ -149,7 +150,7 @@ public class ProductBiz {
             }
         }
 
-        return Result.success("操作成功");
+        return Result.success("操作成功", productId);
     }
 
     /**

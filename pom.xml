@@ -6,7 +6,7 @@
 
     <groupId>com.github.chenlijia1111</groupId>
     <artifactId>mallModules</artifactId>
-    <version>1.0-RELEASE</version>
+    <version>${mall.version}</version>
     <description>商城多模块系统</description>
     <packaging>pom</packaging>
 
@@ -17,7 +17,10 @@
     </modules>
 
     <properties>
+        <mall.version>1.1-SNAPSHOT</mall.version>
         <java.version>1.8</java.version>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
         <skipTests>true</skipTests>
         <mysql-connector-java.version>8.0.17</mysql-connector-java.version>
         <lombok.version>1.18.10</lombok.version>
@@ -29,7 +32,8 @@
         <tk.mybatis.version>4.1.5</tk.mybatis.version>
         <mybatis.version>3.5.3</mybatis.version>
         <javax.servlet-api.version>4.0.1</javax.servlet-api.version>
-        <utils.version>1.1.7-SNAPSHOT</utils.version>
+        <quartz.version>2.3.1</quartz.version>
+        <utils.version>1.1.8-SNAPSHOT</utils.version>
 
         <spring-tx.version>5.2.1.RELEASE</spring-tx.version>
         <spring-web.version>5.2.1.RELEASE</spring-web.version>
@@ -110,6 +114,15 @@
             <groupId>com.github.chenlijia1111</groupId>
             <artifactId>utils</artifactId>
             <version>${utils.version}</version>
+        </dependency>
+
+        <!-- 显示引用工具类中使用到的jar包 -->
+        <!-- quartz 定时器框架 -->
+        <dependency>
+            <groupId>org.quartz-scheduler</groupId>
+            <artifactId>quartz</artifactId>
+            <version>${quartz.version}</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 

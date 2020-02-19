@@ -1,6 +1,6 @@
 package com.github.chenlijia1111.commonModule.service.impl;
 
-import com.github.chenlijia1111.commonModule.service.OrderIdGeneratorServiceI;
+import com.github.chenlijia1111.commonModule.service.IdGeneratorServiceI;
 import com.github.chenlijia1111.utils.core.StringUtils;
 
 import java.time.LocalDate;
@@ -19,7 +19,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author Chen LiJia
  * @since 2019/12/30
  */
-public class GroupIdGeneratorServiceImpl implements OrderIdGeneratorServiceI {
+public class GroupIdGeneratorServiceImpl implements IdGeneratorServiceI {
 
     //当前序号
     public static AtomicInteger currentNumber = new AtomicInteger(0);

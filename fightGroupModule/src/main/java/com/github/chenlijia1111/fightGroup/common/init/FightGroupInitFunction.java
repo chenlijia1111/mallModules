@@ -18,7 +18,7 @@ import org.springframework.stereotype.Service;
  * @since 2019/11/27 0027 上午 9:19
  **/
 @Service
-public class InitFunction implements ApplicationListener<ContextRefreshedEvent> {
+public class FightGroupInitFunction implements ApplicationListener<ContextRefreshedEvent> {
 
 
     @Override

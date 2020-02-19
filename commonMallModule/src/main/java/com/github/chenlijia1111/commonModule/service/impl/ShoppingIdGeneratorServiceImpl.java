@@ -1,6 +1,6 @@
 package com.github.chenlijia1111.commonModule.service.impl;
 
-import com.github.chenlijia1111.commonModule.service.OrderIdGeneratorServiceI;
+import com.github.chenlijia1111.commonModule.service.IdGeneratorServiceI;
 import com.github.chenlijia1111.utils.core.StringUtils;
 
 import java.time.LocalDate;
@@ -9,19 +9,17 @@ import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * 发货订单生成策略
+ * 购物订单生成策略
  * 约定
  * 已天为单位
  * 订单类型代号 1代表组订单 2代表订单编号 3代表发货单 4代表收货单 5代表退货单
  * <p>
- * 3 + 年月日 + 6位流水
- *
- * 在初始化的时候拿到当前的流水初始值
+ * 2 + 年月日 + 6位流水
  *
  * @author Chen LiJia
  * @since 2019/12/30
  */
-public class SendOrderIdGeneratorServiceImpl implements OrderIdGeneratorServiceI {
+public class ShoppingIdGeneratorServiceImpl implements IdGeneratorServiceI {
 
     //当前序号
     public static AtomicInteger currentNumber = new AtomicInteger(0);
@@ -41,7 +39,7 @@ public class SendOrderIdGeneratorServiceImpl implements OrderIdGeneratorServiceI
         }
 
         lastDay = nowDate;
-        String groupId = StringUtils.completeIntToFixedLengthStr("3" + nowDate.format(DateTimeFormatter.ofPattern("yyyyMMdd")), 6, currentNumber.addAndGet(1), '0');
+        String groupId = StringUtils.completeIntToFixedLengthStr("2" + nowDate.format(DateTimeFormatter.ofPattern("yyyyMMdd")), 6, currentNumber.addAndGet(1), '0');
         return groupId;
     }
 

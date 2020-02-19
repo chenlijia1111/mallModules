@@ -9,17 +9,17 @@ import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * 商家组订单生成策略
+ * 收货订单生成策略
  * 约定
  * 已天为单位
- * 订单类型代号 1代表组订单 2代表订单编号 3代表发货单 4代表收货单 5代表退货单 6秒杀 7拼团 8商家组订单
+ * 订单类型代号 1代表组订单 2代表订单编号 3代表发货单 4代表收货单 5代表退货单
  * <p>
- * 1 + 年月日 + 6位流水
+ * 4 + 年月日 + 6位流水
  *
  * @author Chen LiJia
  * @since 2019/12/30
  */
-public class ShopGroupIdGeneratorServiceImpl implements IdGeneratorServiceI {
+public class ReceiveIdGeneratorServiceImpl implements IdGeneratorServiceI {
 
     //当前序号
     public static AtomicInteger currentNumber = new AtomicInteger(0);
@@ -39,7 +39,7 @@ public class ShopGroupIdGeneratorServiceImpl implements IdGeneratorServiceI {
         }
 
         lastDay = nowDate;
-        String groupId = StringUtils.completeIntToFixedLengthStr("8" + nowDate.format(DateTimeFormatter.ofPattern("yyyyMMdd")), 6, currentNumber.addAndGet(1), '0');
+        String groupId = StringUtils.completeIntToFixedLengthStr("4" + nowDate.format(DateTimeFormatter.ofPattern("yyyyMMdd")), 6, currentNumber.addAndGet(1), '0');
         return groupId;
     }
 

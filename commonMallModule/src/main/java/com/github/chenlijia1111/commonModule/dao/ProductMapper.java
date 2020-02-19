@@ -34,4 +34,10 @@ public interface ProductMapper extends Mapper<Product> {
      * @return java.util.List<com.github.chenlijia1111.commonModule.common.responseVo.product.AppProductListVo>
      **/
     List<AppProductListVo> appListPage(AppProductQueryParams params);
+
+    /**
+     * 获取最大产品编号
+     * @return
+     */
+    String maxProductNo();
 }

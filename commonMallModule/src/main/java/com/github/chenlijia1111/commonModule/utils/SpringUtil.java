@@ -4,6 +4,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * @author chenlijia
@@ -22,6 +23,18 @@ public class SpringUtil {
      **/
     public static HttpServletRequest getCurrentRequest() {
         return ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes())).getRequest();
+    }
+
+    /**
+     * 获取当前线程 response
+     * 线程安全的
+     *
+     * @return javax.servlet.http.HttpServletRequest
+     * @author chenlijia
+     * @since 上午 10:09 2019/6/14 0014
+     **/
+    public static HttpServletResponse getCurrentResponse() {
+        return ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes())).getResponse();
     }
 
 
