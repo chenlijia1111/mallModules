@@ -67,4 +67,12 @@
     ORDER BY s_product.create_time DESC
     LIMIT 1
   </select>
+  <select id="listByProductIdSet" resultMap="BaseResultMap">
+    SELECT 
+    <include refid="Base_Column_List"></include>
+    FROM s_product
+    <foreach collection="productIdSet" item="productId" open="WHERE id IN (" close=")" separator=",">
+      #{productId}
+    </foreach>
+  </select>
 </mapper>

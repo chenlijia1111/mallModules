@@ -170,7 +170,8 @@ public class ShoppingOrderBiz {
                     setOrderAmountTotal(goodVo.getPrice() * count).
                     setShopGroupId(shopGroupId).
                     setGroupId(groupId).
-                    setCreateTime(currentTime).setRemarks(params.getRemarks());
+                    setCreateTime(currentTime).setRemarks(params.getRemarks()).
+                    setDeleteStatus(BooleanConstant.NO_INTEGER);
 
             //订单快照
             AdminProductVo adminProductVo = productService.findAdminProductVoByProductId(goodVo.getProductId());
@@ -662,7 +663,7 @@ public class ShoppingOrderBiz {
 
 
     /**
-     * 拼团支付回调
+     * 支付回调
      * 只处理关于普通订单的回调业务,不处理其他不相关业务(拼团、秒杀)
      *
      * @param payRecode     商家支付订单号

@@ -1,7 +1,6 @@
 package com.github.chenlijia1111.commonModule.service.impl;
 
 import com.github.chenlijia1111.commonModule.common.pojo.CommonMallConstants;
-import com.github.chenlijia1111.commonModule.common.requestVo.product.AdminProductQueryParams;
 import com.github.chenlijia1111.commonModule.common.responseVo.product.*;
 import com.github.chenlijia1111.commonModule.dao.*;
 import com.github.chenlijia1111.commonModule.entity.Goods;
@@ -95,6 +94,20 @@ public class ProductServiceImpl implements ProductServiceI {
     @Override
     public Product findByProductId(String productId) {
         return StringUtils.isEmpty(productId) ? null : productMapper.selectByPrimaryKey(productId);
+    }
+
+    /**
+     * 根据产品id集合查询产品信息
+     *
+     * @param productIdSet
+     * @return
+     */
+    @Override
+    public List<Product> listByProductIdSet(Set<String> productIdSet) {
+        if (Sets.isNotEmpty(productIdSet)) {
+            return productMapper.listByProductIdSet(productIdSet);
+        }
+        return new ArrayList<>();
     }
 
     /**

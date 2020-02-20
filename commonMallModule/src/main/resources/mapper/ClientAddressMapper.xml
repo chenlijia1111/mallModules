@@ -22,7 +22,7 @@
   </sql>
   <update id="updateClientCommonAddressByClient">
     UPDATE s_client_address
-    SET is_common_address = 0
+    SET common_address = 0
     WHERE client_id = #{clientId}
   </update>
 </mapper>

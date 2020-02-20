@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.github.chenlijia1111.commonModule.dao.ShopCarMapper">
+  <resultMap id="BaseResultMap" type="com.github.chenlijia1111.commonModule.entity.ShopCar">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="client_id" jdbcType="VARCHAR" property="clientId" />
+    <result column="product_id" jdbcType="VARCHAR" property="productId" />
+    <result column="good_id" jdbcType="VARCHAR" property="goodId" />
+    <result column="good_count" jdbcType="INTEGER" property="goodCount" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+  </resultMap>
+  <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.github.chenlijia1111.commonModule.entity.ShopCar">
+    <result column="product_json" jdbcType="LONGVARCHAR" property="productJson" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, client_id, product_id, good_id, good_count, update_time
+  </sql>
+  <sql id="Blob_Column_List">
+    product_json
+  </sql>
+  <delete id="batchDelete">
+    DELETE FROM s_shop_car
+    WHERE 1=1
+    <foreach collection="shopCarIdList" item="shopCarId" open="AND id IN (" close=")" separator=",">
+      #{shopCarId}
+    </foreach>
+  </delete>
+  <select id="findShopCarAllGoodsKindCount" resultType="java.lang.Integer">
+    SELECT
+      COUNT(good_id)
+    FROM
+      s_shop_car,s_product
+    WHERE s_shop_car.product_id = s_product.id
+      AND s_product.delete_status = 0
+      AND client_id = #{clientId}
+      AND  s_product.shelf_status = 1
+  </select>
+  <select id="listPageWithClientShopCarGroupByShopVo" resultType="com.logicalthinking.jiuyou.common.reponseVo.shopCar.ClientShopCarGroupByShopVo">
+    SELECT s_product.shops shopId, max(s_shop_car.update_time) updateTime
+    FROM s_shop_car,
+         s_product
+    WHERE s_shop_car.product_id = s_product.id
+      AND client_id = #{clientId}
+    GROUP BY s_product.shops
+    ORDER BY updateTime DESC
+  </select>
+  <select id="listPageByClientAndShopIdSet" resultMap="BaseResultMapWithVo">
+    select
+    s_shop_car.id, s_shop_car.client_id, s_shop_car.product_id, s_shop_car.good_id, s_shop_car.good_count,
+           s_shop_car.update_time,
+    s_product.name productName,s_product.small_pic productImage,s_product.shops shopId
+    from s_shop_car,s_product
+    WHERE s_shop_car.product_id = s_product.id
+    AND s_product.shelf_status = 1
+    AND client_id = #{clientId}
+    <foreach collection="shopIdSet" item="shopId" open="AND s_product.shops IN (" close=")" separator=",">
+      #{shopId}
+    </foreach>
+    ORDER BY s_shop_car.update_time DESC
+  </select>
+  <select id="listPageByShopCarIdSetAndClientId" resultMap="BaseResultMapWithVo">
+    select
+    s_shop_car.id, s_shop_car.client_id, s_shop_car.product_id, s_shop_car.good_id, s_shop_car.good_count, s_shop_car.update_time,
+    s_product.name productName,s_product.small_pic productImage,s_product.shops shopId
+    from s_shop_car,s_product
+    WHERE s_shop_car.product_id = s_product.id
+    AND client_id = #{clientId}
+    AND s_product.shelf_status = 1
+    <foreach collection="shopCarIdSet" item="shopCarId" open="AND s_shop_car.id IN (" close=")" separator=",">
+      #{shopCarId}
+    </foreach>
+    ORDER BY s_shop_car.update_time DESC
+  </select>
+</mapper>

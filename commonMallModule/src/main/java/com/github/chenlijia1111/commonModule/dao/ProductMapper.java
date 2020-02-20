@@ -5,9 +5,11 @@ import com.github.chenlijia1111.commonModule.common.requestVo.product.AppProduct
 import com.github.chenlijia1111.commonModule.common.responseVo.product.AdminProductListVo;
 import com.github.chenlijia1111.commonModule.common.responseVo.product.AppProductListVo;
 import com.github.chenlijia1111.commonModule.entity.Product;
+import org.apache.ibatis.annotations.Param;
 import tk.mybatis.mapper.common.Mapper;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * 产品表
@@ -40,4 +42,11 @@ public interface ProductMapper extends Mapper<Product> {
      * @return
      */
     String maxProductNo();
+
+    /**
+     * 根据产品id集合查询产品信息
+     * @param productIdSet
+     * @return
+     */
+    List<Product> listByProductIdSet(@Param("productIdSet") Set<String> productIdSet);
 }

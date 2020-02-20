@@ -65,7 +65,12 @@ public class CouponBiz {
 
         String s = JSONUtil.objToStr(countDiscountCoupon);
         coupon.setCouponJson(s);
-        return couponService.add(coupon);
+        //返回券 json
+        Result add = couponService.add(coupon);
+        if (add.getSuccess()) {
+            add.setData(s);
+        }
+        return add;
     }
 
     /**
@@ -104,7 +109,12 @@ public class CouponBiz {
 
         String s = JSONUtil.objToStr(countSubCoupon);
         coupon.setCouponJson(s);
-        return couponService.add(coupon);
+        //返回券 json
+        Result add = couponService.add(coupon);
+        if (add.getSuccess()) {
+            add.setData(s);
+        }
+        return add;
     }
 
     /**
@@ -143,7 +153,12 @@ public class CouponBiz {
 
         String s = JSONUtil.objToStr(priceDiscountCoupon);
         coupon.setCouponJson(s);
-        return couponService.add(coupon);
+        //返回券 json
+        Result add = couponService.add(coupon);
+        if (add.getSuccess()) {
+            add.setData(s);
+        }
+        return add;
     }
 
     /**
@@ -182,7 +197,12 @@ public class CouponBiz {
 
         String s = JSONUtil.objToStr(priceSubCoupon);
         coupon.setCouponJson(s);
-        return couponService.add(coupon);
+        //返回券 json
+        Result add = couponService.add(coupon);
+        if (add.getSuccess()) {
+            add.setData(s);
+        }
+        return add;
     }
 
     /**
@@ -224,7 +244,13 @@ public class CouponBiz {
 
         String s = JSONUtil.objToStr(expressCoupon);
         coupon.setCouponJson(s);
-        return couponService.add(coupon);
+
+        //返回券 json
+        Result add = couponService.add(coupon);
+        if (add.getSuccess()) {
+            add.setData(s);
+        }
+        return add;
     }
 
     /**
@@ -264,7 +290,12 @@ public class CouponBiz {
 
         String s = JSONUtil.objToStr(scoreCoupon);
         coupon.setCouponJson(s);
-        return couponService.add(coupon);
+        //返回券 json
+        Result add = couponService.add(coupon);
+        if (add.getSuccess()) {
+            add.setData(s);
+        }
+        return add;
     }
 
 }

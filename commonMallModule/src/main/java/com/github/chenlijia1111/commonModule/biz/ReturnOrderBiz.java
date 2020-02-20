@@ -13,6 +13,7 @@ import com.github.chenlijia1111.commonModule.entity.ReturnGoodsOrder;
 import com.github.chenlijia1111.commonModule.entity.ShoppingOrder;
 import com.github.chenlijia1111.commonModule.service.*;
 import com.github.chenlijia1111.utils.common.Result;
+import com.github.chenlijia1111.utils.common.constant.BooleanConstant;
 import com.github.chenlijia1111.utils.core.PropertyCheckUtil;
 import com.github.chenlijia1111.utils.core.StringUtils;
 import com.github.chenlijia1111.utils.list.Lists;
@@ -99,7 +100,8 @@ public class ReturnOrderBiz {
                 setFrontOrder(order.getOrderNo()).
                 setReFundStatus(CommonMallConstants.ORDER_INIT).
                 setState(CommonMallConstants.ORDER_INIT).
-                setReType(ReturnTypeEnum.RETURN_GOOD_AND_MONEY.getReturnType());
+                setReType(ReturnTypeEnum.RETURN_GOOD_AND_MONEY.getReturnType()).
+                setDeleteStatus(BooleanConstant.NO_INTEGER);
         returnGoodsOrderService.add(returnGoodsOrder);
 
         //添加发货单

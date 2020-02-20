@@ -1,5 +1,10 @@
 package com.github.chenlijia1111.commonModule.service;
 
+import com.github.chenlijia1111.commonModule.common.responseVo.shop.CommonMallSimpleShopVo;
+
+import java.util.List;
+import java.util.Set;
+
 /**
  * 商家
  * 通用模块通的商家服务只定义接口
@@ -18,5 +23,13 @@ public interface CommonModuleShopServiceI {
      * @since 下午 2:07 2019/11/21 0021
      **/
     String currentShopId();
+
+
+    /**
+     * 根据店铺Id集合查询店铺名称 以及logo
+     * @param shopIdSet
+     * @return
+     */
+    List<CommonMallSimpleShopVo> listByShopIdSet(Set<String> shopIdSet);
 
 }

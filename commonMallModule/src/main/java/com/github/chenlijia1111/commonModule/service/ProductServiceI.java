@@ -7,6 +7,7 @@ import com.github.chenlijia1111.commonModule.entity.Product;
 import com.github.chenlijia1111.utils.common.Result;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * 产品表
@@ -58,5 +59,12 @@ public interface ProductServiceI {
      * @return com.github.chenlijia1111.commonModule.common.responseVo.product.AdminProductVo
      **/
     AdminProductVo findAdminProductVoByProductId(String productId);
+
+    /**
+     * 根据产品id集合查询产品信息
+     * @param productIdSet
+     * @return
+     */
+    List<Product> listByProductIdSet(Set<String> productIdSet);
 
 }

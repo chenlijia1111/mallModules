@@ -232,6 +232,14 @@ public class ShoppingOrder {
     private String orderCoupon;
 
     /**
+     * 是否删除 0否1是
+     */
+    @ApiModelProperty("是否删除 0否1是")
+    @PropertyCheck(name = "是否删除 0否1是")
+    @Column(name = "delete_status")
+    private Integer deleteStatus;
+
+    /**
      * 订单使用的券
      *
      * @see #orderCoupon
