@@ -32,6 +32,13 @@ public interface ShoppingOrderMapper extends Mapper<ShoppingOrder> {
      **/
     List<ShoppingOrder> listByOrderNoSet(@Param("orderNoSet") Set<String> orderNoSet);
 
+    /**
+     * 根据shopGroupId集合查询订单
+     * @param shopGroupIdSet
+     * @return
+     */
+    List<ShoppingOrder> listByShopGroupIdSet(@Param("shopGroupIdSet") Set<String> shopGroupIdSet);
+
 
     /**
      * 查找当日最大订单号

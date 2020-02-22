@@ -29,4 +29,12 @@
     ORDER BY s_return_goods_order.re_create_time DESC
     LIMIT 1
   </select>
+  <select id="listByReturnOrderNoSet" resultMap="BaseResultMap">
+    SELECT 
+    <include refid="Base_Column_List"></include>
+    FROM s_return_goods_order
+    <foreach collection="returnOrderNoSet" item="returnOrderNo" open="WHERE re_order_no IN (" close=")" separator=",">
+      #{returnOrderNo}
+    </foreach>
+  </select>
 </mapper>

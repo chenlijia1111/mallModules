@@ -118,7 +118,7 @@ public class ShopCarServiceImpl implements ShopCarServiceI {
         List<ClientShopCarGroupByShopVo> clientShopCarGroupByShopVoList = shopCarMapper.listPageWithClientShopCarGroupByShopVo(clientId);
         if (Lists.isNotEmpty(clientShopCarGroupByShopVoList)) {
             //商家id集合
-            Set<Integer> shopIdSet = clientShopCarGroupByShopVoList.stream().map(e -> e.getShopId()).collect(Collectors.toSet());
+            Set<String> shopIdSet = clientShopCarGroupByShopVoList.stream().map(e -> e.getShopId()).collect(Collectors.toSet());
             //根据分好组的进行查询相关的购物车数据
             List<ClientShopCarVo> clientShopCarVos = shopCarMapper.listPageByClientAndShopIdSet(shopIdSet, clientId);
             //关联出商品信息-查询商品价格

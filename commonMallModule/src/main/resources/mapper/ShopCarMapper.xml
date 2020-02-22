@@ -12,6 +12,7 @@
   <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.github.chenlijia1111.commonModule.entity.ShopCar">
     <result column="product_json" jdbcType="LONGVARCHAR" property="productJson" />
   </resultMap>
+  <resultMap id="BaseResultMapWithVo" type="com.github.chenlijia1111.commonModule.common.responseVo.shopCar.ClientShopCarVo" extends="BaseResultMap"></resultMap>
   <sql id="Base_Column_List">
     id, client_id, product_id, good_id, good_count, update_time
   </sql>
@@ -35,7 +36,7 @@
       AND client_id = #{clientId}
       AND  s_product.shelf_status = 1
   </select>
-  <select id="listPageWithClientShopCarGroupByShopVo" resultType="com.logicalthinking.jiuyou.common.reponseVo.shopCar.ClientShopCarGroupByShopVo">
+  <select id="listPageWithClientShopCarGroupByShopVo" resultType="com.github.chenlijia1111.commonModule.common.responseVo.shopCar.ClientShopCarGroupByShopVo">
     SELECT s_product.shops shopId, max(s_shop_car.update_time) updateTime
     FROM s_shop_car,
          s_product
@@ -48,7 +49,8 @@
     select
     s_shop_car.id, s_shop_car.client_id, s_shop_car.product_id, s_shop_car.good_id, s_shop_car.good_count,
            s_shop_car.update_time,
-    s_product.name productName,s_product.small_pic productImage,s_product.shops shopId
+    s_product.name productName,s_product.small_pic productImage,s_product.shops shopId,
+           s_product.shelf_status shelfStatus
     from s_shop_car,s_product
     WHERE s_shop_car.product_id = s_product.id
     AND s_product.shelf_status = 1
@@ -61,7 +63,7 @@
   <select id="listPageByShopCarIdSetAndClientId" resultMap="BaseResultMapWithVo">
     select
     s_shop_car.id, s_shop_car.client_id, s_shop_car.product_id, s_shop_car.good_id, s_shop_car.good_count, s_shop_car.update_time,
-    s_product.name productName,s_product.small_pic productImage,s_product.shops shopId
+    s_product.name productName,s_product.small_pic productImage,s_product.shops shopId,s_product.shelf_status shelfStatus
     from s_shop_car,s_product
     WHERE s_shop_car.product_id = s_product.id
     AND client_id = #{clientId}

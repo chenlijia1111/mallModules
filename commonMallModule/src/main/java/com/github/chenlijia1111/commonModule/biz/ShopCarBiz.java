@@ -12,6 +12,7 @@ import com.github.chenlijia1111.commonModule.service.*;
 import com.github.chenlijia1111.utils.common.Result;
 import com.github.chenlijia1111.utils.core.PropertyCheckUtil;
 import com.github.chenlijia1111.utils.core.StringUtils;
+import com.github.chenlijia1111.utils.database.mybatis.pojo.Page;
 import com.github.chenlijia1111.utils.database.mybatis.pojo.PageInfo;
 import com.github.chenlijia1111.utils.list.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -209,6 +210,9 @@ public class ShopCarBiz {
         if (StringUtils.isEmpty(currentUserId)) {
             return Result.notLogin();
         }
+
+        //开启分页
+        Page.startPage(pageAbleVo.getPage(),pageAbleVo.getLimit());
 
         List<ClientShopCarGroupByShopVo> list = shopCarService.listPageWithClient(currentUserId);
         if (Lists.isNotEmpty(list)) {

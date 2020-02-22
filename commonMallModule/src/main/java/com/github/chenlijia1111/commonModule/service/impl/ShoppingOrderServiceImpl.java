@@ -3,6 +3,7 @@ package com.github.chenlijia1111.commonModule.service.impl;
 import com.github.chenlijia1111.commonModule.common.enums.OrderStatusEnum;
 import com.github.chenlijia1111.commonModule.common.pojo.CommonMallConstants;
 import com.github.chenlijia1111.commonModule.dao.*;
+import com.github.chenlijia1111.commonModule.entity.Evaluation;
 import com.github.chenlijia1111.commonModule.entity.ImmediatePaymentOrder;
 import com.github.chenlijia1111.commonModule.entity.ReceivingGoodsOrder;
 import com.github.chenlijia1111.commonModule.entity.ShoppingOrder;
@@ -10,6 +11,7 @@ import com.github.chenlijia1111.commonModule.service.ShoppingOrderServiceI;
 import com.github.chenlijia1111.utils.common.Result;
 import com.github.chenlijia1111.utils.core.PropertyCheckUtil;
 import com.github.chenlijia1111.utils.core.StringUtils;
+import com.github.chenlijia1111.utils.list.Lists;
 import com.github.chenlijia1111.utils.list.Sets;
 import org.springframework.stereotype.Service;
 
@@ -39,6 +41,8 @@ public class ShoppingOrderServiceImpl implements ShoppingOrderServiceI {
     private ProductMapper productMapper;///产品
     @Resource
     private GoodSpecMapper goodSpecMapper;//商品规格
+    @Resource
+    private EvaluationMapper evaluationMapper;//评价
 
 
     /**
@@ -120,6 +124,8 @@ public class ShoppingOrderServiceImpl implements ShoppingOrderServiceI {
             Set<String> sendOrderNoSet = immediatePaymentOrders.stream().map(e -> e.getOrderNo()).collect(Collectors.toSet());
             //所有收货单
             List<ReceivingGoodsOrder> receivingGoodsOrders = receivingGoodsOrderMapper.listByFrontOrderNoSet(sendOrderNoSet);
+            //查询所有评价
+            List<Evaluation> evaluations = evaluationMapper.listByOrderNoSet(orderNoSet);
 
             for (String orderNo : orderNoSet) {
                 //查询这个订单的信息
@@ -156,6 +162,15 @@ public class ShoppingOrderServiceImpl implements ShoppingOrderServiceI {
                                 if (Objects.equals(CommonMallConstants.ORDER_COMPLETE, receiveState)) {
                                     //已收货
                                     map.put(orderNo, OrderStatusEnum.RECEIVED.getOrderStatus());
+
+                                    //判断是否已评价
+                                    if (Lists.isNotEmpty(evaluations)) {
+                                        Optional<Evaluation> any3 = evaluations.stream().filter(e -> Objects.equals(e.getOrderNo(), orderNo)).findAny();
+                                        if (any3.isPresent()) {
+                                            //已评价
+                                            map.put(orderNo, OrderStatusEnum.EVALUAED.getOrderStatus());
+                                        }
+                                    }
                                 }
                             }
                         }

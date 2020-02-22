@@ -1,7 +1,11 @@
 package com.github.chenlijia1111.commonModule.dao;
 
 import com.github.chenlijia1111.commonModule.entity.ReturnGoodsOrder;
+import org.apache.ibatis.annotations.Param;
 import tk.mybatis.mapper.common.Mapper;
+
+import java.util.List;
+import java.util.Set;
 
 /**
  * 退货单
@@ -17,5 +21,12 @@ public interface ReturnGoodsOrderMapper extends Mapper<ReturnGoodsOrder> {
      * @return
      */
     String maxOrderNo();
+
+    /**
+     * 根据退货单Id集合查询退货单列表
+     * @param returnOrderNoSet
+     * @return
+     */
+    List<ReturnGoodsOrder> listByReturnOrderNoSet(@Param("returnOrderNoSet") Set<String> returnOrderNoSet);
 
 }

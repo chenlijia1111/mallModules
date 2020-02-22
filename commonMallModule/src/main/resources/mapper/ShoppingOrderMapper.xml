@@ -8,6 +8,7 @@
     <result column="goods_id" jdbcType="VARCHAR" property="goodsId" />
     <result column="count" jdbcType="INTEGER" property="count" />
     <result column="state" jdbcType="INTEGER" property="state" />
+    <result column="order_type" jdbcType="INTEGER" property="orderType" />
     <result column="product_amount_total" jdbcType="DOUBLE" property="productAmountTotal" />
     <result column="pay_channel" jdbcType="VARCHAR" property="payChannel" />
     <result column="pay_record" jdbcType="VARCHAR" property="payRecord" />
@@ -15,16 +16,21 @@
     <result column="good_price" jdbcType="DOUBLE" property="goodPrice" />
     <result column="order_amount_total" jdbcType="DOUBLE" property="orderAmountTotal" />
     <result column="pay_time" jdbcType="TIMESTAMP" property="payTime" />
+    <result column="details_json" jdbcType="VARCHAR" property="detailsJson" />
+    <result column="shop_group_id" jdbcType="VARCHAR" property="shopGroupId" />
     <result column="group_id" jdbcType="VARCHAR" property="groupId" />
     <result column="payable" jdbcType="DOUBLE" property="payable" />
+    <result column="order_coupon" jdbcType="VARCHAR" property="orderCoupon" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="remarks" jdbcType="VARCHAR" property="remarks" />
     <result column="shop_remarks" jdbcType="VARCHAR" property="shopRemarks" />
+    <result column="delete_status" jdbcType="INTEGER" property="deleteStatus" />
   </resultMap>
   <sql id="Base_Column_List">
-    order_no, custom, shops, goods_id, count, state, product_amount_total, pay_channel, 
-    pay_record, transaction_id, good_price, order_amount_total, pay_time, group_id, payable, create_time,
-    remarks, shop_remarks, details_json, order_coupon
+    order_no, custom, shops, goods_id, count, state, order_type,
+           product_amount_total, pay_channel, pay_record, transaction_id,
+           good_price, order_amount_total, pay_time, details_json, shop_group_id,
+           group_id, payable, order_coupon, create_time, remarks, shop_remarks, delete_status
   </sql>
   <select id="listByGroupIdSet" resultMap="BaseResultMap">
     SELECT
@@ -42,6 +48,15 @@
     s_shopping_order
     <foreach collection="orderNoSet" item="orderNo" open="WHERE order_no IN (" close=")" separator=",">
       #{orderNo}
+    </foreach>
+  </select>
+  <select id="listByShopGroupIdSet" resultMap="BaseResultMap">
+    SELECT
+    <include refid="Base_Column_List"></include>
+    FROM
+    s_shopping_order
+    <foreach collection="shopGroupIdSet" item="shopGroupId" open="WHERE shop_group_id IN (" close=")" separator=",">
+      #{shopGroupId}
     </foreach>
   </select>
   <select id="maxOrderNo" resultType="java.lang.String">

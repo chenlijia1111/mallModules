@@ -110,6 +110,7 @@ public class EvaluationBiz {
                 setProductId(adminProductVo.getId()).
                 setComment(params.getComment()).
                 setImages(params.getImages()).
+                setProductLevel(params.getProductLevel()).
                 setShopLevel(params.getShopLevel()).
                 setServiceLevel(params.getServiceLevel()).
                 setExpressLevel(params.getExpressLevel()).

@@ -2,22 +2,32 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.github.chenlijia1111.commonModule.dao.EvaluationMapper">
   <resultMap id="BaseResultMap" type="com.github.chenlijia1111.commonModule.entity.Evaluation">
-    <id column="id" jdbcType="INTEGER" property="id" />
-    <result column="client_id" jdbcType="INTEGER" property="clientId" />
-    <result column="order_item" jdbcType="VARCHAR" property="orderItem" />
+    <id column="id" jdbcType="VARCHAR" property="id" />
+    <result column="client_id" jdbcType="VARCHAR" property="clientId" />
+    <result column="shop_id" jdbcType="VARCHAR" property="shopId" />
+    <result column="order_no" jdbcType="VARCHAR" property="orderNo" />
+    <result column="good_id" jdbcType="VARCHAR" property="goodId" />
     <result column="product_id" jdbcType="VARCHAR" property="productId" />
-    <result column="goods_id" jdbcType="VARCHAR" property="goodsId" />
-    <result column="images" jdbcType="VARCHAR" property="images" />
     <result column="comment" jdbcType="VARCHAR" property="comment" />
-    <result column="back_comment" jdbcType="VARCHAR" property="backComment" />
-    <result column="service_level" jdbcType="INTEGER" property="serviceLevel" />
-    <result column="seller_level" jdbcType="INTEGER" property="sellerLevel" />
-    <result column="parent_evalua" jdbcType="INTEGER" property="parentEvalua" />
+    <result column="images" jdbcType="VARCHAR" property="images" />
+    <result column="product_level" jdbcType="DOUBLE" property="productLevel" />
+    <result column="shop_level" jdbcType="DOUBLE" property="shopLevel" />
+    <result column="service_level" jdbcType="DOUBLE" property="serviceLevel" />
+    <result column="express_level" jdbcType="DOUBLE" property="expressLevel" />
+    <result column="parent_evalua" jdbcType="VARCHAR" property="parentEvalua" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
-    <result column="w_delete" jdbcType="INTEGER" property="wDelete" />
+    <result column="delete_status" jdbcType="INTEGER" property="deleteStatus" />
   </resultMap>
   <sql id="Base_Column_List">
-    id, client_id, order_item, product_id, goods_id, images, comment, back_comment, service_level, 
-    seller_level, parent_evalua, create_time, w_delete
+    id, client_id, shop_id, order_no, good_id, product_id, comment, images, product_level,
+    shop_level, service_level, express_level, parent_evalua, create_time, delete_status
   </sql>
+  <select id="listByOrderNoSet" resultMap="BaseResultMap">
+    SELECT 
+    <include refid="Base_Column_List"></include>
+    FROM s_evaluation
+    <foreach collection="orderNoSet" item="orderNo" open="WHERE s_evaluation.order_no IN (" close=")" separator=",">
+      #{orderNo}
+    </foreach>
+  </select>
 </mapper>

@@ -1,0 +1,14 @@
+package com.github.chenlijia1111.commonModule.dao;
+
+import com.github.chenlijia1111.commonModule.entity.VerifyCode;
+import tk.mybatis.mapper.common.Mapper;
+
+/**
+ * 系统验证码
+ * @author chenLiJia
+ * @since 2020-02-22 09:04:10
+ * @version 1.0
+ **/
+public interface VerifyCodeMapper extends Mapper<VerifyCode> {
+    VerifyCode selectByPrimaryKey(Integer id);
+}

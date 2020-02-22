@@ -2,8 +2,6 @@ package com.github.chenlijia1111.commonModule.common.responseVo.shopCar;
 
 import com.github.chenlijia1111.commonModule.common.responseVo.product.GoodSpecVo;
 import com.github.chenlijia1111.commonModule.common.responseVo.product.GoodVo;
-import com.github.chenlijia1111.commonModule.entity.GoodSpec;
-import com.github.chenlijia1111.commonModule.entity.Goods;
 import com.github.chenlijia1111.commonModule.entity.ShopCar;
 import com.github.chenlijia1111.utils.list.Lists;
 import io.swagger.annotations.ApiModel;
@@ -12,8 +10,6 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.util.StringUtils;
 
-import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -85,6 +81,14 @@ public class ClientShopCarVo extends ShopCar {
      **/
     @ApiModelProperty("库存数量")
     private Integer count;
+
+    /**
+     * 是否上架 0否 1是
+     *
+     * @since 下午 6:00 2019/9/23 0023
+     **/
+    @ApiModelProperty("是否上架 0否 1是")
+    private Integer shelfStatus;
 
 
     /**

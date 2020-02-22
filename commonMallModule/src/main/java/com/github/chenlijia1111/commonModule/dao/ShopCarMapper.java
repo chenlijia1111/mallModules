@@ -61,7 +61,7 @@ public interface ShopCarMapper extends Mapper<ShopCar> {
      * @author chenlijia
      * @since 下午 1:01 2019/8/17 0017
      **/
-    List<ClientShopCarVo> listPageByClientAndShopIdSet(@Param("shopIdSet") Set<Integer> shopIdSet, @Param("clientId") String clientId);
+    List<ClientShopCarVo> listPageByClientAndShopIdSet(@Param("shopIdSet") Set<String> shopIdSet, @Param("clientId") String clientId);
 
 
     /**

@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.persistence.Column;
 import java.util.List;
 
 /**
@@ -33,12 +34,19 @@ public class AddEvaluationParams {
     @ApiModelProperty("图片")
     private String images;
 
+
     /**
      * 评价内容
      */
     @ApiModelProperty("评价内容")
     @PropertyCheck(name = "评价内容")
     private String comment;
+
+    /**
+     * 商品评分
+     */
+    @ApiModelProperty("商品评分")
+    private Double productLevel;
 
     /**
      * 商家评分

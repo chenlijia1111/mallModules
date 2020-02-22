@@ -88,6 +88,14 @@ public class Evaluation {
     private String images;
 
     /**
+     * 商品评分
+     */
+    @ApiModelProperty("商品评分")
+    @PropertyCheck(name = "商品评分")
+    @Column(name = "product_level")
+    private Double productLevel;
+
+    /**
      * 商家评分
      */
     @ApiModelProperty("商家评分")

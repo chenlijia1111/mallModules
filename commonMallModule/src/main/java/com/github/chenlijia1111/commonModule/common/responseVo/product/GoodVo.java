@@ -1,6 +1,7 @@
 package com.github.chenlijia1111.commonModule.common.responseVo.product;
 
 import com.github.chenlijia1111.commonModule.entity.Goods;
+import com.github.chenlijia1111.utils.core.StringUtils;
 import com.github.chenlijia1111.utils.list.Lists;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -100,5 +101,41 @@ public class GoodVo extends Goods {
             }
         }
         return list;
+    }
+
+    /**
+     * 构建规格名称
+     *
+     * @param needSpecName              是否需要规格名称
+     * @param specNameAndValueDelimiter 规格名称与规格值之间的分隔符
+     * @param specDelimiter             规格之间的分隔符
+     * @return
+     */
+    public String releaseSkuName(boolean needSpecName, String specNameAndValueDelimiter, String specDelimiter) {
+
+        StringBuilder skuName = new StringBuilder();
+
+        List<GoodSpecVo> goodSpecVoList = this.getGoodSpecVoList();
+        if (Lists.isNotEmpty(goodSpecVoList)) {
+            for (GoodSpecVo goodSpecVo : goodSpecVoList) {
+                if (needSpecName) {
+                    skuName.append(goodSpecVo.getSpecName());
+                    if (StringUtils.isNotEmpty(specNameAndValueDelimiter)) {
+                        skuName.append(specNameAndValueDelimiter);
+                    }
+                }
+
+                skuName.append(goodSpecVo.getSpecValue());
+                if (StringUtils.isNotEmpty(specDelimiter)) {
+                    skuName.append(specDelimiter);
+                }
+            }
+
+            //删除最后一个规格分隔符
+            if (StringUtils.isNotEmpty(specDelimiter)) {
+                skuName.delete(skuName.length() - specDelimiter.length(), skuName.length());
+            }
+        }
+        return skuName.toString();
     }
 }
