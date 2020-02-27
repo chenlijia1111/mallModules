@@ -124,10 +124,18 @@ public class VerifyCodeServiceImpl implements VerifyCodeServiceI {
             }
 
             //验证通过
-            return Result.success("验证通过");
+            return Result.success("验证码验证通过");
         }
 
-        return Result.failure("验证失败");
+        return Result.failure("验证码验证失败");
+    }
+
+    /**
+     * 清除过期的验证码
+     */
+    @Override
+    public void clearExpireCode() {
+        verifyCodeMapper.clearExpireCode();
     }
 
 

@@ -3,6 +3,8 @@ package com.github.chenlijia1111.commonModule.service;
 import com.github.chenlijia1111.utils.common.Result;
 import com.github.chenlijia1111.commonModule.entity.Evaluation;
 
+import java.util.List;
+
 /**
  * 评价表
  * @author chenLiJia
@@ -45,4 +47,11 @@ public interface EvaluationServiceI {
      * @return com.github.chenlijia1111.commonModule.entity.Evaluation
      **/
     Evaluation findById(String id);
+
+    /**
+     * 根据条件查询列表
+     * @param condition
+     * @return
+     */
+    List<Evaluation> listByCondition(Evaluation condition);
 }

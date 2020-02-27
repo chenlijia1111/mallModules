@@ -12,10 +12,7 @@
   <sql id="Base_Column_List">
     id, code_type, code_key, code_value, create_time, limit_time
   </sql>
-  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
-    select 
-    <include refid="Base_Column_List" />
-    from s_verify_code
-    where id = #{id,jdbcType=INTEGER}
+  <select id="clearExpireCode">
+    DELETE FROM s_verify_code WHERE s_verify_code.limit_time &lt;= now()
   </select>
 </mapper>

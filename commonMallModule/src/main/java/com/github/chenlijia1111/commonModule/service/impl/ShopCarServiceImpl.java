@@ -12,6 +12,7 @@ import com.github.chenlijia1111.commonModule.service.ShopCarServiceI;
 import com.github.chenlijia1111.utils.common.Result;
 import com.github.chenlijia1111.utils.core.PropertyCheckUtil;
 import com.github.chenlijia1111.utils.list.Lists;
+import com.github.chenlijia1111.utils.list.Sets;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -183,6 +184,21 @@ public class ShopCarServiceImpl implements ShopCarServiceI {
 
         PropertyCheckUtil.transferObjectNotNull(condition, true);
         return shopCarMapper.select(condition);
+    }
+
+
+    /**
+     * 根据购物车id集合查询购物车
+     *
+     * @param shopCarIdSet
+     * @return
+     */
+    @Override
+    public List<ShopCar> listByShopCarIdSet(Set<Integer> shopCarIdSet) {
+        if (Sets.isNotEmpty(shopCarIdSet)) {
+            return shopCarMapper.listByShopCarIdSet(shopCarIdSet);
+        }
+        return new ArrayList<>();
     }
 
 

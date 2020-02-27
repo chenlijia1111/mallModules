@@ -29,4 +29,11 @@ public interface ImmediatePaymentOrderMapper extends Mapper<ImmediatePaymentOrde
      */
     String maxOrderNo();
 
+    /**
+     * 通过发货单编号集合查询发货单集合
+     * @param sendOrderNoSet
+     * @return
+     */
+    List<ImmediatePaymentOrder> listBySendOrderNoSet(@Param("sendOrderNoSet") Set<String> sendOrderNoSet);
+
 }

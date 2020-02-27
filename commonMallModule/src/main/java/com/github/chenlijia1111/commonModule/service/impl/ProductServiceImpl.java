@@ -85,6 +85,19 @@ public class ProductServiceImpl implements ProductServiceI {
     }
 
     /**
+     * 条件统计数量
+     * @param condition
+     * @return
+     */
+    @Override
+    public Integer countByCondition(Product condition) {
+        condition = PropertyCheckUtil.transferObjectNotNull(condition, true);
+        Integer count = productMapper.selectCount(condition);
+        count = Objects.isNull(count) ? 0 : count;
+        return count;
+    }
+
+    /**
      * 通过产品id查询产品信息
      *
      * @param productId 1

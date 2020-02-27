@@ -45,4 +45,15 @@
     ORDER BY s_immediate_payment_order.create_time DESC
     LIMIT 1
   </select>
+  <select id="listBySendOrderNoSet" resultMap="BaseResultMap">
+    SELECT
+    order_no, custom, shops, state, rec_user, star_user, rec_tel, star_tel, rec_addr, star_addr, express_no,
+    express_com, express_name, front_order, shopping_order, send_time, create_time,rec_province,
+    rec_city, rec_area
+    FROM
+    s_immediate_payment_order
+    <foreach collection="sendOrderNoSet" item="sendOrderNo" open="WHERE order_no IN (" close=")" separator=",">
+      #{sendOrderNo}
+    </foreach>
+  </select>
 </mapper>

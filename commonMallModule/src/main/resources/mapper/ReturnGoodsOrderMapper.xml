@@ -18,10 +18,12 @@
     <result column="return_pay_no" jdbcType="VARCHAR" property="returnPayNo" />
     <result column="re_type" jdbcType="INTEGER" property="reType" />
     <result column="return_pay_time" jdbcType="TIMESTAMP" property="returnPayTime" />
+    <result column="delete_status" jdbcType="INTEGER" property="deleteStatus" />
   </resultMap>
   <sql id="Base_Column_List">
     re_order_no, custom, shops, re_create_time, re_explain, re_fund, check_status, re_handle_time, 
-    re_reason, shopping_order, front_order, re_fund_status, state, return_pay_no, re_type,return_pay_time
+    re_reason, shopping_order, front_order, re_fund_status, state, return_pay_no,
+    re_type,return_pay_time,delete_status
   </sql>
   <select id="maxOrderNo" resultType="java.lang.String">
     SELECT s_return_goods_order.re_order_no

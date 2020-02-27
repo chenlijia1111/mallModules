@@ -39,7 +39,6 @@ public class AddEvaluationParams {
      * 评价内容
      */
     @ApiModelProperty("评价内容")
-    @PropertyCheck(name = "评价内容")
     private String comment;
 
     /**

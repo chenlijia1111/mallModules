@@ -9,6 +9,7 @@ import com.github.chenlijia1111.utils.core.StringUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * 评价表
@@ -78,6 +79,17 @@ public class EvaluationServiceImpl implements EvaluationServiceI {
             return evaluationMapper.selectByPrimaryKey(id);
         }
         return null;
+    }
+
+    /**
+     * 根据条件查询列表
+     * @param condition
+     * @return
+     */
+    @Override
+    public List<Evaluation> listByCondition(Evaluation condition) {
+        condition = PropertyCheckUtil.transferObjectNotNull(condition, true);
+        return evaluationMapper.select(condition);
     }
 
 

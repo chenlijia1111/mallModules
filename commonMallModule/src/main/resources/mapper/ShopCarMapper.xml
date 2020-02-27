@@ -73,4 +73,12 @@
     </foreach>
     ORDER BY s_shop_car.update_time DESC
   </select>
+  <select id="listByShopCarIdSet" resultMap="BaseResultMap">
+    SELECT
+    id, client_id, product_id, good_id, product_json, good_count, update_time
+    FROM s_shop_car
+    <foreach collection="shopCarIdSet" item="shopCarId" open="WHERE id IN (" close=")" separator=",">
+      #{shopCarId}
+    </foreach>
+  </select>
 </mapper>

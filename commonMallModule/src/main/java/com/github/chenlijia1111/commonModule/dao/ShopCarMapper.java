@@ -11,9 +11,10 @@ import java.util.Set;
 
 /**
  * 购物车
+ *
  * @author chenLiJia
- * @since 2020-02-19 17:37:03
  * @version 1.0
+ * @since 2020-02-19 17:37:03
  **/
 public interface ShopCarMapper extends Mapper<ShopCar> {
     ShopCar selectByPrimaryKey(Integer id);
@@ -73,6 +74,14 @@ public interface ShopCarMapper extends Mapper<ShopCar> {
      * @author chenlijia
      * @since 14:11 2019/8/23
      **/
-    List<ClientShopCarVo> listPageByShopCarIdSetAndClientId(@Param("shopCarIdSet") Set<Integer> shopCarIdSet,
-                                                            @Param("clientId") String clientId);
+    List<ClientShopCarVo> listPageByShopCarIdSetAndClientId(@Param("shopCarIdSet") Set<Integer> shopCarIdSet, @Param("clientId") String clientId);
+
+
+    /**
+     * 根据购物车id集合查询购物车
+     *
+     * @param shopCarIdSet
+     * @return
+     */
+    List<ShopCar> listByShopCarIdSet(@Param("shopCarIdSet") Set<Integer> shopCarIdSet);
 }

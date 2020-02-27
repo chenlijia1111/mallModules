@@ -4,6 +4,8 @@ import com.github.chenlijia1111.commonModule.common.responseVo.shopCar.ClientSho
 import com.github.chenlijia1111.commonModule.common.responseVo.shopCar.ClientShopCarVo;
 import com.github.chenlijia1111.utils.common.Result;
 import java.util.List;
+import java.util.Set;
+
 import com.github.chenlijia1111.commonModule.entity.ShopCar;
 import org.apache.ibatis.annotations.Param;
 
@@ -90,5 +92,12 @@ public interface ShopCarServiceI {
      **/
     List<ClientShopCarVo> listByShopCarIdList(List<Integer> shopCarIdList, String currentUserId);
 
+
+    /**
+     * 根据购物车id集合查询购物车
+     * @param shopCarIdSet
+     * @return
+     */
+    List<ShopCar> listByShopCarIdSet(Set<Integer> shopCarIdSet);
 
 }

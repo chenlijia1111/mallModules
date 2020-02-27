@@ -131,7 +131,7 @@ public class ReturnOrderBiz {
                 setCreateTime(currentTime);
         receivingGoodsOrderService.add(receivingGoodsOrder);
 
-        return Result.success("操作成功");
+        return Result.success("操作成功",returnNo);
     }
 
     /**
@@ -185,7 +185,8 @@ public class ReturnOrderBiz {
                 setFrontOrder(order.getOrderNo()).
                 setReFundStatus(CommonMallConstants.ORDER_INIT).
                 setState(CommonMallConstants.ORDER_INIT).
-                setReType(ReturnTypeEnum.RETURN_GOOD.getReturnType());
+                setReType(ReturnTypeEnum.RETURN_GOOD.getReturnType()).
+                setDeleteStatus(BooleanConstant.NO_INTEGER);
         returnGoodsOrderService.add(returnGoodsOrder);
 
         //添加发货单
@@ -215,7 +216,7 @@ public class ReturnOrderBiz {
                 setCreateTime(currentTime);
         receivingGoodsOrderService.add(receivingGoodsOrder);
 
-        return Result.success("操作成功");
+        return Result.success("操作成功",returnNo);
     }
 
     /**
@@ -265,9 +266,10 @@ public class ReturnOrderBiz {
                 setFrontOrder(order.getOrderNo()).
                 setReFundStatus(CommonMallConstants.ORDER_INIT).
                 setState(CommonMallConstants.ORDER_INIT).
-                setReType(ReturnTypeEnum.RETURN_MONEY.getReturnType());
+                setReType(ReturnTypeEnum.RETURN_MONEY.getReturnType()).
+                setDeleteStatus(BooleanConstant.NO_INTEGER);
         returnGoodsOrderService.add(returnGoodsOrder);
-        return Result.success("操作成功");
+        return Result.success("操作成功",returnNo);
     }
 
     /**

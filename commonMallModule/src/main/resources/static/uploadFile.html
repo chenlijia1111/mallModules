@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>批量上传文件</title>
+</head>
+<body>
+
+
+<fieldset class="layui-elem-field layui-field-title" style="margin-top: 30px;">
+    <legend>上传多张图片</legend>
+</fieldset>
+
+<div class="layui-upload">
+    <input type="file" name="file" multiple="multiple" onchange="showPreview(this)">
+</div>
+<script src="/ende/jquery.js"></script>
+<script>
+    function showPreview(source) {
+        var files = source.files;
+        console.log(files);
+
+        var formData = new FormData();
+        formData.append("fileType", "file");
+        formData.append("isfileName", "false");
+        formData.append("files", files[0]);
+        $.ajax(
+            {
+                url: "http://127.0.0.1:8087/ende/system/upload/batch",
+                data: formData,
+                type: "POST",
+                processData: false,
+                contentType: false,
+                success: function (res) {
+                    console.log(res);
+                }
+            }
+        );
+    }
+</script>
+</body>
+</html>

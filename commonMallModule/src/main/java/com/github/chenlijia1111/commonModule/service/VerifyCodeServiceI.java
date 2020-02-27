@@ -52,5 +52,10 @@ public interface VerifyCodeServiceI {
      */
     Result checkExpire(Integer codeType, String codeKey, String codeValue);
 
+    /**
+     * 清除过期的验证码
+     */
+    void clearExpireCode();
+
 
 }

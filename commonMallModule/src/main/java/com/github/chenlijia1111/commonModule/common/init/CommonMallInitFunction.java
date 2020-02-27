@@ -1,10 +1,14 @@
 package com.github.chenlijia1111.commonModule.common.init;
 
+import com.github.chenlijia1111.commonModule.common.schedules.AutoClearLimitVerifyCode;
 import com.github.chenlijia1111.commonModule.dao.*;
 import com.github.chenlijia1111.commonModule.service.impl.*;
 import com.github.chenlijia1111.commonModule.utils.SpringContextHolder;
 import com.github.chenlijia1111.utils.core.StringUtils;
+import com.github.chenlijia1111.utils.timer.TimerTaskUtil;
+import com.github.chenlijia1111.utils.timer.TriggerUtil;
 import org.joda.time.LocalDate;
+import org.quartz.Trigger;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Service;
@@ -30,6 +34,8 @@ public class CommonMallInitFunction implements ApplicationListener<ContextRefres
         if (contextRefreshedEvent.getApplicationContext().getParent() == null) {
             //执行方法
             initMaxOrderNo();
+            //添加定时清理验证码
+            addClearVerifyCodeTask();
         }
     }
 
@@ -92,7 +98,7 @@ public class CommonMallInitFunction implements ApplicationListener<ContextRefres
      * @param orderNo
      * @return
      */
-    public AtomicInteger createInitOrderAtomicInteger(String orderNo) {
+    private AtomicInteger createInitOrderAtomicInteger(String orderNo) {
         if (StringUtils.isNotEmpty(orderNo) && orderNo.length() == 15) {
             //判断年月日,判断是否是今天
             String substring = orderNo.substring(1, 9);
@@ -105,5 +111,18 @@ public class CommonMallInitFunction implements ApplicationListener<ContextRefres
             }
         }
         return new AtomicInteger(0);
+    }
+
+
+    /**
+     * 添加定时清理验证码定时任务
+     */
+    private void addClearVerifyCodeTask() {
+        String groupName = "autoClearCode";
+
+        //每天3点运行
+        Trigger autoClearTrigger = TriggerUtil.createCronTrigger("0 0 3 * * ? ", "autoClearCodeTrigger", groupName);
+
+        TimerTaskUtil.doTask(autoClearTrigger, AutoClearLimitVerifyCode.class, AutoClearLimitVerifyCode.class.getSimpleName(), groupName);
     }
 }

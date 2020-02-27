@@ -11,4 +11,11 @@ import tk.mybatis.mapper.common.Mapper;
  **/
 public interface VerifyCodeMapper extends Mapper<VerifyCode> {
     VerifyCode selectByPrimaryKey(Integer id);
+
+
+    /**
+     * 清除过期的验证码
+     */
+    Integer clearExpireCode();
+
 }

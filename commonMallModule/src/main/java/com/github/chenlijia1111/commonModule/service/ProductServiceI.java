@@ -1,7 +1,5 @@
 package com.github.chenlijia1111.commonModule.service;
 
-import com.github.chenlijia1111.commonModule.common.requestVo.product.AdminProductQueryParams;
-import com.github.chenlijia1111.commonModule.common.responseVo.product.AdminProductListVo;
 import com.github.chenlijia1111.commonModule.common.responseVo.product.AdminProductVo;
 import com.github.chenlijia1111.commonModule.entity.Product;
 import com.github.chenlijia1111.utils.common.Result;
@@ -42,6 +40,13 @@ public interface ProductServiceI {
      * @return
      */
     List<Product> listByCondition(Product condition);
+
+    /**
+     * 条件统计数量
+     * @param condition
+     * @return
+     */
+    Integer countByCondition(Product condition);
 
 
     /**
