@@ -46,4 +46,12 @@
       #{goodId}
     </foreach>
   </select>
+  <insert id="batchAdd">
+    INSERT INTO s_goods (id, product_id, good_no, stock_count, price, vip_price, market_price,
+                         create_time, update_time, delete_status) VALUES
+    <foreach collection="goodsList" item="goods" separator=",">
+      (#{goods.id},#{goods.productId},#{goods.goodNo},#{goods.stockCount},#{goods.price},#{goods.vipPrice},
+       #{goods.marketPrice},#{goods.createTime},#{goods.updateTime},#{goods.deleteStatus})
+    </foreach>
+  </insert>
 </mapper>

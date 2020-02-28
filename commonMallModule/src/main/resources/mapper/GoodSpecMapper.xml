@@ -33,4 +33,10 @@
     AND s_goods.product_id = #{productId}
     )
   </delete>
+  <insert id="batchAdd">
+    INSERT INTO s_good_spec (id, good_id, spec_value_id) VALUES
+    <foreach collection="goodSpecList" item="goodSpec" separator=",">
+      (#{goodSpec.id},#{goodSpec.goodId},#{goodSpec.specValueId})
+    </foreach>
+  </insert>
 </mapper>

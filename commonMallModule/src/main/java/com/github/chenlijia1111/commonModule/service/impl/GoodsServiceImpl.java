@@ -52,6 +52,22 @@ public class GoodsServiceImpl implements GoodsServiceI {
     }
 
     /**
+     * 批量添加商品
+     *
+     * @param goodsList
+     * @return
+     */
+    @Override
+    public Result batchAdd(List<Goods> goodsList) {
+        if (Lists.isEmpty(goodsList)) {
+            return Result.failure("商品列表为空");
+        }
+
+        int i = goodsMapper.batchAdd(goodsList);
+        return i > 0 ? Result.success("操作成功") : Result.failure("操作失败");
+    }
+
+    /**
      * 编辑
      *
      * @param params 编辑参数

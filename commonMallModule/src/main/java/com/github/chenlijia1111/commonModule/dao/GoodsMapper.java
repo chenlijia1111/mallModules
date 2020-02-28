@@ -2,6 +2,7 @@ package com.github.chenlijia1111.commonModule.dao;
 
 import com.github.chenlijia1111.commonModule.common.responseVo.product.GoodVo;
 import com.github.chenlijia1111.commonModule.entity.Goods;
+import com.github.chenlijia1111.utils.common.Result;
 import org.apache.ibatis.annotations.Param;
 import tk.mybatis.mapper.common.Mapper;
 
@@ -43,5 +44,13 @@ public interface GoodsMapper extends Mapper<Goods> {
      * @return java.util.List<com.github.chenlijia1111.commonModule.common.responseVo.product.GoodVo>
      **/
     List<GoodVo> listByGoodIdSet(@Param("goodIdSet") Set<String> goodIdSet);
+
+
+    /**
+     * 批量添加商品
+     * @param goodsList
+     * @return
+     */
+    Integer batchAdd(@Param("goodsList") List<Goods> goodsList);
 
 }

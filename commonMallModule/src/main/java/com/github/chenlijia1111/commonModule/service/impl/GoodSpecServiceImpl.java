@@ -6,9 +6,11 @@ import com.github.chenlijia1111.utils.common.Result;
 import com.github.chenlijia1111.utils.core.StringUtils;
 import com.github.chenlijia1111.commonModule.dao.GoodSpecMapper;
 import com.github.chenlijia1111.commonModule.entity.GoodSpec;
+import com.github.chenlijia1111.utils.list.Lists;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * 商品规格
@@ -35,6 +37,20 @@ public class GoodSpecServiceImpl implements GoodSpecServiceI {
     public Result add(GoodSpec params) {
 
         int i = goodSpecMapper.insertSelective(params);
+        return i > 0 ? Result.success("操作成功") : Result.failure("操作失败");
+    }
+
+    /**
+     * 批量添加
+     * @param goodSpecList
+     * @return
+     */
+    @Override
+    public Result batchAdd(List<GoodSpec> goodSpecList) {
+        if(Lists.isEmpty(goodSpecList)){
+            return Result.failure("商品规格为空");
+        }
+        int i = goodSpecMapper.batchAdd(goodSpecList);
         return i > 0 ? Result.success("操作成功") : Result.failure("操作失败");
     }
 

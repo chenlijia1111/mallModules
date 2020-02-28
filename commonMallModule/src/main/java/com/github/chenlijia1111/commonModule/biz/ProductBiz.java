@@ -115,6 +115,9 @@ public class ProductBiz {
         }
 
         //添加商品
+        //构造批量插入商品 商品规格数据
+        List<Goods> goodsList = new ArrayList<>();
+        List<GoodSpec> goodSpecList = new ArrayList<>();
         for (GoodAddParams goodAddParams : goodList) {
             //商品id
             String goodId = String.valueOf(IDGenerateFactory.GOOD_ID_UTIL.nextId());
@@ -129,7 +132,7 @@ public class ProductBiz {
                     setDeleteStatus(BooleanConstant.NO_INTEGER).
                     setStockCount(goodAddParams.getStockCount());
 
-            goodsService.add(goods);
+            goodsList.add(goods);
 
             //添加这个商品的规格属性
             List<GoodSpecParams> goodSpecParamsList = goodAddParams.getGoodSpecParamsList();
@@ -144,11 +147,15 @@ public class ProductBiz {
                     if (any1.isPresent()) {
                         ProductSpecValue productSpecValue = any1.get();
                         GoodSpec goodSpec = new GoodSpec().setGoodId(goodId).setSpecValueId(productSpecValue.getId());
-                        goodSpecService.add(goodSpec);
+                        goodSpecList.add(goodSpec);
                     }
                 }
             }
         }
+
+        //批量插入商品 商品规格
+        goodsService.batchAdd(goodsList);
+        goodSpecService.batchAdd(goodSpecList);
 
         return Result.success("操作成功", productId);
     }

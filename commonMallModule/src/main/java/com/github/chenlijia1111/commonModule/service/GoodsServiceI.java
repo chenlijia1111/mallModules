@@ -25,6 +25,13 @@ public interface GoodsServiceI {
     Result add(Goods params);
 
     /**
+     * 批量添加商品
+     * @param goodsList
+     * @return
+     */
+    Result batchAdd(List<Goods> goodsList);
+
+    /**
      * 添加
      *
      * @param params      1

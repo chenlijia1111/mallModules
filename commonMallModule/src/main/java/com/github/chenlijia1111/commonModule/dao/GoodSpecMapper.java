@@ -2,6 +2,7 @@ package com.github.chenlijia1111.commonModule.dao;
 
 import com.github.chenlijia1111.commonModule.common.responseVo.product.GoodSpecVo;
 import com.github.chenlijia1111.commonModule.entity.GoodSpec;
+import com.github.chenlijia1111.utils.common.Result;
 import org.apache.ibatis.annotations.Param;
 import tk.mybatis.mapper.common.Mapper;
 
@@ -30,5 +31,13 @@ public interface GoodSpecMapper extends Mapper<GoodSpec> {
      * @return java.lang.Integer
      **/
     Integer deleteByProductId(@Param("productId") String productId);
+
+
+    /**
+     * 批量添加
+     * @param goodSpecList
+     * @return
+     */
+    Integer batchAdd(@Param("goodSpecList") List<GoodSpec> goodSpecList);
 
 }

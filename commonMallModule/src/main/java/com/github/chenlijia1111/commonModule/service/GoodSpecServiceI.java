@@ -3,6 +3,8 @@ package com.github.chenlijia1111.commonModule.service;
 import com.github.chenlijia1111.utils.common.Result;
 import com.github.chenlijia1111.commonModule.entity.GoodSpec;
 
+import java.util.List;
+
 /**
  * 商品规格
  *
@@ -22,7 +24,14 @@ public interface GoodSpecServiceI {
     Result add(GoodSpec params);
 
     /**
-     * 添加
+     * 批量添加
+     * @param goodSpecList
+     * @return
+     */
+    Result batchAdd(List<GoodSpec> goodSpecList);
+
+    /**
+     * 编辑
      *
      * @param params 1
      * @return com.github.chenlijia1111.utils.common.Result
