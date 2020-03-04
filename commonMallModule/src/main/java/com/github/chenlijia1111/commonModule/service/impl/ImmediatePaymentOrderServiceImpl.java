@@ -41,6 +41,21 @@ public class ImmediatePaymentOrderServiceImpl implements ImmediatePaymentOrderSe
     }
 
     /**
+     * 批量添加发货单
+     * @param immediatePaymentOrderList
+     * @return
+     */
+    @Override
+    public Result batchAdd(List<ImmediatePaymentOrder> immediatePaymentOrderList) {
+        if(Lists.isEmpty(immediatePaymentOrderList)){
+            return Result.failure("数据为空");
+        }
+
+        Integer i = immediatePaymentOrderMapper.batchAdd(immediatePaymentOrderList);
+        return i > 0 ? Result.success("操作成功") : Result.failure("操作失败");
+    }
+
+    /**
      * 编辑
      *
      * @param params      编辑参数

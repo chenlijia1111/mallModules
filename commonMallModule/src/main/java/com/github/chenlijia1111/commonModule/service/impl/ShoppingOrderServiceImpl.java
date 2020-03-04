@@ -60,6 +60,22 @@ public class ShoppingOrderServiceImpl implements ShoppingOrderServiceI {
     }
 
     /**
+     * 批量添加购物单
+     * @param shoppingOrderList
+     * @return
+     */
+    @Override
+    public Result batchAdd(List<ShoppingOrder> shoppingOrderList) {
+        if(Lists.isEmpty(shoppingOrderList)){
+            return Result.failure("数据为空");
+        }
+
+
+        int i = shoppingOrderMapper.batchAdd(shoppingOrderList);
+        return i > 0 ? Result.success("操作成功") : Result.failure("操作失败");
+    }
+
+    /**
      * 编辑
      *
      * @param params 编辑参数

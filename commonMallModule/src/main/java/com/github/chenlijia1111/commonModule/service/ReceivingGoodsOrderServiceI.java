@@ -25,7 +25,14 @@ public interface ReceivingGoodsOrderServiceI {
     Result add(ReceivingGoodsOrder params);
 
     /**
-     * 添加
+     * 批量添加
+     * @param receivingGoodsOrderList
+     * @return
+     */
+    Result batchAdd(List<ReceivingGoodsOrder> receivingGoodsOrderList);
+
+    /**
+     * 编辑
      *
      * @param params 1
      * @return com.github.chenlijia1111.utils.common.Result

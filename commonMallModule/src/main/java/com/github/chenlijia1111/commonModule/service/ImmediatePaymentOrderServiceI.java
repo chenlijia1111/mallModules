@@ -24,6 +24,14 @@ public interface ImmediatePaymentOrderServiceI {
     Result add(ImmediatePaymentOrder params);
 
     /**
+     * 批量添加发货单
+     * @param immediatePaymentOrderList
+     * @return
+     */
+    Result batchAdd(List<ImmediatePaymentOrder> immediatePaymentOrderList);
+
+
+    /**
      * 添加
      *
      * @param params      1

@@ -66,6 +66,14 @@ public class ReturnGoodsOrder {
     private String reExplain;
 
     /**
+     * 退款凭证图片
+     */
+    @ApiModelProperty("退款凭证图片")
+    @PropertyCheck(name = "退款凭证图片")
+    @Column(name = "re_images")
+    private String reImages;
+
+    /**
      * 退货金额
      */
     @ApiModelProperty("退货金额")

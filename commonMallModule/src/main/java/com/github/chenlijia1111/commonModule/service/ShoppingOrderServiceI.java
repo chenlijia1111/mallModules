@@ -24,6 +24,13 @@ public interface ShoppingOrderServiceI {
     Result add(ShoppingOrder params);
 
     /**
+     * 批量添加购物单
+     * @param shoppingOrderList
+     * @return
+     */
+    Result batchAdd(List<ShoppingOrder> shoppingOrderList);
+
+    /**
      * 添加
      *
      * @param params 1

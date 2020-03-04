@@ -29,4 +29,11 @@ public interface ReturnGoodsOrderMapper extends Mapper<ReturnGoodsOrder> {
      */
     List<ReturnGoodsOrder> listByReturnOrderNoSet(@Param("returnOrderNoSet") Set<String> returnOrderNoSet);
 
+    /**
+     * 根据订单集合查询退货单集合
+     * @param orderNoSet
+     * @return
+     */
+    List<ReturnGoodsOrder> listByOrderNoSet(@Param("orderNoSet") Set<String> orderNoSet);
+
 }

@@ -288,12 +288,17 @@ public class ShoppingOrderBiz {
             List<AbstractCoupon> couponList = order.getCouponList();
             String s = JSONUtil.objToStr(couponList);
             order.setOrderCoupon(s);
+        }
 
-            shoppingOrderService.add(order);
-            ImmediatePaymentOrder immediatePaymentOrder = order.getImmediatePaymentOrder();
-            immediatePaymentOrderService.add(immediatePaymentOrder);
-            ReceivingGoodsOrder receivingGoodsOrder = immediatePaymentOrder.getReceivingGoodsOrder();
-            receivingGoodsOrderService.add(receivingGoodsOrder);
+        //批量插入数据
+        shoppingOrderService.batchAdd(orderList);
+        List<ImmediatePaymentOrder> immediatePaymentOrders = orderList.stream().map(e -> e.getImmediatePaymentOrder()).collect(Collectors.toList());
+        immediatePaymentOrderService.batchAdd(immediatePaymentOrders);
+        List<ReceivingGoodsOrder> receivingGoodsOrders = immediatePaymentOrders.stream().map(e -> e.getReceivingGoodsOrder()).collect(Collectors.toList());
+        receivingGoodsOrderService.batchAdd(receivingGoodsOrders);
+
+        //修改库存
+        for (ShoppingOrder order : orderList) {
 
             //下单成功之后,减库存
             GoodVo goodsVO = order.getGoodsVO();
@@ -301,7 +306,6 @@ public class ShoppingOrderBiz {
                     setStockCount(goodsVO.getStockCount() - order.getCount());
             goodsService.update(goods);
         }
-
 
         //返回groupId
         return Result.success("操作成功", groupId);

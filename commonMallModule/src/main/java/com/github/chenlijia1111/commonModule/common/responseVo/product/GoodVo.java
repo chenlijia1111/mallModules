@@ -23,6 +23,26 @@ import java.util.stream.Collectors;
 @Getter
 public class GoodVo extends Goods {
 
+
+    /**
+     * sku构建参数 是否需要规格名称
+     * 可在项目启动之前修改
+     */
+    public static boolean needSpecName = false;
+
+    /**
+     * sku构建参数 规格名称与规格值之间的分隔符
+     * 可在项目启动之前修改
+     */
+    public static String specNameAndValueDelimiter = null;
+
+    /**
+     * sku构建参数 规格之间的分隔符
+     * 可在项目启动之前修改
+     */
+    public static String specDelimiter = "/";
+
+
     /**
      * 商品规格
      */
@@ -105,6 +125,18 @@ public class GoodVo extends Goods {
 
     /**
      * 构建规格名称
+     * 默认规格名称生成方式  示例：红色/L
+     *
+     * @return
+     */
+    public String releaseSkuName() {
+        return releaseSkuName(needSpecName, specNameAndValueDelimiter, specDelimiter);
+    }
+
+
+    /**
+     * 构建规格名称
+     * 不用默认的sku生成方式 自定义
      *
      * @param needSpecName              是否需要规格名称
      * @param specNameAndValueDelimiter 规格名称与规格值之间的分隔符
@@ -138,4 +170,5 @@ public class GoodVo extends Goods {
         }
         return skuName.toString();
     }
+
 }

@@ -1,6 +1,7 @@
 package com.github.chenlijia1111.commonModule.dao;
 
 import com.github.chenlijia1111.commonModule.entity.ImmediatePaymentOrder;
+import com.github.chenlijia1111.utils.common.Result;
 import org.apache.ibatis.annotations.Param;
 import tk.mybatis.mapper.common.Mapper;
 
@@ -35,5 +36,13 @@ public interface ImmediatePaymentOrderMapper extends Mapper<ImmediatePaymentOrde
      * @return
      */
     List<ImmediatePaymentOrder> listBySendOrderNoSet(@Param("sendOrderNoSet") Set<String> sendOrderNoSet);
+
+
+    /**
+     * 批量添加发货单
+     * @param immediatePaymentOrderList
+     * @return
+     */
+    Integer batchAdd(@Param("immediatePaymentOrderList") List<ImmediatePaymentOrder> immediatePaymentOrderList);
 
 }

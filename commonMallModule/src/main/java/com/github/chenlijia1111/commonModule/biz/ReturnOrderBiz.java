@@ -94,6 +94,7 @@ public class ReturnOrderBiz {
                 setShops(order.getShops()).
                 setReCreateTime(currentTime).
                 setReExplain(params.getReturnReason()).
+                setReImages(params.getImage()).
                 setReFund(order.getOrderAmountTotal()).
                 setCheckStatus(CommonMallConstants.ORDER_INIT).
                 setShoppingOrder(order.getOrderNo()).
@@ -179,6 +180,7 @@ public class ReturnOrderBiz {
                 setShops(order.getShops()).
                 setReCreateTime(currentTime).
                 setReExplain(params.getReturnReason()).
+                setReImages(params.getImage()).
                 setReFund(order.getOrderAmountTotal()).
                 setCheckStatus(CommonMallConstants.ORDER_INIT).
                 setShoppingOrder(order.getOrderNo()).
@@ -260,6 +262,7 @@ public class ReturnOrderBiz {
                 setShops(order.getShops()).
                 setReCreateTime(currentTime).
                 setReExplain(params.getReturnReason()).
+                setReImages(params.getImage()).
                 setReFund(order.getOrderAmountTotal()).
                 setCheckStatus(CommonMallConstants.ORDER_INIT).
                 setShoppingOrder(order.getOrderNo()).

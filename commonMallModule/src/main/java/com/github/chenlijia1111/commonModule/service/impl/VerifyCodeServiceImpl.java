@@ -43,6 +43,7 @@ public class VerifyCodeServiceImpl implements VerifyCodeServiceI {
         List<VerifyCode> verifyCodeList = verifyCodeMapper.select(verifyCodeCondition);
         if (Lists.isNotEmpty(verifyCodeList)) {
             //变更
+            params.setId(verifyCodeList.get(0).getId());
             params.setCreateTime(new Date());
             return update(params);
         }

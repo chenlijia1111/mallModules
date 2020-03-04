@@ -42,6 +42,21 @@ public class ReceivingGoodsOrderServiceImpl implements ReceivingGoodsOrderServic
     }
 
     /**
+     * 批量添加
+     * @param receivingGoodsOrderList
+     * @return
+     */
+    @Override
+    public Result batchAdd(List<ReceivingGoodsOrder> receivingGoodsOrderList) {
+        if(Lists.isEmpty(receivingGoodsOrderList)){
+            return Result.failure("数据为空");
+        }
+
+        int i = receivingGoodsOrderMapper.batchAdd(receivingGoodsOrderList);
+        return i > 0 ? Result.success("操作成功") : Result.failure("操作失败");
+    }
+
+    /**
      * 编辑
      *
      * @param params 编辑参数

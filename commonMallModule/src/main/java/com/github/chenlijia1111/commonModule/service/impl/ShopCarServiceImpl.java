@@ -8,11 +8,13 @@ import com.github.chenlijia1111.commonModule.dao.GoodSpecMapper;
 import com.github.chenlijia1111.commonModule.dao.GoodsMapper;
 import com.github.chenlijia1111.commonModule.dao.ShopCarMapper;
 import com.github.chenlijia1111.commonModule.entity.ShopCar;
+import com.github.chenlijia1111.commonModule.service.GoodsServiceI;
 import com.github.chenlijia1111.commonModule.service.ShopCarServiceI;
 import com.github.chenlijia1111.utils.common.Result;
 import com.github.chenlijia1111.utils.core.PropertyCheckUtil;
 import com.github.chenlijia1111.utils.list.Lists;
 import com.github.chenlijia1111.utils.list.Sets;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -38,6 +40,9 @@ public class ShopCarServiceImpl implements ShopCarServiceI {
     private GoodsMapper goodsMapper;//商品
     @Resource
     private GoodSpecMapper goodSpecMapper;//商品规格
+
+    @Autowired
+    private GoodsServiceI goodsService;//商品
 
 
     /**
@@ -124,14 +129,11 @@ public class ShopCarServiceImpl implements ShopCarServiceI {
             List<ClientShopCarVo> clientShopCarVos = shopCarMapper.listPageByClientAndShopIdSet(shopIdSet, clientId);
             //关联出商品信息-查询商品价格
             Set<String> goodsIdSet = clientShopCarVos.stream().map(e -> e.getGoodId()).collect(Collectors.toSet());
-            List<GoodVo> goodVos = goodsMapper.listByGoodIdSet(goodsIdSet);
-            //关联查询商品属性-查询商品 sku名称
-            List<GoodSpecVo> propertyGoodsList = goodSpecMapper.listGoodSpecVoByGoodIdSet(goodsIdSet);
+            List<GoodVo> goodVos = goodsService.listByGoodIdSet(goodsIdSet);
 
             //关联这些
             for (ClientShopCarVo shopCarVo : clientShopCarVos) {
-                shopCarVo.findGoodsInfo(goodVos) //查询商品价格信息
-                        .findGoodsSkuName(propertyGoodsList); //查询商品sku名称
+                shopCarVo.findGoodsInfo(goodVos);  //查询商品价格信息 sku
             }
 
             //查找商家分组下的购物车列表
@@ -160,13 +162,10 @@ public class ShopCarServiceImpl implements ShopCarServiceI {
         List<ClientShopCarVo> clientShopCarVos = shopCarMapper.listPageByShopCarIdSetAndClientId(collect, currentUserId);
         //关联出商品信息-查询商品价格
         Set<String> goodsIdSet = clientShopCarVos.stream().map(e -> e.getGoodId()).collect(Collectors.toSet());
-        List<GoodVo> goodVos = goodsMapper.listByGoodIdSet(goodsIdSet);
-        //关联查询商品属性-查询商品 sku名称
-        List<GoodSpecVo> goodSpecVos = goodSpecMapper.listGoodSpecVoByGoodIdSet(goodsIdSet);
+        List<GoodVo> goodVos = goodsService.listByGoodIdSet(goodsIdSet);
         //关联这些
         for (ClientShopCarVo shopCarVo : clientShopCarVos) {
-            shopCarVo.findGoodsInfo(goodVos) //查询商品价格信息
-                    .findGoodsSkuName(goodSpecVos); //查询商品sku名称
+            shopCarVo.findGoodsInfo(goodVos); //查询商品价格信息
         }
         return clientShopCarVos;
     }

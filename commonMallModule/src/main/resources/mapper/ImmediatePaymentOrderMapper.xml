@@ -56,4 +56,22 @@
       #{sendOrderNo}
     </foreach>
   </select>
+  <insert id="batchAdd">
+    INSERT INTO s_immediate_payment_order (order_no, custom, shops, state, rec_user, rec_tel, rec_addr, rec_province,
+                                           rec_city, rec_area, star_user, star_tel, star_addr, express_no,
+                                           express_com, express_name, front_order, shopping_order,
+                                           send_time, create_time) VALUES
+    <foreach collection="immediatePaymentOrderList" item="immediatePaymentOrder" separator=",">
+      (#{immediatePaymentOrder.orderNo},#{immediatePaymentOrder.custom},#{immediatePaymentOrder.shops},
+       #{immediatePaymentOrder.state},
+       #{immediatePaymentOrder.recUser},#{immediatePaymentOrder.recTel},#{immediatePaymentOrder.recAddr},
+       #{immediatePaymentOrder.recProvince},
+       #{immediatePaymentOrder.recCity},#{immediatePaymentOrder.recArea},#{immediatePaymentOrder.starUser},
+       #{immediatePaymentOrder.starTel},
+       #{immediatePaymentOrder.starAddr},#{immediatePaymentOrder.expressNo},#{immediatePaymentOrder.expressCom},
+       #{immediatePaymentOrder.expressName},
+       #{immediatePaymentOrder.frontOrder},#{immediatePaymentOrder.shoppingOrder},#{immediatePaymentOrder.sendTime},
+       #{immediatePaymentOrder.createTime})
+    </foreach>
+  </insert>
 </mapper>

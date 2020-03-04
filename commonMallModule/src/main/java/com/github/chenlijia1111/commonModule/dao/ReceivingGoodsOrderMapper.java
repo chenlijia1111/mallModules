@@ -1,6 +1,7 @@
 package com.github.chenlijia1111.commonModule.dao;
 
 import com.github.chenlijia1111.commonModule.entity.ReceivingGoodsOrder;
+import com.github.chenlijia1111.utils.common.Result;
 import org.apache.ibatis.annotations.Param;
 import tk.mybatis.mapper.common.Mapper;
 
@@ -28,5 +29,13 @@ public interface ReceivingGoodsOrderMapper extends Mapper<ReceivingGoodsOrder> {
      * @return
      */
     String maxOrderNo();
+
+
+    /**
+     * 批量添加
+     * @param receivingGoodsOrderList
+     * @return
+     */
+    Integer batchAdd(@Param("receivingGoodsOrderList") List<ReceivingGoodsOrder> receivingGoodsOrderList);
 
 }

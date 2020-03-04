@@ -32,4 +32,14 @@
     ORDER BY s_receiving_goods_order.create_time DESC
     LIMIT 1
   </select>
+  <insert id="batchAdd">
+    INSERT INTO s_receiving_goods_order (order_no, custom, shops, state, shopping_order, immediate_payment_order,
+                                         receive_time, rec_user, front_order, create_time) VALUES
+    <foreach collection="receivingGoodsOrderList" item="receivingGoodsOrder" separator=",">
+      (#{receivingGoodsOrder.orderNo},#{receivingGoodsOrder.custom},#{receivingGoodsOrder.shops},
+       #{receivingGoodsOrder.state},#{receivingGoodsOrder.shoppingOrder},#{receivingGoodsOrder.immediatePaymentOrder},
+       #{receivingGoodsOrder.receiveTime},#{receivingGoodsOrder.recUser},#{receivingGoodsOrder.frontOrder},
+       #{receivingGoodsOrder.createTime})
+    </foreach>
+  </insert>
 </mapper>

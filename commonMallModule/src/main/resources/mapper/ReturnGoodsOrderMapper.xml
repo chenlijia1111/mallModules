@@ -7,6 +7,7 @@
     <result column="shops" jdbcType="VARCHAR" property="shops" />
     <result column="re_create_time" jdbcType="TIMESTAMP" property="reCreateTime" />
     <result column="re_explain" jdbcType="VARCHAR" property="reExplain" />
+    <result column="re_images" jdbcType="VARCHAR" property="reImages" />
     <result column="re_fund" jdbcType="DOUBLE" property="reFund" />
     <result column="check_status" jdbcType="INTEGER" property="checkStatus" />
     <result column="re_handle_time" jdbcType="TIMESTAMP" property="reHandleTime" />
@@ -21,7 +22,7 @@
     <result column="delete_status" jdbcType="INTEGER" property="deleteStatus" />
   </resultMap>
   <sql id="Base_Column_List">
-    re_order_no, custom, shops, re_create_time, re_explain, re_fund, check_status, re_handle_time, 
+    re_order_no, custom, shops, re_create_time, re_explain,re_images, re_fund, check_status, re_handle_time,
     re_reason, shopping_order, front_order, re_fund_status, state, return_pay_no,
     re_type,return_pay_time,delete_status
   </sql>
@@ -37,6 +38,14 @@
     FROM s_return_goods_order
     <foreach collection="returnOrderNoSet" item="returnOrderNo" open="WHERE re_order_no IN (" close=")" separator=",">
       #{returnOrderNo}
+    </foreach>
+  </select>
+  <select id="listByOrderNoSet" resultMap="BaseResultMap">
+    SELECT
+    <include refid="Base_Column_List"></include>
+    FROM s_return_goods_order
+    <foreach collection="orderNoSet" item="orderNo" open="WHERE front_order IN (" close=")" separator=",">
+      #{orderNo}
     </foreach>
   </select>
 </mapper>

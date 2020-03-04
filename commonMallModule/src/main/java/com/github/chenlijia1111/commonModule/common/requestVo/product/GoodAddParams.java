@@ -2,12 +2,16 @@ package com.github.chenlijia1111.commonModule.common.requestVo.product;
 
 import com.github.chenlijia1111.commonModule.common.checkFunction.PositiveNumberCheck;
 import com.github.chenlijia1111.commonModule.common.checkFunction.PriceCheck;
+import com.github.chenlijia1111.commonModule.common.responseVo.product.ReleaseProductSkuSpecVo;
+import com.github.chenlijia1111.commonModule.common.responseVo.product.ReleaseProductSkuVo;
 import com.github.chenlijia1111.utils.core.annos.PropertyCheck;
+import com.github.chenlijia1111.utils.list.Lists;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -64,5 +68,36 @@ public class GoodAddParams {
     @ApiModelProperty(value = "库存")
     @PropertyCheck(name = "库存", checkFunction = PositiveNumberCheck.class)
     private Integer stockCount;
+
+
+    /**
+     * 转换 为构建规格对象
+     * @return
+     */
+    public ReleaseProductSkuVo transferToReleaseProductSkuVo(){
+        ReleaseProductSkuVo vo = new ReleaseProductSkuVo();
+        vo.setPrice(this.price);
+        vo.setMarketPrice(this.marketPrice);
+        vo.setVipPrice(this.vipPrice);
+        vo.setStockCount(this.stockCount);
+
+        if(Lists.isNotEmpty(this.goodSpecParamsList)){
+            List<GoodSpecParams> goodSpecParamsList = this.goodSpecParamsList;
+
+            List<ReleaseProductSkuSpecVo> skuSpecVos = new ArrayList<>();
+            for (GoodSpecParams goodSpecParams : goodSpecParamsList) {
+                ReleaseProductSkuSpecVo specVo = new ReleaseProductSkuSpecVo();
+
+                specVo.setSpecName(goodSpecParams.getSpecName());
+                specVo.setValue(goodSpecParams.getSpecValue());
+                specVo.setImageValue(goodSpecParams.getSpecImageValue());
+
+                skuSpecVos.add(specVo);
+            }
+
+            vo.setSkuSpecVos(skuSpecVos);
+        }
+        return vo;
+    }
 
 }

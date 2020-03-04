@@ -1,6 +1,7 @@
 package com.github.chenlijia1111.commonModule.dao;
 
 import com.github.chenlijia1111.commonModule.entity.ShoppingOrder;
+import com.github.chenlijia1111.utils.common.Result;
 import org.apache.ibatis.annotations.Param;
 import tk.mybatis.mapper.common.Mapper;
 
@@ -58,6 +59,14 @@ public interface ShoppingOrderMapper extends Mapper<ShoppingOrder> {
      * @return
      */
     String maxShopGroupId();
+
+
+    /**
+     * 批量添加购物单
+     * @param shoppingOrderList
+     * @return
+     */
+    Integer batchAdd(@Param("shoppingOrderList") List<ShoppingOrder> shoppingOrderList);
 
 
 }

@@ -77,4 +77,20 @@
     ORDER BY s_shopping_order.create_time DESC
     LIMIT 1
   </select>
+  <insert id="batchAdd">
+    INSERT INTO s_shopping_order (order_no, custom, shops, goods_id, count, state, order_type, product_amount_total,
+                                  pay_channel, pay_record, transaction_id, good_price, order_amount_total, pay_time,
+                                  details_json, shop_group_id, group_id, payable, order_coupon, create_time, remarks,
+                                  shop_remarks, delete_status) VALUES
+    <foreach collection="shoppingOrderList" item="shoppingOrder" separator=",">
+      (#{shoppingOrder.orderNo},#{shoppingOrder.custom},#{shoppingOrder.shops},#{shoppingOrder.goodsId},
+       #{shoppingOrder.count},#{shoppingOrder.state},
+       #{shoppingOrder.orderType},#{shoppingOrder.productAmountTotal},#{shoppingOrder.payChannel},
+       #{shoppingOrder.payRecord},#{shoppingOrder.transactionId},#{shoppingOrder.goodPrice},
+       #{shoppingOrder.orderAmountTotal},#{shoppingOrder.payTime},#{shoppingOrder.detailsJson},
+       #{shoppingOrder.shopGroupId},#{shoppingOrder.groupId},#{shoppingOrder.payable},
+      #{shoppingOrder.orderCoupon},#{shoppingOrder.createTime},#{shoppingOrder.remarks},
+       #{shoppingOrder.shopRemarks},#{shoppingOrder.deleteStatus})
+    </foreach>
+  </insert>
 </mapper>
