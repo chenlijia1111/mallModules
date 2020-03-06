@@ -38,7 +38,7 @@ public class ClientAddressBiz {
      * 添加收货地址
      *
      * @param params 1
-     * @return com.logicalthinking.jiuyou.common.pojo.Result
+     * @return
      * @author chenlijia
      * @since 下午 12:47 2019/8/15 0015
      **/
@@ -78,7 +78,7 @@ public class ClientAddressBiz {
      * 编辑收货地址
      *
      * @param params 1
-     * @return com.logicalthinking.jiuyou.common.pojo.Result
+     * @return
      * @author chenlijia
      * @since 下午 12:47 2019/8/15 0015
      **/
@@ -122,7 +122,7 @@ public class ClientAddressBiz {
      * 删除收货地址
      *
      * @param id 1
-     * @return com.logicalthinking.jiuyou.common.pojo.Result
+     * @return
      * @author chenlijia
      * @since 下午 12:47 2019/8/15 0015
      **/
@@ -151,7 +151,7 @@ public class ClientAddressBiz {
      * 查询当前用户收货地址
      *
      * @param commonAddress 是否默认地址 0否 1是
-     * @return com.logicalthinking.jiuyou.common.pojo.Result
+     * @return
      * @author chenlijia
      * @since 下午 12:48 2019/8/15 0015
      **/
@@ -183,7 +183,7 @@ public class ClientAddressBiz {
      * 主键查询地址
      *
      * @param id 1
-     * @return com.logicalthinking.jiuyou.common.pojo.Result
+     * @return
      * @since 下午 3:45 2019/10/9 0009
      **/
     public Result findById(Integer id) {

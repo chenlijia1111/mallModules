@@ -34,13 +34,13 @@
     WHERE s_shop_car.product_id = s_product.id
       AND s_product.delete_status = 0
       AND client_id = #{clientId}
-      AND  s_product.shelf_status = 1
   </select>
   <select id="listPageWithClientShopCarGroupByShopVo" resultType="com.github.chenlijia1111.commonModule.common.responseVo.shopCar.ClientShopCarGroupByShopVo">
     SELECT s_product.shops shopId, max(s_shop_car.update_time) updateTime
     FROM s_shop_car,
          s_product
     WHERE s_shop_car.product_id = s_product.id
+      AND s_product.delete_status = 0
       AND client_id = #{clientId}
     GROUP BY s_product.shops
     ORDER BY updateTime DESC
@@ -53,7 +53,7 @@
            s_product.shelf_status shelfStatus
     from s_shop_car,s_product
     WHERE s_shop_car.product_id = s_product.id
-    AND s_product.shelf_status = 1
+    AND s_product.delete_status = 0
     AND client_id = #{clientId}
     <foreach collection="shopIdSet" item="shopId" open="AND s_product.shops IN (" close=")" separator=",">
       #{shopId}
@@ -67,7 +67,7 @@
     from s_shop_car,s_product
     WHERE s_shop_car.product_id = s_product.id
     AND client_id = #{clientId}
-    AND s_product.shelf_status = 1
+    AND s_product.delete_status = 0
     <foreach collection="shopCarIdSet" item="shopCarId" open="AND s_shop_car.id IN (" close=")" separator=",">
       #{shopCarId}
     </foreach>

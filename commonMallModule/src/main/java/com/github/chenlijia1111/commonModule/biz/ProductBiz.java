@@ -246,6 +246,9 @@ public class ProductBiz {
         //添加商品
         //添加参数里的商品集合
         List<GoodAddParams> goodList = params.getGoodList();
+        //商品规格集合,用于批量添加  减少时间消耗
+        List<GoodSpec> batchAddGoodSpecList = new ArrayList<>();
+
         for (GoodAddParams goodAddParams : goodList) {
 
             GoodVo goodVo = findMatchGoodVo(goodAddParams.transferToReleaseProductSkuVo(), listByCondition);
@@ -302,10 +305,15 @@ public class ProductBiz {
                     if (any1.isPresent()) {
                         ProductSpecValue productSpecValue = any1.get();
                         GoodSpec goodSpec = new GoodSpec().setGoodId(goods.getId()).setSpecValueId(productSpecValue.getId());
-                        goodSpecService.add(goodSpec);
+                        batchAddGoodSpecList.add(goodSpec);
                     }
                 }
             }
+        }
+
+        //批量添加商品规格
+        if (Lists.isNotEmpty(batchAddGoodSpecList)) {
+            goodSpecService.batchAdd(batchAddGoodSpecList);
         }
 
         //判断那些前端删除了的商品,删掉

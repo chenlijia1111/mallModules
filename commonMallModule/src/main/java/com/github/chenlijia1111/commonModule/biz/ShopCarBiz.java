@@ -47,7 +47,7 @@ public class ShopCarBiz {
      * 并返回购物车商品总数量
      *
      * @param params 1
-     * @return com.logicalthinking.jiuyou.common.pojo.Result
+     * @return
      * @author chenlijia
      * @since 上午 11:25 2019/8/17 0017
      **/
@@ -115,7 +115,7 @@ public class ShopCarBiz {
      * 批量删除购物车
      *
      * @param shopCarIdList 1
-     * @return com.logicalthinking.jiuyou.common.pojo.Result
+     * @return
      * @author chenlijia
      * @since 上午 11:26 2019/8/17 0017
      **/
@@ -135,7 +135,7 @@ public class ShopCarBiz {
      * 修改成功之后 返回商品当前的价格
      *
      * @param params 1
-     * @return com.logicalthinking.jiuyou.common.pojo.Result
+     * @return
      * @author chenlijia
      * @since 上午 11:26 2019/8/17 0017
      **/
@@ -197,7 +197,7 @@ public class ShopCarBiz {
      * 先查询出商家，在查询商家对应的购物车列表
      *
      * @param pageAbleVo 1
-     * @return com.logicalthinking.jiuyou.common.pojo.Result
+     * @return
      * @author chenlijia
      * @since 上午 11:26 2019/8/17 0017
      **/
@@ -239,7 +239,7 @@ public class ShopCarBiz {
      * 通过购物车id查询购物车信息
      *
      * @param list 1
-     * @return com.logicalthinking.jiuyou.common.pojo.Result
+     * @return
      * @author chenlijia
      * @since 14:05 2019/8/23
      **/
@@ -263,7 +263,7 @@ public class ShopCarBiz {
     /**
      * 查询当前用户购物车数量信息
      *
-     * @return com.logicalthinking.jiuyou.common.pojo.Result
+     * @return
      * @since 下午 4:40 2019/9/21 0021
      **/
     public Result findCurrentUserShopCarCountInfo() {

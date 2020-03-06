@@ -79,7 +79,7 @@ public class ShopCarServiceImpl implements ShopCarServiceI {
      * 批量删除购物车
      *
      * @param shopCarIdList 1
-     * @return com.logicalthinking.jiuyou.common.pojo.Result
+     * @return
      * @author chenlijia
      * @since 上午 11:26 2019/8/17 0017
      **/
