@@ -29,7 +29,7 @@
   <select id="maxOrderNo" resultType="java.lang.String">
     SELECT s_receiving_goods_order.order_no
     FROM s_receiving_goods_order
-    ORDER BY s_receiving_goods_order.create_time DESC
+    ORDER BY s_receiving_goods_order.create_time DESC,s_receiving_goods_order.order_no DESC
     LIMIT 1
   </select>
   <insert id="batchAdd">

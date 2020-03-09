@@ -64,7 +64,7 @@
     SELECT
     s_product.id
     FROM s_product
-    ORDER BY s_product.create_time DESC
+    ORDER BY s_product.create_time DESC,s_product.id DESC
     LIMIT 1
   </select>
   <select id="listByProductIdSet" resultMap="BaseResultMap">

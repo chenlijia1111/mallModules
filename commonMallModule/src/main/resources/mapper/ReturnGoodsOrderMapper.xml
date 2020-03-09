@@ -29,7 +29,7 @@
   <select id="maxOrderNo" resultType="java.lang.String">
     SELECT s_return_goods_order.re_order_no
     FROM s_return_goods_order
-    ORDER BY s_return_goods_order.re_create_time DESC
+    ORDER BY s_return_goods_order.re_create_time DESC,s_return_goods_order.re_order_no DESC
     LIMIT 1
   </select>
   <select id="listByReturnOrderNoSet" resultMap="BaseResultMap">

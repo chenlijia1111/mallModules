@@ -62,19 +62,19 @@
   <select id="maxOrderNo" resultType="java.lang.String">
     SELECT s_shopping_order.order_no
     FROM s_shopping_order
-    ORDER BY s_shopping_order.create_time DESC
+    ORDER BY s_shopping_order.create_time DESC,s_shopping_order.order_no DESC
     LIMIT 1
   </select>
   <select id="maxGroupId" resultType="java.lang.String">
     SELECT s_shopping_order.group_id
     FROM s_shopping_order
-    ORDER BY s_shopping_order.create_time DESC
+    ORDER BY s_shopping_order.create_time DESC,s_shopping_order.group_id DESC
     LIMIT 1
   </select>
   <select id="maxShopGroupId" resultType="java.lang.String">
     SELECT s_shopping_order.shop_group_id
     FROM s_shopping_order
-    ORDER BY s_shopping_order.create_time DESC
+    ORDER BY s_shopping_order.create_time DESC,s_shopping_order.shop_group_id DESC
     LIMIT 1
   </select>
   <insert id="batchAdd">

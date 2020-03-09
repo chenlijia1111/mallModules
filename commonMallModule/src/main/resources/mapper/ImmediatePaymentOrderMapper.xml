@@ -42,7 +42,7 @@
   <select id="maxOrderNo" resultType="java.lang.String">
     SELECT s_immediate_payment_order.order_no
     FROM s_immediate_payment_order
-    ORDER BY s_immediate_payment_order.create_time DESC
+    ORDER BY s_immediate_payment_order.create_time DESC,s_immediate_payment_order.order_no DESC
     LIMIT 1
   </select>
   <select id="listBySendOrderNoSet" resultMap="BaseResultMap">
