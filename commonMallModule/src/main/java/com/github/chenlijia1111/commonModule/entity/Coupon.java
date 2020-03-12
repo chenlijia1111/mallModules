@@ -66,12 +66,15 @@ public class Coupon {
 
     /**
      * 优惠券类型 1满价格减优惠券 2满价格折扣优惠券 3满数量减优惠券 4满数量折扣优惠券 5积分券 6物流券 其他待扩展
+     * 将在1.1.3_RELEASE废弃，不做有意义处理
+     * 优惠券将直接通过类名称进行转换
      *
      * @see com.github.chenlijia1111.commonModule.common.enums.CouponTypeEnum
      */
     @ApiModelProperty("优惠券类型 1满价格减优惠券 2满价格折扣优惠券 3满数量减优惠券 4满数量折扣优惠券 5积分券 6物流券 其他待扩展")
     @PropertyCheck(name = "优惠券类型 1满价格减优惠券 2满价格折扣优惠券 3满数量减优惠券 4满数量折扣优惠券 5积分券 6物流券 其他待扩展")
     @Column(name = "coupon_type")
+    @Deprecated
     private Integer couponType;
 
     /**

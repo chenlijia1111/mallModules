@@ -235,40 +235,14 @@ public class ShoppingOrderBiz {
                     List<String> goodIdList = couponWithGoodId.getGoodIdList();
 
                     Optional<Coupon> any = coupons.stream().filter(e -> Objects.equals(e.getId(), couponId)).findAny();
-                    if (!any.isPresent() || Objects.equals(any.get().getCouponType(), CouponTypeEnum.ExpressCoupon.getType())) {
-                        //物流券最后处理
-                        continue;
-                    }
                     Coupon coupon = any.get();
                     //找出符合条件的订单进行计算
                     //作用的订单
                     List<ShoppingOrder> hitOrderList = orderList.stream().filter(e -> goodIdList.contains(e.getGoodsId())).collect(Collectors.toList());
                     if (Lists.isNotEmpty(hitOrderList)) {
                         String couponJson = coupon.getCouponJson();
-                        AbstractCoupon abstractCoupon = AbstractCoupon.transferTypeToCoupon(coupon.getCouponType(), couponJson);
+                        AbstractCoupon abstractCoupon = AbstractCoupon.transferTypeToCoupon( couponJson);
                         abstractCoupon.calculatePayable(hitOrderList);
-                    }
-                }
-
-                //最后计算物流券
-                for (CouponWithGoodIds couponWithGoodId : couponWithGoodIdsList) {
-                    //优惠券Id
-                    String couponId = couponWithGoodId.getCouponId();
-                    //优惠券作用的商品id集合
-                    List<String> goodIdList = couponWithGoodId.getGoodIdList();
-
-                    Optional<Coupon> any = coupons.stream().filter(e -> Objects.equals(e.getId(), couponId)).findAny();
-                    if (any.isPresent() && Objects.equals(any.get().getCouponType(), CouponTypeEnum.ExpressCoupon.getType())) {
-                        //物流券最后处理
-                        Coupon coupon = any.get();
-                        //找出符合条件的订单进行计算
-                        //作用的订单
-                        List<ShoppingOrder> hitOrderList = orderList.stream().filter(e -> goodIdList.contains(e.getGoodsId())).collect(Collectors.toList());
-                        if (Lists.isNotEmpty(hitOrderList)) {
-                            String couponJson = coupon.getCouponJson();
-                            AbstractCoupon abstractCoupon = AbstractCoupon.transferTypeToCoupon(coupon.getCouponType(), couponJson);
-                            abstractCoupon.calculatePayable(hitOrderList);
-                        }
                     }
                 }
 
@@ -415,40 +389,14 @@ public class ShoppingOrderBiz {
                     List<String> goodIdList = couponWithGoodId.getGoodIdList();
 
                     Optional<Coupon> any = coupons.stream().filter(e -> Objects.equals(e.getId(), couponId)).findAny();
-                    if (!any.isPresent() || Objects.equals(any.get().getCouponType(), CouponTypeEnum.ExpressCoupon.getType())) {
-                        //物流券最后处理
-                        continue;
-                    }
                     Coupon coupon = any.get();
                     //找出符合条件的订单进行计算
                     //作用的订单
                     List<ShoppingOrder> hitOrderList = orderList.stream().filter(e -> goodIdList.contains(e.getGoodsId())).collect(Collectors.toList());
                     if (Lists.isNotEmpty(hitOrderList)) {
                         String couponJson = coupon.getCouponJson();
-                        AbstractCoupon abstractCoupon = AbstractCoupon.transferTypeToCoupon(coupon.getCouponType(), couponJson);
+                        AbstractCoupon abstractCoupon = AbstractCoupon.transferTypeToCoupon( couponJson);
                         abstractCoupon.calculatePayable(hitOrderList);
-                    }
-                }
-
-                //最后计算物流券
-                for (CouponWithGoodIds couponWithGoodId : couponWithGoodIdsList) {
-                    //优惠券Id
-                    String couponId = couponWithGoodId.getCouponId();
-                    //优惠券作用的商品id集合
-                    List<String> goodIdList = couponWithGoodId.getGoodIdList();
-
-                    Optional<Coupon> any = coupons.stream().filter(e -> Objects.equals(e.getId(), couponId)).findAny();
-                    if (any.isPresent() && Objects.equals(any.get().getCouponType(), CouponTypeEnum.ExpressCoupon.getType())) {
-                        //物流券最后处理
-                        Coupon coupon = any.get();
-                        //找出符合条件的订单进行计算
-                        //作用的订单
-                        List<ShoppingOrder> hitOrderList = orderList.stream().filter(e -> goodIdList.contains(e.getGoodsId())).collect(Collectors.toList());
-                        if (Lists.isNotEmpty(hitOrderList)) {
-                            String couponJson = coupon.getCouponJson();
-                            AbstractCoupon abstractCoupon = AbstractCoupon.transferTypeToCoupon(coupon.getCouponType(), couponJson);
-                            abstractCoupon.calculatePayable(hitOrderList);
-                        }
                     }
                 }
 
@@ -472,24 +420,11 @@ public class ShoppingOrderBiz {
                 abstractCouponList.addAll(couponList);
             }
         }
-        //满数量折扣优惠券抵扣金额
-        vo.setCountDiscountPrice(abstractCouponList.stream().filter(e -> Objects.equals(CouponTypeEnum.CountDiscountCoupon.getType(), e.type())).
-                collect(Collectors.summingDouble(AbstractCoupon::getEffectiveMoney)));
-        //满数量减优惠券抵扣金额
-        vo.setCountSubPrice(abstractCouponList.stream().filter(e -> Objects.equals(CouponTypeEnum.CountSubCoupon.getType(), e.type())).
-                collect(Collectors.summingDouble(AbstractCoupon::getEffectiveMoney)));
-        //满价格折扣优惠券抵扣金额
-        vo.setPriceDiscountPrice(abstractCouponList.stream().filter(e -> Objects.equals(CouponTypeEnum.PriceDiscountCoupon.getType(), e.type())).
-                collect(Collectors.summingDouble(AbstractCoupon::getEffectiveMoney)));
-        //满价格减优惠券抵扣金额
-        vo.setPriceSubPrice(abstractCouponList.stream().filter(e -> Objects.equals(CouponTypeEnum.PriceSubCoupon.getType(), e.type())).
-                collect(Collectors.summingDouble(AbstractCoupon::getEffectiveMoney)));
-        //积分抵扣金额
-        vo.setScorePrice(abstractCouponList.stream().filter(e -> Objects.equals(CouponTypeEnum.ScoreCoupon.getType(), e.type())).
-                collect(Collectors.summingDouble(AbstractCoupon::getEffectiveMoney)));
-        //物流费用
-        vo.setExpressPrice(abstractCouponList.stream().filter(e -> Objects.equals(CouponTypeEnum.ExpressCoupon.getType(), e.type())).
-                collect(Collectors.summingDouble(AbstractCoupon::getEffectiveMoney)));
+
+        //费用详情信息map
+        Map<String, Double> feeMap = abstractCouponList.stream().
+                collect(Collectors.groupingBy(AbstractCoupon::getCouponImplClassName, Collectors.summingDouble(e -> e.getEffectiveMoney())));
+        vo.setFeeMap(feeMap);
 
 
         return Result.success("操作成功", vo);

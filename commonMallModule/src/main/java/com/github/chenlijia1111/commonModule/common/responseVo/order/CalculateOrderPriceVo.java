@@ -5,6 +5,8 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Map;
+
 /**
  * 试算价格返回对象
  *
@@ -26,51 +28,9 @@ public class CalculateOrderPriceVo {
     private Double payAble;
 
     /**
-     * 满数量折扣优惠券抵扣金额
-     *
-     * @since 下午 4:05 2019/11/22 0022
-     **/
-    @ApiModelProperty(value = "满数量折扣优惠券抵扣金额")
-    private Double countDiscountPrice;
-
-    /**
-     * 满数量减优惠券抵扣金额
-     *
-     * @since 下午 4:05 2019/11/22 0022
-     **/
-    @ApiModelProperty(value = "满数量减优惠券抵扣金额")
-    private Double countSubPrice;
-
-    /**
-     * 满价格折扣优惠券抵扣金额
-     *
-     * @since 下午 4:05 2019/11/22 0022
-     **/
-    @ApiModelProperty(value = "满价格折扣优惠券抵扣金额")
-    private Double priceDiscountPrice;
-
-    /**
-     * 满价格减优惠券抵扣金额
-     *
-     * @since 下午 4:05 2019/11/22 0022
-     **/
-    @ApiModelProperty(value = "满价格减优惠券抵扣金额")
-    private Double priceSubPrice;
-
-    /**
-     * 积分抵扣金额
-     *
-     * @since 下午 4:05 2019/11/22 0022
-     **/
-    @ApiModelProperty(value = "积分抵扣金额")
-    private Double ScorePrice;
-
-    /**
-     * 物流费用
-     *
-     * @since 下午 4:05 2019/11/22 0022
-     **/
-    @ApiModelProperty(value = "物流费用")
-    private Double expressPrice;
+     * 费用详情信息
+     */
+    @ApiModelProperty(value = "费用详情信息")
+    private Map<String, Double> feeMap;
 
 }

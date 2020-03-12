@@ -20,7 +20,24 @@ import java.util.Optional;
  * {@link ExpressCoupon} 物流券
  * {@link ScoreCoupon} 积分券
  * <p>
- * 如果还需要其他的自定义的优惠券,只需要实现本类即可,请参考订单中处理优惠券的策略
+ * 因为设计时，不可能把所有的费用计算方式都涵盖，如果还需要其他的自定义的优惠券,
+ * 只需要实现本类即可,请参考订单中处理优惠券的策略
+ * 比如需要以下需求：运费计算需要按件数进行计算  5件以内10元 5件以上每加一件0.5元
+ * 那么可以自己定义一个实现类，然后在 {@link AbstractCoupon#calculatePayable(List)} 进行计算即可
+ * 订单查询的时候查询运费就取这个优惠券的生效金额就行了
+ * Integer freight = 0;
+ * String orderCoupon = order.getOrderCoupon();
+ * if (StringUtils.isNotEmpty(orderCoupon)) {
+ * JsonNode jsonNode = JSONUtil.strToJsonNode(orderCoupon);
+ * for (JsonNode node : jsonNode) {
+ * if (Objects.equals(ExpressCoupon.class.getSimpleName(), node.get("voucherKey").asText())) {
+ * JsonNode effectiveMoney = node.get("effectiveMoney");
+ * if (Objects.nonNull(effectiveMoney)) {
+ * freight += effectiveMoney.asDouble();
+ * }
+ * }
+ * }
+ * }
  *
  * @author chenlijia
  * @version 1.0
@@ -30,10 +47,14 @@ public abstract class AbstractCoupon {
 
     /**
      * 生效金额
-     *
-     * @since 下午 6:09 2019/11/5 0005
      **/
     private Double effectiveMoney = 0.0;
+
+    /**
+     * 优惠券具体的实现类名称
+     * 如 com.github.chenlijia1111.commonModule.common.pojo.coupon.PriceSubCoupon
+     */
+    private String couponImplClassName = this.getClass().getName();
 
 
     /**
@@ -59,12 +80,18 @@ public abstract class AbstractCoupon {
         this.effectiveMoney = effectiveMoney;
     }
 
+    public String getCouponImplClassName() {
+        return couponImplClassName;
+    }
+
     /**
      * 获取当前优惠券的类别
+     * 废弃不用
      *
      * @return java.lang.Integer
      * @since 下午 4:02 2019/11/22 0022
      **/
+    @Deprecated
     public Integer type() {
         Optional<CouponTypeEnum> any = Lists.asList(CouponTypeEnum.values()).stream().filter(e -> Objects.equals(this.getClass(), e.getCouponClass())).findAny();
         if (any.isPresent()) {
@@ -78,12 +105,12 @@ public abstract class AbstractCoupon {
     /**
      * 根据优惠券类型以及json 转化为优惠券对象
      *
-     * @param type       1
+     * @param type       在1.1.3_RELEASE之后的版本可以不传,直接用优惠券内的类名称进行转换
      * @param couponJson 2
      * @return com.github.chenlijia1111.commonModule.common.pojo.coupon.AbstractCoupon
      * @see CouponTypeEnum 优惠券类型枚举
-     * @since 下午 3:50 2019/11/22 0022
      **/
+    @Deprecated
     public static AbstractCoupon transferTypeToCoupon(Integer type, String couponJson) {
         if (Objects.nonNull(type) && StringUtils.isNotEmpty(couponJson)) {
             Optional<CouponTypeEnum> any = Lists.asList(CouponTypeEnum.values()).stream().filter(e -> Objects.equals(e.getType(), type)).findAny();
@@ -92,6 +119,30 @@ public abstract class AbstractCoupon {
                 Class<? extends AbstractCoupon> couponClass = couponTypeEnum.getCouponClass();
                 AbstractCoupon abstractCoupon = JSONUtil.strToObj(couponJson, couponClass);
                 return abstractCoupon;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * 根据优惠券类型以及json 转化为优惠券对象
+     *
+     * @param couponJson 2
+     * @return com.github.chenlijia1111.commonModule.common.pojo.coupon.AbstractCoupon
+     * @see CouponTypeEnum 优惠券类型枚举
+     **/
+    public static AbstractCoupon transferTypeToCoupon(String couponJson) {
+        if (StringUtils.isNotEmpty(couponJson)) {
+
+            String couponImplClassName = JSONUtil.strToJsonNode(couponJson).get("couponImplClassName").asText();
+            if(StringUtils.isNotEmpty(couponImplClassName)){
+                try {
+                    Class<? extends AbstractCoupon> couponClass = (Class<? extends AbstractCoupon>) Class.forName(couponImplClassName);
+                    AbstractCoupon abstractCoupon = JSONUtil.strToObj(couponJson, couponClass);
+                    return abstractCoupon;
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                }
             }
         }
         return null;

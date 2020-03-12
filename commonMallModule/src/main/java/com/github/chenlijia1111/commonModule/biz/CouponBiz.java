@@ -51,7 +51,6 @@ public class CouponBiz {
                 setCouponName(params.getCouponName()).
                 setCouponCount(params.getCouponTotalCount()).
                 setCouponTotalCount(params.getCouponTotalCount()).
-                setCouponType(CouponTypeEnum.CountDiscountCoupon.getType()).
                 setCreateTime(currentTime).setUpdateTime(currentTime).
                 setCreateUserType(params.getCreateUserType()).
                 setCreateUserId(params.getCreateUserId()).
@@ -95,7 +94,6 @@ public class CouponBiz {
                 setCouponName(params.getCouponName()).
                 setCouponCount(params.getCouponTotalCount()).
                 setCouponTotalCount(params.getCouponTotalCount()).
-                setCouponType(CouponTypeEnum.CountSubCoupon.getType()).
                 setCreateTime(currentTime).setUpdateTime(currentTime).
                 setCreateUserType(params.getCreateUserType()).
                 setCreateUserId(params.getCreateUserId()).
@@ -139,7 +137,6 @@ public class CouponBiz {
                 setCouponName(params.getCouponName()).
                 setCouponCount(params.getCouponTotalCount()).
                 setCouponTotalCount(params.getCouponTotalCount()).
-                setCouponType(CouponTypeEnum.PriceDiscountCoupon.getType()).
                 setCreateTime(currentTime).setUpdateTime(currentTime).
                 setCreateUserType(params.getCreateUserType()).
                 setCreateUserId(params.getCreateUserId()).
@@ -183,7 +180,6 @@ public class CouponBiz {
                 setCouponName(params.getCouponName()).
                 setCouponCount(params.getCouponTotalCount()).
                 setCouponTotalCount(params.getCouponTotalCount()).
-                setCouponType(CouponTypeEnum.PriceSubCoupon.getType()).
                 setCreateTime(currentTime).setUpdateTime(currentTime).
                 setCreateUserType(params.getCreateUserType()).
                 setCreateUserId(params.getCreateUserId()).
@@ -227,7 +223,6 @@ public class CouponBiz {
                 setCouponName(params.getCouponName()).
                 setCouponCount(params.getCouponTotalCount()).
                 setCouponTotalCount(params.getCouponTotalCount()).
-                setCouponType(CouponTypeEnum.ExpressCoupon.getType()).
                 setCreateTime(currentTime).setUpdateTime(currentTime).
                 setCreateUserType(params.getCreateUserType()).
                 setCreateUserId(params.getCreateUserId()).
@@ -275,7 +270,6 @@ public class CouponBiz {
                 setCouponName(params.getCouponName()).
                 setCouponCount(params.getCouponTotalCount()).
                 setCouponTotalCount(params.getCouponTotalCount()).
-                setCouponType(CouponTypeEnum.ScoreCoupon.getType()).
                 setCreateTime(currentTime).setUpdateTime(currentTime).
                 setCreateUserType(params.getCreateUserType()).
                 setCreateUserId(params.getCreateUserId()).

@@ -6,6 +6,7 @@ import com.github.chenlijia1111.commonModule.common.pojo.CommonMallConstants;
 import com.github.chenlijia1111.commonModule.common.pojo.IDGenerateFactory;
 import com.github.chenlijia1111.commonModule.common.pojo.coupon.AbstractCoupon;
 import com.github.chenlijia1111.commonModule.common.requestVo.order.CouponWithGoodIds;
+import com.github.chenlijia1111.commonModule.common.responseVo.order.CalculateOrderPriceVo;
 import com.github.chenlijia1111.commonModule.common.responseVo.product.AdminProductVo;
 import com.github.chenlijia1111.commonModule.common.responseVo.product.GoodVo;
 import com.github.chenlijia1111.commonModule.entity.*;
@@ -126,7 +127,7 @@ public class FightGroupOrderBiz {
         Date startTime = fightGroupProduct.getStartTime();
         Date endTime = fightGroupProduct.getEndTime();
         if (Objects.isNull(startTime) || Objects.isNull(endTime)) {
-            return Result.failure("秒杀信息不合法");
+            return Result.failure("拼团信息不合法");
         }
 
         //判断当前时间端
@@ -193,7 +194,7 @@ public class FightGroupOrderBiz {
                 if (fightGroupProduct.getStockCount() < params.getCount()) {
                     //回滚
                     TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                    return Result.failure("商品已被秒杀完");
+                    return Result.failure("商品已被拼完");
                 }
                 updateStockByVersion = fightGroupProductService.updateStockByVersion(fightGroupProduct.getId(), newStockCount, fightGroupProduct.getUpdateVersion(), newUpdateVersion);
                 retryLength = retryLength - 1;
@@ -347,41 +348,15 @@ public class FightGroupOrderBiz {
                     List<String> goodIdList = couponWithGoodId.getGoodIdList();
 
                     Optional<Coupon> any = coupons.stream().filter(e -> Objects.equals(e.getId(), couponId)).findAny();
-                    if (!any.isPresent() || Objects.equals(any.get().getCouponType(), CouponTypeEnum.ExpressCoupon.getType())) {
-                        //物流券最后处理
-                        continue;
-                    }
                     Coupon coupon = any.get();
                     //找出符合条件的订单进行计算
                     //是否作用当前订单
                     if (goodIdList.contains(params.getGoodId())) {
                         String couponJson = coupon.getCouponJson();
-                        AbstractCoupon abstractCoupon = AbstractCoupon.transferTypeToCoupon(coupon.getCouponType(), couponJson);
+                        AbstractCoupon abstractCoupon = AbstractCoupon.transferTypeToCoupon(couponJson);
                         abstractCoupon.calculatePayable(Lists.asList(shoppingOrder));
                     }
                 }
-
-                //最后计算物流券
-                for (CouponWithGoodIds couponWithGoodId : couponWithGoodIdsList) {
-                    //优惠券Id
-                    String couponId = couponWithGoodId.getCouponId();
-                    //优惠券作用的商品id集合
-                    List<String> goodIdList = couponWithGoodId.getGoodIdList();
-
-                    Optional<Coupon> any = coupons.stream().filter(e -> Objects.equals(e.getId(), couponId)).findAny();
-                    if (any.isPresent() && Objects.equals(any.get().getCouponType(), CouponTypeEnum.ExpressCoupon.getType())) {
-                        //物流券最后处理
-                        Coupon coupon = any.get();
-                        //找出符合条件的订单进行计算
-                        //作用的订单
-                        if (goodIdList.contains(params.getGoodId())) {
-                            String couponJson = coupon.getCouponJson();
-                            AbstractCoupon abstractCoupon = AbstractCoupon.transferTypeToCoupon(coupon.getCouponType(), couponJson);
-                            abstractCoupon.calculatePayable(Lists.asList(shoppingOrder));
-                        }
-                    }
-                }
-
             }
         }
 
@@ -405,6 +380,197 @@ public class FightGroupOrderBiz {
         //返回groupId
         return Result.success("操作成功", groupId);
     }
+
+
+    /**
+     * 计算拼团订单金额
+     *
+     * @param params                   下单参数
+     * @return com.github.chenlijia1111.utils.common.Result
+     * @since 下午 2:49 2019/11/26 0026
+     **/
+    @Transactional
+    public Result calculateFightGroupOrder(FightGroupOrderAddParams params) {
+
+        //校验参数
+        Result result = PropertyCheckUtil.checkProperty(params);
+        if (!result.getSuccess()) {
+            return result;
+        }
+
+        //当前用户
+        String userId = commonModuleUserService.currentUserId();
+        if (StringUtils.isEmpty(userId)) {
+            return Result.notLogin();
+        }
+
+        //查询商品参与拼团信息,判断时间段与当前时间是否符合
+        FightGroupProduct fightGroupProduct = fightGroupProductService.findById(params.getFightGroupProductId());
+        if (Objects.isNull(fightGroupProduct) ||
+                Objects.equals(BooleanConstant.YES_INTEGER, fightGroupProduct.getDeleteStatus())) {
+            return Result.failure("无法查询到拼团信息");
+        }
+
+        Date startTime = fightGroupProduct.getStartTime();
+        Date endTime = fightGroupProduct.getEndTime();
+        if (Objects.isNull(startTime) || Objects.isNull(endTime)) {
+            return Result.failure("拼团信息不合法");
+        }
+
+        //判断当前时间端
+        Date currentTime = new Date();
+        if (currentTime.getTime() < startTime.getTime()) {
+            Result.failure("拼团还未开始");
+        }
+        if (currentTime.getTime() >= fightGroupProduct.getEndTime().getTime()) {
+            return Result.failure("拼团已结束");
+        }
+        //判断库存
+        if (fightGroupProduct.getStockCount() == 0) {
+            return Result.failure("商品已被拼完");
+        }
+        if (fightGroupProduct.getStockCount() < params.getCount()) {
+            return Result.failure("商品库存不足");
+        }
+
+        //可以进行拼团
+        //下单
+        //组订单Id
+        String groupId = String.valueOf(IDGenerateFactory.ORDER_ID_UTIL.nextId());
+        //商家组订单编号
+        String shopGroupId = String.valueOf(IDGenerateFactory.ORDER_ID_UTIL.nextId());
+
+        //开始处理订单
+        //商品id
+        String goodId = params.getGoodId();
+        //商品数量
+        Integer count = params.getCount();
+
+        //查询商品信息
+        GoodVo goodVo = goodsService.findByGoodId(goodId);
+        if (Objects.isNull(goodVo)) {
+            return Result.failure("商品不存在");
+        }
+        //判断产品是否存在且上架
+        Product product = productService.findByProductId(goodVo.getProductId());
+        if (Objects.isNull(product)) {
+            return Result.failure("产品不存在");
+        }
+        if (Objects.equals(BooleanConstant.NO_INTEGER, product.getShelfStatus())) {
+            return Result.failure("产品未上架");
+        }
+
+        //订单编号
+        String orderNo = String.valueOf(IDGenerateFactory.ORDER_ID_UTIL.nextId());
+        //构建订单
+        ShoppingOrder shoppingOrder = new ShoppingOrder().setOrderNo(orderNo).
+                setCustom(userId).
+                setShops(product.getShops()).
+                setGoodsId(goodId).
+                setCount(count).
+                setState(CommonMallConstants.ORDER_INIT).
+                setOrderType(OrderTypeEnum.FIGHT_GROUP_ORDER.getType()).
+                setProductAmountTotal(fightGroupProduct.getFightPrice() * count).
+                setGoodPrice(fightGroupProduct.getFightPrice()).
+                setOrderAmountTotal(fightGroupProduct.getFightPrice() * count).
+                setShopGroupId(shopGroupId).
+                setGroupId(groupId).
+                setCreateTime(currentTime).setRemarks(params.getRemarks());
+        //订单备注
+        shoppingOrder.setRemarks(params.getRemarks());
+
+        //添加发货单
+        //发货单单号
+        String sendOrderNo = String.valueOf(IDGenerateFactory.ORDER_ID_UTIL.nextId());
+        ImmediatePaymentOrder immediatePaymentOrder = new ImmediatePaymentOrder().
+                setOrderNo(sendOrderNo).
+                setCustom(userId).
+                setShops(product.getShops()).
+                setState(CommonMallConstants.ORDER_INIT).
+                setRecUser(params.getReceiverName()).
+                setRecTel(params.getReceiverTelephone()).
+                setRecProvince(params.getRecProvince()).
+                setRecCity(params.getRecCity()).
+                setRecArea(params.getRecArea()).
+                setRecAddr(params.getRecAddr()).
+                setFrontOrder(orderNo).
+                setShoppingOrder(orderNo).
+                setCreateTime(currentTime);
+
+        shoppingOrder.setImmediatePaymentOrder(immediatePaymentOrder);
+
+        //添加收货单
+        //收货单单号
+        String receiveOrderNo = String.valueOf(IDGenerateFactory.ORDER_ID_UTIL.nextId());
+        ReceivingGoodsOrder receivingGoodsOrder = new ReceivingGoodsOrder().
+                setOrderNo(receiveOrderNo).
+                setCustom(userId).
+                setShops(product.getShops()).
+                setState(CommonMallConstants.ORDER_INIT).
+                setShoppingOrder(orderNo).
+                setImmediatePaymentOrder(sendOrderNo).
+                setFrontOrder(sendOrderNo).
+                setRecUser(params.getReceiverName()).
+                setCreateTime(currentTime);
+        immediatePaymentOrder.setReceivingGoodsOrder(receivingGoodsOrder);
+
+        //计算各种优惠券,结算最终应付金额
+        List<CouponWithGoodIds> couponWithGoodIdsList = params.getCouponWithGoodIdsList();
+        if (Lists.isNotEmpty(couponWithGoodIdsList)) {
+            //优惠券id集合
+            Set<String> couponIdSet = couponWithGoodIdsList.stream().map(e -> e.getCouponId()).collect(Collectors.toSet());
+            List<Coupon> coupons = couponService.listByIdSet(couponIdSet);
+            if (Lists.isNotEmpty(coupons)) {
+                for (CouponWithGoodIds couponWithGoodId : couponWithGoodIdsList) {
+                    //优惠券Id
+                    String couponId = couponWithGoodId.getCouponId();
+                    //优惠券作用的商品id集合
+                    List<String> goodIdList = couponWithGoodId.getGoodIdList();
+
+                    Optional<Coupon> any = coupons.stream().filter(e -> Objects.equals(e.getId(), couponId)).findAny();
+                    Coupon coupon = any.get();
+                    //找出符合条件的订单进行计算
+                    //是否作用当前订单
+                    if (goodIdList.contains(params.getGoodId())) {
+                        String couponJson = coupon.getCouponJson();
+                        AbstractCoupon abstractCoupon = AbstractCoupon.transferTypeToCoupon(couponJson);
+                        abstractCoupon.calculatePayable(Lists.asList(shoppingOrder));
+                    }
+                }
+            }
+        }
+
+
+        //总应付金额
+        Double payAble = shoppingOrder.getOrderAmountTotal();
+        //保留两位小数
+        payAble = NumberUtil.doubleToFixLengthDouble(payAble, 2);
+        //最终的应付金额,待考虑
+        shoppingOrder.setPayable(payAble);
+
+        //订单使用的优惠券
+        List<AbstractCoupon> couponList = shoppingOrder.getCouponList();
+        String s = JSONUtil.objToStr(couponList);
+        shoppingOrder.setOrderCoupon(s);
+
+        CalculateOrderPriceVo vo = new CalculateOrderPriceVo();
+        vo.setPayAble(payAble);
+
+        //查询各个优惠券的抵扣金额
+        List<AbstractCoupon> abstractCouponList = Lists.newArrayList();
+        if (Lists.isNotEmpty(couponList)) {
+            abstractCouponList.addAll(couponList);
+        }
+
+        //费用详情信息map
+        Map<String, Double> feeMap = abstractCouponList.stream().
+                collect(Collectors.groupingBy(AbstractCoupon::getCouponImplClassName, Collectors.summingDouble(e -> e.getEffectiveMoney())));
+        vo.setFeeMap(feeMap);
+
+        //返回计算结果
+        return Result.success("操作成功", vo);
+    }
+
 
     /**
      * 拼团支付回调
