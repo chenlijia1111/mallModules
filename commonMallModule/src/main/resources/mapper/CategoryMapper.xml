@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.github.chenlijia1111.commonModule.dao.CategoryMapper">
+  <resultMap id="BaseResultMap" type="com.github.chenlijia1111.commonModule.entity.Category">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="category_name" jdbcType="VARCHAR" property="categoryName" />
+    <result column="category_image" jdbcType="VARCHAR" property="categoryImage" />
+    <result column="sort_num" jdbcType="INTEGER" property="sortNum" />
+    <result column="open_status" jdbcType="INTEGER" property="openStatus" />
+    <result column="delete_status" jdbcType="INTEGER" property="deleteStatus" />
+    <result column="parent_id" jdbcType="INTEGER" property="parentId" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+  </resultMap>
+  <resultMap id="BaseResultMapVo" type="com.github.chenlijia1111.commonModule.common.responseVo.category.CategoryVo" extends="BaseResultMap">
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, category_name, category_image, sort_num, open_status, delete_status, parent_id, 
+    create_time, update_time
+  </sql>
+  <select id="listAllChildCategory" resultMap="BaseResultMapVo">
+    SELECT
+    <include refid="Base_Column_List"></include>
+    FROM s_category
+    WHERE s_category.delete_status = 0
+    <foreach collection="idSet" item="id" open="AND parent_id IN (" close=")" separator=",">
+      #{id}
+    </foreach>
+    ORDER BY if(isnull(sort_num),0,1) DESC ,sort_num
+  </select>
+  <update id="batchUpdateStatus">
+    UPDATE s_category SET open_status = #{openStatus}
+    <foreach collection="idSet" item="id" open="WHERE id IN (" close=")" separator=",">
+      #{id}
+    </foreach>
+  </update>
+  <update id="batchDelete">
+    UPDATE s_category SET delete_status = 1
+    <foreach collection="idSet" item="id" open="WHERE id IN (" close=")" separator=",">
+      #{id}
+    </foreach>
+  </update>
+</mapper>

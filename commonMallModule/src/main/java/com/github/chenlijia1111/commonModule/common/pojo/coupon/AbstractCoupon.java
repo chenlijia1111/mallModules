@@ -129,7 +129,6 @@ public abstract class AbstractCoupon {
      *
      * @param couponJson 2
      * @return com.github.chenlijia1111.commonModule.common.pojo.coupon.AbstractCoupon
-     * @see CouponTypeEnum 优惠券类型枚举
      **/
     public static AbstractCoupon transferTypeToCoupon(String couponJson) {
         if (StringUtils.isNotEmpty(couponJson)) {

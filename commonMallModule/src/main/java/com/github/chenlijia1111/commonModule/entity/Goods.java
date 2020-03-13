@@ -110,11 +110,7 @@ public class Goods {
 
 
     public Goods setStockCount(Integer stockCount) {
-        if (Objects.isNull(stockCount) || stockCount < 0) {
-            this.stockCount = 0;
-        } else {
-            this.stockCount = stockCount;
-        }
+        this.stockCount = (Objects.isNull(stockCount) || stockCount < 0) ? 0 : stockCount;
         return this;
     }
 }

@@ -4,12 +4,13 @@ import com.github.chenlijia1111.commonModule.common.pojo.coupon.AbstractCoupon;
 
 /**
  * 优惠券类型
- * 将在下一个版本1.1.3_RELEASE废弃  直接在优惠券里json里加上对应的class名字 这样就可以直接转换了
+ * 在版本1.1.3_RELEASE废弃  直接在优惠券里json里加上对应的class名字 这样就可以直接转换了
  *
  * @author chenlijia
  * @version 1.0
  * @since 2019/11/22 0022 上午 11:40
  **/
+@Deprecated
 public enum CouponTypeEnum {
 
     PriceSubCoupon(1, com.github.chenlijia1111.commonModule.common.pojo.coupon.PriceSubCoupon.class), //满价格减优惠券

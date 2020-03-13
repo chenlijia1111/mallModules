@@ -1,6 +1,5 @@
 package com.github.chenlijia1111.commonModule.biz;
 
-import com.github.chenlijia1111.commonModule.common.enums.CouponTypeEnum;
 import com.github.chenlijia1111.commonModule.common.enums.OrderStatusEnum;
 import com.github.chenlijia1111.commonModule.common.enums.OrderTypeEnum;
 import com.github.chenlijia1111.commonModule.common.pojo.CommonMallConstants;
@@ -466,6 +465,13 @@ public class ShoppingOrderBiz {
         for (ShoppingOrder order : shoppingOrders) {
             order.setState(CommonMallConstants.ORDER_CANCEL);
             shoppingOrderService.update(order);
+
+            //回补库存
+            GoodVo goodVo = goodsService.findByGoodId(order.getGoodsId());
+            if (Objects.nonNull(goodVo)) {
+                goodVo.setStockCount(goodVo.getStockCount() + order.getCount());
+                goodsService.update(goodVo);
+            }
         }
 
         return Result.success("操作成功");
