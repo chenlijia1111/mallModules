@@ -62,7 +62,6 @@ public abstract class AbstractCoupon {
      *
      * @param orderList 目标订单
      * @return java.lang.Double 返回具体可以抵扣的金额
-     * @since 上午 11:51 2019/11/22 0022
      **/
     public abstract Double calculatePayable(List<ShoppingOrder> orderList);
 
@@ -70,7 +69,6 @@ public abstract class AbstractCoupon {
      * 获取抵扣金额
      *
      * @return java.lang.Double 返回具体抵扣的金额
-     * @since 上午 11:51 2019/11/22 0022
      **/
     public Double getEffectiveMoney() {
         return effectiveMoney;
@@ -89,7 +87,6 @@ public abstract class AbstractCoupon {
      * 废弃不用
      *
      * @return java.lang.Integer
-     * @since 下午 4:02 2019/11/22 0022
      **/
     @Deprecated
     public Integer type() {
