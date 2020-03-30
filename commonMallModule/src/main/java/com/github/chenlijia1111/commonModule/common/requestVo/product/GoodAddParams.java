@@ -1,6 +1,6 @@
 package com.github.chenlijia1111.commonModule.common.requestVo.product;
 
-import com.github.chenlijia1111.commonModule.common.checkFunction.PositiveNumberCheck;
+import com.github.chenlijia1111.commonModule.common.checkFunction.NaturalNumberCheck;
 import com.github.chenlijia1111.commonModule.common.checkFunction.PriceCheck;
 import com.github.chenlijia1111.commonModule.common.responseVo.product.ReleaseProductSkuSpecVo;
 import com.github.chenlijia1111.commonModule.common.responseVo.product.ReleaseProductSkuVo;
@@ -66,7 +66,7 @@ public class GoodAddParams {
      * @since 下午 2:50 2019/11/21 0021
      **/
     @ApiModelProperty(value = "库存")
-    @PropertyCheck(name = "库存", checkFunction = PositiveNumberCheck.class)
+    @PropertyCheck(name = "库存", checkFunction = NaturalNumberCheck.class)
     private Integer stockCount;
 
 

@@ -82,6 +82,7 @@ public class ProductBiz {
                 setSortNumber(params.getSortNumber()).
                 setSmallPic(params.getSmallPic()).
                 setContent(params.getContent()).
+                setDescription(params.getDescription()).
                 setShelfStatus(params.getShelfStatus()).
                 setCreateTime(currentTime).
                 setUpdateTime(currentTime).
@@ -203,6 +204,7 @@ public class ProductBiz {
                 setSortNumber(params.getSortNumber()).
                 setSmallPic(params.getSmallPic()).
                 setContent(params.getContent()).
+                setDescription(params.getDescription()).
                 setShelfStatus(params.getShelfStatus()).
                 setUpdateTime(currentTime).
                 setDeleteStatus(BooleanConstant.NO_INTEGER);
@@ -603,7 +605,7 @@ public class ProductBiz {
      * @param params
      * @return
      */
-    public Result releaseUpdaateProductSkuVo(ReleaseUpdateProductSkuParams params) {
+    public Result releaseUpdateProductSkuVo(ReleaseUpdateProductSkuParams params) {
         List<ProductSpecParams> productSpecParamsList = params.getProductSpecParamsList();
 
         //校验一下数据

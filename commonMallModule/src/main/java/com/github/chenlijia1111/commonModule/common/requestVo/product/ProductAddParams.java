@@ -78,6 +78,12 @@ public class ProductAddParams {
     private String content;
 
     /**
+     * 商品描述
+     */
+    @ApiModelProperty(value = "商品描述")
+    private String description;
+
+    /**
      * 是否上架 0未上架 1上架
      */
     @ApiModelProperty("是否上架 0未上架 1上架")

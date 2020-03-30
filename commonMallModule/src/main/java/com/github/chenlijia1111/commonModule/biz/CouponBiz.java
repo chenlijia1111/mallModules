@@ -1,6 +1,5 @@
 package com.github.chenlijia1111.commonModule.biz;
 
-import com.github.chenlijia1111.commonModule.common.enums.CouponTypeEnum;
 import com.github.chenlijia1111.commonModule.common.pojo.IDGenerateFactory;
 import com.github.chenlijia1111.commonModule.common.pojo.coupon.*;
 import com.github.chenlijia1111.commonModule.common.requestVo.coupon.*;

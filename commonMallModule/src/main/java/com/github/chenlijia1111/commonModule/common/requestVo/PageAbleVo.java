@@ -1,6 +1,8 @@
 package com.github.chenlijia1111.commonModule.common.requestVo;
 
+import com.github.chenlijia1111.utils.core.annos.PropertyCheck;
 import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 
 /**
  * 分页查询条件
@@ -12,8 +14,12 @@ import io.swagger.annotations.ApiModel;
 @ApiModel
 public class PageAbleVo {
 
+    @ApiModelProperty(value = "当前页")
+    @PropertyCheck(name = "当前页")
     private Integer page;
 
+    @ApiModelProperty(value = "每页数量")
+    @PropertyCheck(name = "每页数量")
     private Integer limit;
 
 

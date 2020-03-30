@@ -26,7 +26,7 @@
     <foreach collection="idSet" item="id" open="AND parent_id IN (" close=")" separator=",">
       #{id}
     </foreach>
-    ORDER BY if(isnull(sort_num),0,1) DESC ,sort_num
+    ORDER BY create_time DESC
   </select>
   <update id="batchUpdateStatus">
     UPDATE s_category SET open_status = #{openStatus}
