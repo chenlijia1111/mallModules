@@ -1,5 +1,6 @@
 package com.github.chenlijia1111.commonModule.dao;
 
+import com.github.chenlijia1111.commonModule.common.responseVo.order.DelayNotPayOrder;
 import com.github.chenlijia1111.commonModule.entity.ShoppingOrder;
 import com.github.chenlijia1111.utils.common.Result;
 import org.apache.ibatis.annotations.Param;
@@ -67,6 +68,25 @@ public interface ShoppingOrderMapper extends Mapper<ShoppingOrder> {
      * @return
      */
     Integer batchAdd(@Param("shoppingOrderList") List<ShoppingOrder> shoppingOrderList);
+
+
+    /**
+     * 列出未支付的订单
+     * 用处：在系统启动的时候获取未支付的订单放入延时队列中去，等待处理
+     * @return
+     */
+    List<DelayNotPayOrder> listDelayNotPayOrder();
+
+
+    /**
+     * 查询订单状态 state
+     * 排除多余字段，节省资源
+     * 只取一个，用于判断是否已付款
+     *
+     * @param groupId
+     * @return
+     */
+    Integer findOrderState(@Param("groupId") String groupId);
 
 
 }

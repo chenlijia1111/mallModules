@@ -9,8 +9,10 @@ import com.github.chenlijia1111.commonModule.common.requestVo.order.*;
 import com.github.chenlijia1111.commonModule.common.responseVo.order.CalculateOrderPriceVo;
 import com.github.chenlijia1111.commonModule.common.responseVo.product.AdminProductVo;
 import com.github.chenlijia1111.commonModule.common.responseVo.product.GoodVo;
+import com.github.chenlijia1111.commonModule.common.schedules.OrderCancelTimeLimitTask;
 import com.github.chenlijia1111.commonModule.entity.*;
 import com.github.chenlijia1111.commonModule.service.*;
+import com.github.chenlijia1111.commonModule.utils.SpringContextHolder;
 import com.github.chenlijia1111.utils.common.Result;
 import com.github.chenlijia1111.utils.common.constant.BooleanConstant;
 import com.github.chenlijia1111.utils.core.JSONUtil;
@@ -126,20 +128,14 @@ public class ShoppingOrderBiz {
             //查询商品信息
             GoodVo goodVo = goodsService.findByGoodId(goodId);
             if (Objects.isNull(goodVo)) {
-                //回滚
-                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                 return Result.failure("商品不存在");
             }
             //判断产品是否存在且上架
             Product product = productService.findByProductId(goodVo.getProductId());
             if (Objects.isNull(product) || Objects.equals(BooleanConstant.YES_INTEGER, product.getDeleteStatus())) {
-                //回滚
-                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                 return Result.failure("产品不存在");
             }
             if (Objects.equals(BooleanConstant.NO_INTEGER, product.getShelfStatus())) {
-                //回滚
-                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                 return Result.failure("产品未上架");
             }
 
@@ -240,7 +236,7 @@ public class ShoppingOrderBiz {
                     List<ShoppingOrder> hitOrderList = orderList.stream().filter(e -> goodIdList.contains(e.getGoodsId())).collect(Collectors.toList());
                     if (Lists.isNotEmpty(hitOrderList)) {
                         String couponJson = coupon.getCouponJson();
-                        AbstractCoupon abstractCoupon = AbstractCoupon.transferTypeToCoupon( couponJson);
+                        AbstractCoupon abstractCoupon = AbstractCoupon.transferTypeToCoupon(couponJson);
                         abstractCoupon.calculatePayable(hitOrderList);
                     }
                 }
@@ -278,6 +274,17 @@ public class ShoppingOrderBiz {
             Goods goods = new Goods().setId(goodsVO.getId()).
                     setStockCount(goodsVO.getStockCount() - order.getCount());
             goodsService.update(goods);
+        }
+
+
+        //操作成功，添加订单到延时队列，超时未支付取消订单
+        try {
+            OrderCancelTimeLimitTask task = SpringContextHolder.getBean(OrderCancelTimeLimitTask.class);
+            if (Objects.nonNull(task)) {
+                task.addNotPayOrder(groupId, currentTime, CommonMallConstants.CANCEL_NOT_PAY_ORDER_LIMIT_MINUTES);
+            }
+        } catch (Exception e) {
+            //没有获取到bean，说明没有注入
         }
 
         //返回groupId
@@ -394,7 +401,7 @@ public class ShoppingOrderBiz {
                     List<ShoppingOrder> hitOrderList = orderList.stream().filter(e -> goodIdList.contains(e.getGoodsId())).collect(Collectors.toList());
                     if (Lists.isNotEmpty(hitOrderList)) {
                         String couponJson = coupon.getCouponJson();
-                        AbstractCoupon abstractCoupon = AbstractCoupon.transferTypeToCoupon( couponJson);
+                        AbstractCoupon abstractCoupon = AbstractCoupon.transferTypeToCoupon(couponJson);
                         abstractCoupon.calculatePayable(hitOrderList);
                     }
                 }

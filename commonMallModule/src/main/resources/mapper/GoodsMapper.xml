@@ -54,4 +54,7 @@
        #{goods.marketPrice},#{goods.createTime},#{goods.updateTime},#{goods.deleteStatus})
     </foreach>
   </insert>
+  <update id="addGoodStock">
+    UPDATE s_goods SET s_goods.stock_count = s_goods.stock_count + #{addStock} WHERE s_goods.id = #{goodId}
+  </update>
 </mapper>

@@ -1,10 +1,14 @@
 package com.github.chenlijia1111.commonModule.common.init;
 
+import com.github.chenlijia1111.commonModule.common.pojo.CommonMallConstants;
+import com.github.chenlijia1111.commonModule.common.responseVo.order.DelayNotPayOrder;
 import com.github.chenlijia1111.commonModule.common.schedules.AutoClearLimitVerifyCode;
+import com.github.chenlijia1111.commonModule.common.schedules.OrderCancelTimeLimitTask;
 import com.github.chenlijia1111.commonModule.dao.*;
 import com.github.chenlijia1111.commonModule.service.impl.*;
 import com.github.chenlijia1111.commonModule.utils.SpringContextHolder;
 import com.github.chenlijia1111.utils.core.StringUtils;
+import com.github.chenlijia1111.utils.list.Lists;
 import com.github.chenlijia1111.utils.timer.TimerTaskUtil;
 import com.github.chenlijia1111.utils.timer.TriggerUtil;
 import org.joda.time.LocalDate;
@@ -13,6 +17,7 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -36,6 +41,8 @@ public class CommonMallInitFunction implements ApplicationListener<ContextRefres
             initMaxOrderNo();
             //添加定时清理验证码
             addClearVerifyCodeTask();
+            //初始化未支付的订单到延时队列进行处理
+            initNotPayOrderList();
         }
     }
 
@@ -125,4 +132,28 @@ public class CommonMallInitFunction implements ApplicationListener<ContextRefres
 
         TimerTaskUtil.doTask(autoClearTrigger, AutoClearLimitVerifyCode.class, AutoClearLimitVerifyCode.class.getSimpleName(), groupName);
     }
+
+    /**
+     * 初始化未支付的订单到延时队列进行处理
+     */
+    private void initNotPayOrderList(){
+        try {
+            OrderCancelTimeLimitTask task = SpringContextHolder.getBean(OrderCancelTimeLimitTask.class);
+            if(Objects.nonNull(task)){
+                ShoppingOrderMapper shoppingOrderMapper = SpringContextHolder.getBean(ShoppingOrderMapper.class);
+                List<DelayNotPayOrder> delayNotPayOrders = shoppingOrderMapper.listDelayNotPayOrder();
+                if(Lists.isNotEmpty(delayNotPayOrders)){
+                    for (int i = 0; i < delayNotPayOrders.size(); i++) {
+                        DelayNotPayOrder delayNotPayOrder = delayNotPayOrders.get(i);
+                        task.addNotPayOrder(delayNotPayOrder.getGroupId(),delayNotPayOrder.getCreateTime(),
+                                CommonMallConstants.CANCEL_NOT_PAY_ORDER_LIMIT_MINUTES);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            //没有获取到bean说明没有注入
+        }
+
+    }
+
 }

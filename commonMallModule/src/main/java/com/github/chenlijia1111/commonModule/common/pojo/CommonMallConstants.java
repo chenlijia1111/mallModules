@@ -19,4 +19,10 @@ public class CommonMallConstants {
 
     //注入spring的bean的前缀名称
     public static final String BEAN_SUFFIX = "commonModule";
+
+
+    //超时未支付时间 取消订单 允许修改
+    public static Integer CANCEL_NOT_PAY_ORDER_LIMIT_MINUTES = 15;
+
+
 }

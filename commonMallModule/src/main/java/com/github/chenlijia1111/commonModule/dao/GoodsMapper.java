@@ -53,4 +53,12 @@ public interface GoodsMapper extends Mapper<Goods> {
      */
     Integer batchAdd(@Param("goodsList") List<Goods> goodsList);
 
+    /**
+     * 增加库存
+     * @param goodId
+     * @param addStock
+     * @return
+     */
+    Integer addGoodStock(@Param("goodId") String goodId,@Param("addStock") Integer addStock);
+
 }

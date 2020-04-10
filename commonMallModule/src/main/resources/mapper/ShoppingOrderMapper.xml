@@ -93,4 +93,19 @@
        #{shoppingOrder.shopRemarks},#{shoppingOrder.deleteStatus})
     </foreach>
   </insert>
+  <select id="listDelayNotPayOrder" resultType="com.github.chenlijia1111.commonModule.common.responseVo.order.DelayNotPayOrder">
+    SELECT
+      s_shopping_order.group_id groupId,max(s_shopping_order.create_time) createTime
+    FROM
+      s_shopping_order
+    WHERE s_shopping_order.delete_status != 1
+      AND s_shopping_order.state = 0
+    GROUP BY s_shopping_order.group_id
+  </select>
+  <select id="findOrderState" resultType="java.lang.Integer">
+    SELECT s_shopping_order.state
+    FROM s_shopping_order
+    WHERE s_shopping_order.group_id = #{groupId}
+    LIMIT 1
+  </select>
 </mapper>
