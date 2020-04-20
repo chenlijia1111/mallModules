@@ -46,6 +46,12 @@ public class AuthVo extends TreeNodeVo {
     private String pageUrl;
 
     /**
+     * 页面图标
+     */
+    @ApiModelProperty("页面图标")
+    private String pageIcon = "";
+
+    /**
      * 请求路劲
      */
     @ApiModelProperty("请求路劲")

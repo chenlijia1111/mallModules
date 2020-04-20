@@ -57,6 +57,14 @@ public class AuthResources {
     private String pageUrl;
 
     /**
+     * 页面图标
+     */
+    @ApiModelProperty("页面图标")
+    @PropertyCheck(name = "页面图标")
+    @Column(name = "page_icon")
+    private String pageIcon = "";
+
+    /**
      * 请求路劲
      */
     @ApiModelProperty("请求路劲")
