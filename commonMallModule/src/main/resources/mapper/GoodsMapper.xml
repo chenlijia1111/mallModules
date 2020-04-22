@@ -9,13 +9,14 @@
     <result column="price" jdbcType="DOUBLE" property="price" />
     <result column="vip_price" jdbcType="DOUBLE" property="vipPrice" />
     <result column="market_price" jdbcType="DOUBLE" property="marketPrice" />
+    <result column="good_image" jdbcType="VARCHAR" property="goodImage" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
     <result column="delete_status" jdbcType="INTEGER" property="deleteStatus" />
   </resultMap>
   <resultMap id="BaseResultMapVo" type="com.github.chenlijia1111.commonModule.common.responseVo.product.GoodVo" extends="BaseResultMap"></resultMap>
   <sql id="Base_Column_List">
-    id, product_id, good_no, stock_count, price, vip_price, market_price, create_time, 
+    id, product_id, good_no, stock_count, price, vip_price, market_price, good_image, create_time,
     update_time, delete_status
   </sql>
   <update id="batchDelete">
@@ -47,11 +48,11 @@
     </foreach>
   </select>
   <insert id="batchAdd">
-    INSERT INTO s_goods (id, product_id, good_no, stock_count, price, vip_price, market_price,
+    INSERT INTO s_goods (id, product_id, good_no, stock_count, price, vip_price, market_price,good_image,
                          create_time, update_time, delete_status) VALUES
     <foreach collection="goodsList" item="goods" separator=",">
       (#{goods.id},#{goods.productId},#{goods.goodNo},#{goods.stockCount},#{goods.price},#{goods.vipPrice},
-       #{goods.marketPrice},#{goods.createTime},#{goods.updateTime},#{goods.deleteStatus})
+       #{goods.marketPrice},#{goods.goodImage},#{goods.createTime},#{goods.updateTime},#{goods.deleteStatus})
     </foreach>
   </insert>
   <update id="addGoodStock">

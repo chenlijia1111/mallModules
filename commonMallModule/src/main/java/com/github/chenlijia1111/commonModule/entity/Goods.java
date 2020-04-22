@@ -85,6 +85,14 @@ public class Goods {
     private Double marketPrice;
 
     /**
+     * 商品图片
+     */
+    @ApiModelProperty("商品图片")
+    @PropertyCheck(name = "商品图片")
+    @Column(name = "good_image")
+    private String goodImage;
+
+    /**
      * 创建时间
      */
     @ApiModelProperty("创建时间")

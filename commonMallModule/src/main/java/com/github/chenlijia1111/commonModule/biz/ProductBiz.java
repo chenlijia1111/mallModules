@@ -129,7 +129,8 @@ public class ProductBiz {
                     setCreateTime(currentTime).
                     setUpdateTime(currentTime).
                     setDeleteStatus(BooleanConstant.NO_INTEGER).
-                    setStockCount(goodAddParams.getStockCount());
+                    setStockCount(goodAddParams.getStockCount()).
+                    setGoodImage(goodAddParams.getGoodImage());
 
             goodsList.add(goods);
 
@@ -270,7 +271,8 @@ public class ProductBiz {
                         setMarketPrice(goodAddParams.getMarketPrice()).
                         setGoodNo(goodAddParams.getGoodNo()).
                         setUpdateTime(currentTime).
-                        setStockCount(goodAddParams.getStockCount());
+                        setStockCount(goodAddParams.getStockCount()).
+                        setGoodImage(goodAddParams.getGoodImage());
 
                 goodsService.update(goods);
 
@@ -288,7 +290,8 @@ public class ProductBiz {
                         setCreateTime(currentTime).
                         setUpdateTime(currentTime).
                         setDeleteStatus(BooleanConstant.NO_INTEGER).
-                        setStockCount(goodAddParams.getStockCount());
+                        setStockCount(goodAddParams.getStockCount()).
+                        setGoodImage(goodAddParams.getGoodImage());
 
                 goodsService.add(goods);
             }

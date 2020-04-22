@@ -69,6 +69,13 @@ public class GoodAddParams {
     @PropertyCheck(name = "库存", checkFunction = NaturalNumberCheck.class)
     private Integer stockCount;
 
+    /**
+     * 商品图片
+     * 2020/04/22 新增 用于选择规格 选中时显示的图片
+     */
+    @ApiModelProperty(value = "商品图片")
+    private String goodImage;
+
 
     /**
      * 转换 为构建规格对象
