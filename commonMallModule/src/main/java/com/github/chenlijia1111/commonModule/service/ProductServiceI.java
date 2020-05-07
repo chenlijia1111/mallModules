@@ -3,6 +3,7 @@ package com.github.chenlijia1111.commonModule.service;
 import com.github.chenlijia1111.commonModule.common.responseVo.product.AdminProductVo;
 import com.github.chenlijia1111.commonModule.entity.Product;
 import com.github.chenlijia1111.utils.common.Result;
+import tk.mybatis.mapper.entity.Example;
 
 import java.util.List;
 import java.util.Set;
@@ -71,5 +72,27 @@ public interface ProductServiceI {
      * @return
      */
     List<Product> listByProductIdSet(Set<String> productIdSet);
+
+    /**
+     * 条件查询
+     * @param condition
+     * @return
+     */
+    List<Product> listByCondition(Example condition);
+
+    /**
+     * 按条件统计
+     * @param condition
+     * @return
+     */
+    Integer countByCondition(Example condition);
+
+    /**
+     * 按条件修改
+     * @param product
+     * @param condition
+     * @return
+     */
+    Result update(Product product,Example condition);
 
 }

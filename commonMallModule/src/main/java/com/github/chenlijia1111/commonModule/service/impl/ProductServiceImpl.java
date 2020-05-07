@@ -15,6 +15,7 @@ import com.github.chenlijia1111.utils.list.Lists;
 import com.github.chenlijia1111.utils.list.Sets;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import tk.mybatis.mapper.entity.Example;
 
 import javax.annotation.Resource;
 import java.util.*;
@@ -86,6 +87,7 @@ public class ProductServiceImpl implements ProductServiceI {
 
     /**
      * 条件统计数量
+     *
      * @param condition
      * @return
      */
@@ -121,6 +123,50 @@ public class ProductServiceImpl implements ProductServiceI {
             return productMapper.listByProductIdSet(productIdSet);
         }
         return new ArrayList<>();
+    }
+
+    /**
+     * 条件查询
+     *
+     * @param condition
+     * @return
+     */
+    @Override
+    public List<Product> listByCondition(Example condition) {
+        if (Objects.nonNull(condition)) {
+            return productMapper.selectByExample(condition);
+        }
+        return new ArrayList<>();
+    }
+
+    /**
+     * 按条件统计
+     *
+     * @param condition
+     * @return
+     */
+    @Override
+    public Integer countByCondition(Example condition) {
+        if (Objects.nonNull(condition)) {
+            return productMapper.selectCountByExample(condition);
+        }
+        return 0;
+    }
+
+    /**
+     * 按条件修改
+     *
+     * @param product
+     * @param condition
+     * @return
+     */
+    @Override
+    public Result update(Product product, Example condition) {
+        if (Objects.nonNull(product) && Objects.nonNull(condition)) {
+            int i = productMapper.updateByExample(product, condition);
+            return i > 0 ? Result.success("操作成功") : Result.failure("操作失败");
+        }
+        return Result.success("操作成功");
     }
 
     /**

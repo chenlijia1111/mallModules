@@ -2,6 +2,7 @@ package com.github.chenlijia1111.commonModule.dao;
 
 import com.github.chenlijia1111.commonModule.entity.RoleAuth;
 import tk.mybatis.mapper.common.Mapper;
+import tk.mybatis.mapper.common.special.InsertListMapper;
 
 /**
  * 角色权限关联
@@ -9,6 +10,5 @@ import tk.mybatis.mapper.common.Mapper;
  * @since 2020-04-20 09:56:17
  * @version 1.0
  **/
-public interface RoleAuthMapper extends Mapper<RoleAuth> {
-    RoleAuth selectByPrimaryKey(Integer id);
+public interface RoleAuthMapper extends Mapper<RoleAuth>, InsertListMapper<RoleAuth> {
 }

@@ -5,10 +5,14 @@ import com.github.chenlijia1111.utils.core.PropertyCheckUtil;
 import com.github.chenlijia1111.commonModule.entity.RoleAuth;
 import com.github.chenlijia1111.commonModule.dao.RoleAuthMapper;
 import com.github.chenlijia1111.commonModule.service.RoleAuthServiceI;
+import com.github.chenlijia1111.utils.list.Lists;
 import org.springframework.stereotype.Service;
+import tk.mybatis.mapper.entity.Example;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * 角色权限关联
@@ -66,6 +70,47 @@ public class RoleAuthServiceImpl implements RoleAuthServiceI {
     
         PropertyCheckUtil.transferObjectNotNull(condition, true);
         return roleAuthMapper.select(condition);
+    }
+
+    /**
+     * 条件查询
+     * @param condition
+     * @return
+     */
+    @Override
+    public List<RoleAuth> listByCondition(Example condition) {
+        if(Objects.nonNull(condition)){
+            return roleAuthMapper.selectByExample(condition);
+        }
+        return new ArrayList<>();
+    }
+
+    /**
+     * 批量添加
+     * @param roleAuthList
+     * @return
+     */
+    @Override
+    public Result batchAdd(List<RoleAuth> roleAuthList) {
+        if(Lists.isNotEmpty(roleAuthList)){
+            int i = roleAuthMapper.insertList(roleAuthList);
+            return i > 0 ? Result.success("操作成功") : Result.failure("操作失败");
+        }
+        return Result.success("操作成功");
+    }
+
+    /**
+     * 按条件删除
+     * @param condition
+     * @return
+     */
+    @Override
+    public Result deleteByExample(Example condition) {
+        if(Objects.nonNull(condition)){
+            int i = roleAuthMapper.deleteByExample(condition);
+            return i > 0 ? Result.success("操作成功") : Result.failure("操作失败");
+        }
+        return Result.success("操作成功");
     }
 
 

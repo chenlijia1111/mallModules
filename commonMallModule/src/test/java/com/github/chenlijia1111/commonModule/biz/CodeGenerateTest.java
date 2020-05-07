@@ -51,7 +51,7 @@ public class CodeGenerateTest {
     //生成controller,biz,service
     @Test
     public void test2WithChen() {
-        mybatisCodeGeneratorUtil.generateWithBusinssCode();
+        mybatisCodeGeneratorUtil.generateWithBusinessCode();
     }
 
 }
