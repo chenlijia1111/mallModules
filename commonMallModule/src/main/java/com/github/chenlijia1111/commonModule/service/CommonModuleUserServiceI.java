@@ -1,5 +1,10 @@
 package com.github.chenlijia1111.commonModule.service;
 
+import com.github.chenlijia1111.commonModule.common.responseVo.user.CommonSimpleUser;
+
+import java.util.List;
+import java.util.Set;
+
 /**
  * 用户 服务层
  * 调用者需要自己实现,
@@ -18,5 +23,12 @@ public interface CommonModuleUserServiceI {
      * @since 下午 2:05 2019/11/21 0021
      **/
     String currentUserId();
+
+    /**
+     * 查询简单用户信息
+     * @param idSet
+     * @return
+     */
+    List<CommonSimpleUser> listCommonSimpleUserByIdSet(Set<String> idSet);
 
 }

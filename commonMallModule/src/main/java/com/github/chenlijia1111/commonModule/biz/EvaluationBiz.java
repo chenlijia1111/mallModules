@@ -2,7 +2,10 @@ package com.github.chenlijia1111.commonModule.biz;
 
 import com.github.chenlijia1111.commonModule.common.pojo.IDGenerateFactory;
 import com.github.chenlijia1111.commonModule.common.requestVo.evaluation.AddEvaluationParams;
+import com.github.chenlijia1111.commonModule.common.requestVo.evaluation.QueryParams;
+import com.github.chenlijia1111.commonModule.common.responseVo.evaluate.EvaluateListVo;
 import com.github.chenlijia1111.commonModule.common.responseVo.product.AdminProductVo;
+import com.github.chenlijia1111.commonModule.common.responseVo.user.CommonSimpleUser;
 import com.github.chenlijia1111.commonModule.entity.Evaluation;
 import com.github.chenlijia1111.commonModule.entity.EvaluationLabel;
 import com.github.chenlijia1111.commonModule.entity.ShoppingOrder;
@@ -15,14 +18,13 @@ import com.github.chenlijia1111.utils.common.constant.BooleanConstant;
 import com.github.chenlijia1111.utils.core.JSONUtil;
 import com.github.chenlijia1111.utils.core.PropertyCheckUtil;
 import com.github.chenlijia1111.utils.core.StringUtils;
+import com.github.chenlijia1111.utils.database.mybatis.pojo.PageInfo;
 import com.github.chenlijia1111.utils.list.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -134,6 +136,37 @@ public class EvaluationBiz {
         }
 
         return Result.success("操作成功");
+    }
+
+    /**
+     * 根据产品Id查询评价信息
+     *
+     * @param params
+     * @return
+     */
+    public Result listPage(QueryParams params) {
+
+
+        List<EvaluateListVo> list = evaluationService.listPage(params);
+        PageInfo<EvaluateListVo> pageInfo = new PageInfo<>(list);
+
+        //关联用户信息
+        if (Lists.isNotEmpty(list)) {
+            Set<String> userIdSet = list.stream().map(e -> e.getClientId()).collect(Collectors.toSet());
+            List<CommonSimpleUser> commonSimpleUsers = userService.listCommonSimpleUserByIdSet(userIdSet);
+            if (Lists.isNotEmpty(commonSimpleUsers)) {
+                for (int i = 0; i < list.size(); i++) {
+                    EvaluateListVo vo = list.get(i);
+                    Optional<CommonSimpleUser> commonSimpleUserOptional = commonSimpleUsers.stream().filter(e -> Objects.equals(e.getId(), vo.getClientId())).findAny();
+                    if (commonSimpleUserOptional.isPresent()) {
+                        CommonSimpleUser simpleUser = commonSimpleUserOptional.get();
+                        vo.setUserNickName(simpleUser.getNickName());
+                        vo.setUserHeadImage(simpleUser.getHeadImage());
+                    }
+                }
+            }
+        }
+        return Result.success("查询成功", pageInfo);
     }
 
 }

@@ -1,5 +1,7 @@
 package com.github.chenlijia1111.commonModule.dao;
 
+import com.github.chenlijia1111.commonModule.common.requestVo.evaluation.QueryParams;
+import com.github.chenlijia1111.commonModule.common.responseVo.evaluate.EvaluateListVo;
 import com.github.chenlijia1111.commonModule.entity.Evaluation;
 import org.apache.ibatis.annotations.Param;
 import tk.mybatis.mapper.common.Mapper;
@@ -14,7 +16,6 @@ import java.util.Set;
  * @version 1.0
  **/
 public interface EvaluationMapper extends Mapper<Evaluation> {
-    Evaluation selectByPrimaryKey(String id);
 
 
     /**
@@ -23,4 +24,12 @@ public interface EvaluationMapper extends Mapper<Evaluation> {
      * @return
      */
     List<Evaluation> listByOrderNoSet(@Param("orderNoSet") Set<String> orderNoSet);
+
+
+    /**
+     * 查询评价列表
+     * @param params
+     * @return
+     */
+    List<EvaluateListVo> listPage(QueryParams params);
 }

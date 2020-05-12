@@ -1,5 +1,7 @@
 package com.github.chenlijia1111.commonModule.service;
 
+import com.github.chenlijia1111.commonModule.common.requestVo.evaluation.QueryParams;
+import com.github.chenlijia1111.commonModule.common.responseVo.evaluate.EvaluateListVo;
 import com.github.chenlijia1111.utils.common.Result;
 import com.github.chenlijia1111.commonModule.entity.Evaluation;
 
@@ -54,4 +56,11 @@ public interface EvaluationServiceI {
      * @return
      */
     List<Evaluation> listByCondition(Evaluation condition);
+
+    /**
+     * 查询评价列表
+     * @param params
+     * @return
+     */
+    List<EvaluateListVo> listPage(QueryParams params);
 }

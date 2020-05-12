@@ -163,7 +163,7 @@ public class ProductServiceImpl implements ProductServiceI {
     @Override
     public Result update(Product product, Example condition) {
         if (Objects.nonNull(product) && Objects.nonNull(condition)) {
-            int i = productMapper.updateByExample(product, condition);
+            int i = productMapper.updateByExampleSelective(product, condition);
             return i > 0 ? Result.success("操作成功") : Result.failure("操作失败");
         }
         return Result.success("操作成功");

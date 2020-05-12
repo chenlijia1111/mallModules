@@ -1,5 +1,7 @@
 package com.github.chenlijia1111.commonModule.service.impl;
 
+import com.github.chenlijia1111.commonModule.common.requestVo.evaluation.QueryParams;
+import com.github.chenlijia1111.commonModule.common.responseVo.evaluate.EvaluateListVo;
 import com.github.chenlijia1111.commonModule.dao.EvaluationMapper;
 import com.github.chenlijia1111.commonModule.entity.Evaluation;
 import com.github.chenlijia1111.commonModule.service.EvaluationServiceI;
@@ -90,6 +92,16 @@ public class EvaluationServiceImpl implements EvaluationServiceI {
     public List<Evaluation> listByCondition(Evaluation condition) {
         condition = PropertyCheckUtil.transferObjectNotNull(condition, true);
         return evaluationMapper.select(condition);
+    }
+
+    /**
+     * 查询评价列表
+     * @param params
+     * @return
+     */
+    @Override
+    public List<EvaluateListVo> listPage(QueryParams params) {
+        return evaluationMapper.listPage(params);
     }
 
 

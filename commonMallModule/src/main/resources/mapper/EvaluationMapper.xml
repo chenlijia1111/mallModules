@@ -30,4 +30,32 @@
       #{orderNo}
     </foreach>
   </select>
+    <select id="listPage" parameterType="com.github.chenlijia1111.commonModule.common.requestVo.evaluation.QueryParams"
+            resultType="com.github.chenlijia1111.commonModule.common.responseVo.evaluate.EvaluateListVo">
+      SELECT
+      id, client_id clientId, shop_id shopId, order_no orderNo, good_id goodId, product_id productId, comment comment, images images,
+      product_level productLevel, shop_level shopLevel, service_level serviceLevel, express_level expressLevel, parent_evalua parentEvalua,
+      create_time createTime
+      FROM s_evaluation
+      WHERE s_evaluation.delete_status = 0
+      <if test="productId != null and productId != ''">
+        AND s_evaluation.product_id = #{productId}
+      </if>
+      <if test="labelName != null and labelName != ''">
+        AND exists(
+            SELECT s_evaluation_label.id FROM s_evaluation_label
+            WHERE s_evaluation_label.evalua_id = s_evaluation.id
+            AND s_evaluation_label.label_name = #{labelName}
+        )
+      </if>
+      <if test="imageStatus != null">
+        <if test="imageStatus == 0">
+          AND (s_evaluation.images IS NULL OR s_evaluation.images = '' OR s_evaluation.images = '[]')
+        </if>
+        <if test="imageStatus == 1">
+          AND s_evaluation.images IS NOT NULL AND s_evaluation.images != '' AND s_evaluation.images != '[]'
+        </if>
+      </if>
+      ORDER BY s_evaluation.create_time DESC
+    </select>
 </mapper>
