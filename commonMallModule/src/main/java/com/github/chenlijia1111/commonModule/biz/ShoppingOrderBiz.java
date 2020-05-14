@@ -641,4 +641,27 @@ public class ShoppingOrderBiz {
         }
     }
 
+
+    /**
+     * 删除订单
+     * @param orderNo
+     * @return
+     */
+    public Result deleteOrder(String orderNo){
+
+        ShoppingOrder shoppingOrder = shoppingOrderService.findByOrderNo(orderNo);
+        if (Objects.isNull(shoppingOrder)) {
+            return Result.failure("订单不存在");
+        }
+
+        Map<String, Integer> orderStateMap = shoppingOrderService.findOrderStateByOrderNoSet(Sets.asSets(orderNo));
+        Integer orderStatus = orderStateMap.get(orderNo);
+        if (!Lists.asList(2, 6).contains(orderStatus)) {
+            return Result.failure("只能删除已取消或者已完成的订单");
+        }
+
+        shoppingOrder.setDeleteStatus(BooleanConstant.YES_INTEGER);
+        return shoppingOrderService.update(shoppingOrder);
+    }
+
 }

@@ -1,11 +1,13 @@
 package com.github.chenlijia1111.commonModule.common.pojo.coupon;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.github.chenlijia1111.commonModule.common.enums.CouponTypeEnum;
 import com.github.chenlijia1111.commonModule.entity.ShoppingOrder;
 import com.github.chenlijia1111.utils.core.JSONUtil;
 import com.github.chenlijia1111.utils.core.StringUtils;
 import com.github.chenlijia1111.utils.list.Lists;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -131,7 +133,7 @@ public abstract class AbstractCoupon {
         if (StringUtils.isNotEmpty(couponJson)) {
 
             String couponImplClassName = JSONUtil.strToJsonNode(couponJson).get("couponImplClassName").asText();
-            if(StringUtils.isNotEmpty(couponImplClassName)){
+            if (StringUtils.isNotEmpty(couponImplClassName)) {
                 try {
                     Class<? extends AbstractCoupon> couponClass = (Class<? extends AbstractCoupon>) Class.forName(couponImplClassName);
                     AbstractCoupon abstractCoupon = JSONUtil.strToObj(couponJson, couponClass);
@@ -143,5 +145,23 @@ public abstract class AbstractCoupon {
         }
         return null;
     }
+
+    /**
+     * 将优惠券集合json转化为优惠券集合
+     *
+     * @param couponListJson
+     * @return
+     */
+    public static List<AbstractCoupon> transferTypeToCouponList(String couponListJson) {
+        ArrayList<AbstractCoupon> list = new ArrayList<>();
+        if (StringUtils.isNotEmpty(couponListJson)) {
+            JsonNode jsonNode = JSONUtil.strToJsonNode(couponListJson);
+            for (JsonNode node : jsonNode) {
+                list.add(transferTypeToCoupon(node.toString()));
+            }
+        }
+        return list;
+    }
+
 
 }
