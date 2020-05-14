@@ -38,6 +38,9 @@ import java.util.stream.Collectors;
  * 调用者在调用这些方法前可以对这些方法再进行一次封装,进行其他的一些定制操作,
  * 比如在订单之后计算分销等等
  *
+ * @see OrderCancelTimeLimitTask 超时未支付自动取消订单
+ * 设置超时时间 {@link CommonMallConstants#CANCEL_NOT_PAY_ORDER_LIMIT_MINUTES}
+ *
  * @author chenLiJia
  * @since 2019-11-05 16:39:24
  **/
@@ -469,6 +472,7 @@ public class ShoppingOrderBiz {
         //取消订单
         for (ShoppingOrder order : shoppingOrders) {
             order.setState(CommonMallConstants.ORDER_CANCEL);
+            order.setCancelTime(new Date());
             shoppingOrderService.update(order);
 
             //回补库存

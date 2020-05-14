@@ -240,6 +240,14 @@ public class ShoppingOrder {
     private Integer deleteStatus;
 
     /**
+     * 订单取消时间
+     */
+    @ApiModelProperty("订单取消时间")
+    @PropertyCheck(name = "订单取消时间")
+    @Column(name = "cancel_time")
+    private Date cancelTime;
+
+    /**
      * 订单使用的券
      *
      * @see #orderCoupon
