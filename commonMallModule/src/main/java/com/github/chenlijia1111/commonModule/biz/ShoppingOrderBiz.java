@@ -337,20 +337,14 @@ public class ShoppingOrderBiz {
             //查询商品信息
             GoodVo goodVo = goodsService.findByGoodId(goodId);
             if (Objects.isNull(goodVo)) {
-                //回滚
-                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                 return Result.failure("商品不存在");
             }
             //判断产品是否存在且上架
             Product product = productService.findByProductId(goodVo.getProductId());
             if (Objects.isNull(product)) {
-                //回滚
-                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                 return Result.failure("产品不存在");
             }
             if (Objects.equals(BooleanConstant.NO_INTEGER, product.getShelfStatus())) {
-                //回滚
-                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                 return Result.failure("产品未上架");
             }
 
@@ -385,27 +379,31 @@ public class ShoppingOrderBiz {
         List<CouponWithGoodIds> couponWithGoodIdsList = params.getCouponWithGoodIdsList();
         if (Lists.isNotEmpty(couponWithGoodIdsList)) {
             //优惠券id集合
-            Set<String> couponIdSet = couponWithGoodIdsList.stream().map(e -> e.getCouponId()).collect(Collectors.toSet());
-            List<Coupon> coupons = couponService.listByIdSet(couponIdSet);
-            if (Lists.isNotEmpty(coupons)) {
-                for (CouponWithGoodIds couponWithGoodId : couponWithGoodIdsList) {
-                    //优惠券Id
-                    String couponId = couponWithGoodId.getCouponId();
-                    //优惠券作用的商品id集合
-                    List<String> goodIdList = couponWithGoodId.getGoodIdList();
+            Set<String> couponIdSet = couponWithGoodIdsList.stream().filter(e -> StringUtils.isNotEmpty(e.getCouponId())).map(e -> e.getCouponId()).collect(Collectors.toSet());
+            if(Sets.isNotEmpty(couponIdSet)){
+                List<Coupon> coupons = couponService.listByIdSet(couponIdSet);
+                if (Lists.isNotEmpty(coupons)) {
+                    for (CouponWithGoodIds couponWithGoodId : couponWithGoodIdsList) {
+                        //优惠券Id
+                        String couponId = couponWithGoodId.getCouponId();
+                        //优惠券作用的商品id集合
+                        List<String> goodIdList = couponWithGoodId.getGoodIdList();
 
-                    Optional<Coupon> any = coupons.stream().filter(e -> Objects.equals(e.getId(), couponId)).findAny();
-                    Coupon coupon = any.get();
-                    //找出符合条件的订单进行计算
-                    //作用的订单
-                    List<ShoppingOrder> hitOrderList = orderList.stream().filter(e -> goodIdList.contains(e.getGoodsId())).collect(Collectors.toList());
-                    if (Lists.isNotEmpty(hitOrderList)) {
-                        String couponJson = coupon.getCouponJson();
-                        AbstractCoupon abstractCoupon = AbstractCoupon.transferTypeToCoupon(couponJson);
-                        abstractCoupon.calculatePayable(hitOrderList);
+                        Optional<Coupon> any = coupons.stream().filter(e -> Objects.equals(e.getId(), couponId)).findAny();
+                        if (any.isPresent()) {
+                            Coupon coupon = any.get();
+                            //找出符合条件的订单进行计算
+                            //作用的订单
+                            List<ShoppingOrder> hitOrderList = orderList.stream().filter(e -> goodIdList.contains(e.getGoodsId())).collect(Collectors.toList());
+                            if (Lists.isNotEmpty(hitOrderList)) {
+                                String couponJson = coupon.getCouponJson();
+                                AbstractCoupon abstractCoupon = AbstractCoupon.transferTypeToCoupon(couponJson);
+                                abstractCoupon.calculatePayable(hitOrderList);
+                            }
+                        }
                     }
-                }
 
+                }
             }
         }
 

@@ -2,6 +2,7 @@ package com.github.chenlijia1111.commonModule.service;
 
 import com.github.chenlijia1111.utils.common.Result;
 import com.github.chenlijia1111.commonModule.entity.ClientAddress;
+import tk.mybatis.mapper.entity.Example;
 
 import java.util.List;
 
@@ -58,5 +59,20 @@ public interface ClientAddressServiceI {
      * @return com.logicalthining.endeshop.entity.ClientAddress
      **/
     ClientAddress findById(Integer id);
+
+    /**
+     * 条件查询
+     * @param condition
+     * @return
+     */
+    List<ClientAddress> listByCondition(Example condition);
+
+    /**
+     * 编辑
+     * @param clientAddress
+     * @param condition
+     * @return
+     */
+    Result update(ClientAddress clientAddress,Example condition);
 
 }

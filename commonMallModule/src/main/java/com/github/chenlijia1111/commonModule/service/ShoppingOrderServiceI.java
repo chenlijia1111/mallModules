@@ -2,6 +2,7 @@ package com.github.chenlijia1111.commonModule.service;
 
 import com.github.chenlijia1111.commonModule.entity.ShoppingOrder;
 import com.github.chenlijia1111.utils.common.Result;
+import tk.mybatis.mapper.entity.Example;
 
 import java.util.List;
 import java.util.Map;
@@ -90,6 +91,14 @@ public interface ShoppingOrderServiceI {
      * @since 上午 9:37 2019/11/8 0008
      **/
     ShoppingOrder findByOrderNo(String orderNo);
+
+    /**
+     * 更新
+     * @param shoppingOrder
+     * @param condition
+     * @return
+     */
+    Result update(ShoppingOrder shoppingOrder, Example condition);
 
 
 }

@@ -2,6 +2,7 @@ package com.github.chenlijia1111.commonModule.biz;
 
 import com.github.chenlijia1111.commonModule.common.requestVo.PageAbleVo;
 import com.github.chenlijia1111.commonModule.common.requestVo.shopCar.ShopCarAddOrUpdateParams;
+import com.github.chenlijia1111.commonModule.common.requestVo.shopCar.UpdateShopCarGoodIdParams;
 import com.github.chenlijia1111.commonModule.common.responseVo.product.GoodVo;
 import com.github.chenlijia1111.commonModule.common.responseVo.shop.CommonMallSimpleShopVo;
 import com.github.chenlijia1111.commonModule.common.responseVo.shopCar.ClientShopCarGroupByShopVo;
@@ -15,6 +16,7 @@ import com.github.chenlijia1111.utils.core.StringUtils;
 import com.github.chenlijia1111.utils.database.mybatis.pojo.Page;
 import com.github.chenlijia1111.utils.database.mybatis.pojo.PageInfo;
 import com.github.chenlijia1111.utils.list.Lists;
+import com.github.chenlijia1111.utils.list.Sets;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -192,7 +194,7 @@ public class ShopCarBiz {
 
     /**
      * 查询客户端购物车列表
-     * 已商家进行分组
+     * 以商家进行分组
      * 排序按对应的最近的交易时间进行排序
      * 先查询出商家，在查询商家对应的购物车列表
      *
@@ -212,7 +214,7 @@ public class ShopCarBiz {
         }
 
         //开启分页
-        Page.startPage(pageAbleVo.getPage(),pageAbleVo.getLimit());
+        Page.startPage(pageAbleVo.getPage(), pageAbleVo.getLimit());
 
         List<ClientShopCarGroupByShopVo> list = shopCarService.listPageWithClient(currentUserId);
         if (Lists.isNotEmpty(list)) {
@@ -278,5 +280,49 @@ public class ShopCarBiz {
         }
         return Result.success("查询成功", 0);
     }
+
+
+    /**
+     * 修改购物车商品
+     * 如果购物车中已经有这个商品了，那么就把之前的商品的购物车删除
+     * 如果没有则个商品，就直接修改
+     *
+     * @param params
+     * @return
+     */
+    public Result updateShopCarGoodId(UpdateShopCarGoodIdParams params) {
+
+        //当前用户
+        String currentUserId = clientUserService.currentUserId();
+        if (StringUtils.isEmpty(currentUserId)) {
+            return Result.notLogin();
+        }
+
+        //判断购物车是否存在
+        List<ShopCar> shopCars = shopCarService.listByShopCarIdSet(Sets.asSets(params.getShopCarId()));
+        if (Lists.isEmpty(shopCars)) {
+            return Result.failure("购物车不存在");
+        }
+
+        //原来的购物车
+        ShopCar originalShopCar = shopCars.get(0);
+
+        //判断现在要修改的购物车是否存在
+        ShopCar condition = new ShopCar();
+        condition.setClientId(currentUserId);
+        condition.setGoodId(params.getGoodId());
+        List<ShopCar> hitShopCars = shopCarService.listByCondition(condition);
+        if (Lists.isNotEmpty(hitShopCars)) {
+            //这个商品已经在购物车了
+            //删除它
+            shopCarService.batchDelete(hitShopCars.stream().map(e -> e.getId()).collect(Collectors.toList()));
+        }
+
+        //进行修改
+        originalShopCar.setGoodId(params.getGoodId());
+
+        return shopCarService.update(originalShopCar);
+    }
+
 
 }

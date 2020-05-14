@@ -10,14 +10,18 @@ import com.github.chenlijia1111.utils.common.Result;
 import com.github.chenlijia1111.utils.common.constant.BooleanConstant;
 import com.github.chenlijia1111.utils.core.PropertyCheckUtil;
 import com.github.chenlijia1111.utils.list.Lists;
+import com.github.chenlijia1111.utils.list.Sets;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import tk.mybatis.mapper.entity.Example;
+import tk.mybatis.mapper.util.Sqls;
 
 import javax.annotation.Resource;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * 用户收货地址信息表
@@ -132,8 +136,14 @@ public class ClientAddressBiz {
             return Result.failure("id为空");
         }
 
+        //当前用户
+        String userId = userService.currentUserId();
+        if (Objects.isNull(userId)) {
+            return Result.notLogin();
+        }
+
         //判断是否存在
-        ClientAddress condition = new ClientAddress().setId(id).setDeleteStatus(BooleanConstant.NO_INTEGER);
+        ClientAddress condition = new ClientAddress().setId(id).setClientId(userId).setDeleteStatus(BooleanConstant.NO_INTEGER);
         List<ClientAddress> clientAddresses = clientAddressService.listByCondition(condition);
         if (Lists.isEmpty(clientAddresses)) {
             return Result.failure("数据不存在");
@@ -144,6 +154,26 @@ public class ClientAddressBiz {
 
         Result update = clientAddressService.update(clientAddress);
         return update;
+    }
+
+
+    public Result batchDelete(Set<Integer> idSet) {
+        if (Sets.isEmpty(idSet)) {
+            return Result.failure("未选中数据");
+        }
+
+        //当前用户
+        String userId = userService.currentUserId();
+        if (Objects.isNull(userId)) {
+            return Result.notLogin();
+        }
+
+        //set内容
+        ClientAddress clientAddress = new ClientAddress().setDeleteStatus(BooleanConstant.YES_INTEGER);
+        //where内容
+        Example condition = Example.builder(ClientAddress.class).where(Sqls.custom().andIn("id", idSet).andEqualTo("clientId", userId)).build();
+
+        return clientAddressService.update(clientAddress, condition);
     }
 
 

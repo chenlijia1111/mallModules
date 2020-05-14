@@ -75,4 +75,14 @@
       #{productId}
     </foreach>
   </select>
+    <select id="listShopIdSetByGoodIdSet" resultType="java.lang.String">
+      SELECT
+      s_product.shops
+      FROM s_product,s_goods
+      WHERE s_product.id = s_goods.id
+      AND s_product.shops IS NOT NULL
+      <foreach collection="goodIdSet" item="goodId" open=" AND s_goods.id IN (" close=")" separator=",">
+        #{goodId}
+      </foreach>
+    </select>
 </mapper>

@@ -49,4 +49,12 @@ public interface ProductMapper extends Mapper<Product> {
      * @return
      */
     List<Product> listByProductIdSet(@Param("productIdSet") Set<String> productIdSet);
+
+
+    /**
+     * 通过商品id查询商家id集合
+     * @param goodIdSet
+     * @return
+     */
+    Set<String> listShopIdSetByGoodIdSet(@Param("goodIdSet") Set<String> goodIdSet);
 }

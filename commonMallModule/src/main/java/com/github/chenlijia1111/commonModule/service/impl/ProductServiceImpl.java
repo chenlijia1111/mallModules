@@ -260,5 +260,17 @@ public class ProductServiceImpl implements ProductServiceI {
         }
     }
 
-
+    /**
+     * 通过商品id查询商家id集合
+     *
+     * @param goodIdSet
+     * @return
+     */
+    @Override
+    public Set<String> listShopIdSetByGoodIdSet(Set<String> goodIdSet) {
+        if (Sets.isNotEmpty(goodIdSet)) {
+            return productMapper.listShopIdSetByGoodIdSet(goodIdSet);
+        }
+        return new HashSet<>();
+    }
 }

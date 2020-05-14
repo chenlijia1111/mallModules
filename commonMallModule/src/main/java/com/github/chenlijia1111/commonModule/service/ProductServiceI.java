@@ -95,4 +95,11 @@ public interface ProductServiceI {
      */
     Result update(Product product,Example condition);
 
+    /**
+     * 通过商品id查询商家id集合
+     * @param goodIdSet
+     * @return
+     */
+    Set<String> listShopIdSetByGoodIdSet(Set<String> goodIdSet);
+
 }

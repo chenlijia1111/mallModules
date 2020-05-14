@@ -14,6 +14,7 @@ import com.github.chenlijia1111.utils.core.StringUtils;
 import com.github.chenlijia1111.utils.list.Lists;
 import com.github.chenlijia1111.utils.list.Sets;
 import org.springframework.stereotype.Service;
+import tk.mybatis.mapper.entity.Example;
 
 import javax.annotation.Resource;
 import java.util.*;
@@ -253,5 +254,18 @@ public class ShoppingOrderServiceImpl implements ShoppingOrderServiceI {
         return null;
     }
 
-
+    /**
+     * 更新
+     * @param shoppingOrder
+     * @param condition
+     * @return
+     */
+    @Override
+    public Result update(ShoppingOrder shoppingOrder, Example condition) {
+        if(Objects.nonNull(shoppingOrder) && Objects.nonNull(condition)){
+            int i = shoppingOrderMapper.updateByExampleSelective(shoppingOrder, condition);
+            return i > 0 ? Result.success("操作成功") : Result.failure("操作失败");
+        }
+        return Result.success("操作成功");
+    }
 }
