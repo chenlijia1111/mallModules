@@ -24,4 +24,11 @@ public interface CouponMapper extends Mapper<Coupon> {
      **/
     List<Coupon> listByIdSet(@Param("idSet") Set<String> idSet);
 
+    /**
+     * 批量领取优惠券 优惠券数量-1
+     * @param idSet
+     * @return
+     */
+    Integer batchReceiveCoupon(@Param("idSet") Set<String> idSet);
+
 }

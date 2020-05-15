@@ -33,7 +33,6 @@ public class AddParams {
      * 性别  1男 2女 3未知
      */
     @ApiModelProperty("性别  1男 2女 3未知")
-    @PropertyCheck(name = "性别")
     private Integer receiveSex;
 
 

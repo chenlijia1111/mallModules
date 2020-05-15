@@ -32,4 +32,13 @@
       #{id}
     </foreach>
   </select>
+  <update id="batchReceiveCoupon">
+    UPDATE s_coupon
+    SET s_coupon.coupon_count = s_coupon.coupon_count -1
+    WHERE s_coupon.coupon_count > 0
+    <foreach collection="idSet" item="id" open="AND s_coupon.id IN (" close=")" separator=",">
+      #{id}
+    </foreach>
+  </update>
+
 </mapper>

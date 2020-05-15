@@ -5,6 +5,8 @@ import com.github.chenlijia1111.commonModule.dao.GoodsMapper;
 import com.github.chenlijia1111.commonModule.dao.ShoppingOrderMapper;
 import com.github.chenlijia1111.commonModule.entity.Goods;
 import com.github.chenlijia1111.commonModule.entity.ShoppingOrder;
+import com.github.chenlijia1111.commonModule.service.ICancelOrderHook;
+import com.github.chenlijia1111.commonModule.utils.SpringContextHolder;
 import com.github.chenlijia1111.utils.core.StringUtils;
 import com.github.chenlijia1111.utils.list.Lists;
 import com.github.chenlijia1111.utils.list.Sets;
@@ -26,6 +28,10 @@ import java.util.concurrent.TimeUnit;
  * 如果要使用的话就把他注入到spring中去
  * 在项目启动时，没有进行查询了待支付的订单进延时队列，因为设涉及到物流数据的查询,调用者需要自己实现，
  * 我会判断项目是否注入了这个实例，如果注入了才会去查询
+ *
+ * 取消订单之后会调用取消订单的钩子函数
+ * @see com.github.chenlijia1111.commonModule.service.ICancelOrderHook
+ * 方便调用者处理其他自定义逻辑
  *
  * @author Chen LiJia
  * @since 2020/4/8
@@ -158,6 +164,13 @@ public class OrderCancelTimeLimitTask {
                                     goods.setStockCount(goods.getStockCount() + shoppingOrder.getCount());
                                     goodsMapper.updateByPrimaryKeySelective(goods);
                                 }
+                            }
+                            //执行钩子函数
+                            try {
+                                ICancelOrderHook cancelOrderHook = SpringContextHolder.getBean(ICancelOrderHook.class);
+                                cancelOrderHook.cancelOrderByGroupId(delayNotPayOrder.groupId);
+                            } catch (Exception e) {
+                                //e.printStackTrace();
                             }
                         }
                     }

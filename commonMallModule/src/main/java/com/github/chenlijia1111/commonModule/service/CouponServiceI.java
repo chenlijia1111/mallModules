@@ -1,7 +1,7 @@
 package com.github.chenlijia1111.commonModule.service;
 
-import com.github.chenlijia1111.utils.common.Result;
 import com.github.chenlijia1111.commonModule.entity.Coupon;
+import com.github.chenlijia1111.utils.common.Result;
 
 import java.util.List;
 import java.util.Set;
@@ -48,4 +48,12 @@ public interface CouponServiceI {
      * @return java.util.List<com.github.chenlijia1111.commonModule.entity.Coupon>
      **/
     List<Coupon> listByIdSet(Set<String> idSet);
+
+
+    /**
+     * 批量领取优惠券 优惠券数量-1
+     * @param idSet
+     * @return
+     */
+    Result batchReceiveCoupon(Set<String> idSet);
 }

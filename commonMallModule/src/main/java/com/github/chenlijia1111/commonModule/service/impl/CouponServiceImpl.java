@@ -87,5 +87,18 @@ public class CouponServiceImpl implements CouponServiceI {
         return Lists.newArrayList();
     }
 
-
+    /**
+     * 批量领取优惠券 优惠券数量-1
+     *
+     * @param idSet
+     * @return
+     */
+    @Override
+    public Result batchReceiveCoupon(Set<String> idSet) {
+        if (Sets.isNotEmpty(idSet)) {
+            Integer i = couponMapper.batchReceiveCoupon(idSet);
+            return i > 0 ? Result.success("操作成功") : Result.failure("操作失败");
+        }
+        return Result.success("操作成功");
+    }
 }

@@ -100,5 +100,19 @@ public interface ShoppingOrderServiceI {
      */
     Result update(ShoppingOrder shoppingOrder, Example condition);
 
+    /**
+     * 取消订单
+     * @param groupId
+     * @return
+     */
+    Result cancelOrder(String groupId);
+
+    /**
+     * 根据订单编号取消订单
+     * @param orderNo
+     * @return
+     */
+    Result cancelOrderByOrderNo(String orderNo);
+
 
 }

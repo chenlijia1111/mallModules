@@ -2,11 +2,9 @@ package com.github.chenlijia1111.commonModule.service.impl;
 
 import com.github.chenlijia1111.commonModule.common.enums.OrderStatusEnum;
 import com.github.chenlijia1111.commonModule.common.pojo.CommonMallConstants;
+import com.github.chenlijia1111.commonModule.common.responseVo.product.GoodVo;
 import com.github.chenlijia1111.commonModule.dao.*;
-import com.github.chenlijia1111.commonModule.entity.Evaluation;
-import com.github.chenlijia1111.commonModule.entity.ImmediatePaymentOrder;
-import com.github.chenlijia1111.commonModule.entity.ReceivingGoodsOrder;
-import com.github.chenlijia1111.commonModule.entity.ShoppingOrder;
+import com.github.chenlijia1111.commonModule.entity.*;
 import com.github.chenlijia1111.commonModule.service.ShoppingOrderServiceI;
 import com.github.chenlijia1111.utils.common.Result;
 import com.github.chenlijia1111.utils.common.constant.BooleanConstant;
@@ -275,6 +273,93 @@ public class ShoppingOrderServiceImpl implements ShoppingOrderServiceI {
         if (Objects.nonNull(shoppingOrder) && Objects.nonNull(condition)) {
             int i = shoppingOrderMapper.updateByExampleSelective(shoppingOrder, condition);
             return i > 0 ? Result.success("操作成功") : Result.failure("操作失败");
+        }
+        return Result.success("操作成功");
+    }
+
+    /**
+     * 取消订单
+     * 客户主动取消订单,只能是待支付或已完成的订单
+     * 并且是组订单全部取消
+     * @param groupId
+     * @return
+     */
+    @Override
+    public Result cancelOrder(String groupId) {
+        //组订单id为空
+        if (StringUtils.isEmpty(groupId)) {
+            return Result.failure("组订单id为空");
+        }
+
+        //查询订单是否存在
+        ShoppingOrder shoppingOrderCondition = new ShoppingOrder().
+                setGroupId(groupId);
+        List<ShoppingOrder> shoppingOrders = shoppingOrderMapper.select(shoppingOrderCondition);
+        if (Lists.isEmpty(shoppingOrders)) {
+            return Result.failure("订单不存在");
+        }
+
+        //判断订单状态
+        //1初始化 2取消 3已付款 4已发货 5已收货 6已评价 7已完成
+        Map<String, Integer> groupStateMap = findGroupStateByGroupIdSet(Sets.asSets(groupId));
+        Integer groupState = groupStateMap.get(groupId);
+        if (!Lists.asList(OrderStatusEnum.INIT.getOrderStatus(),OrderStatusEnum.COMPLETED.getOrderStatus()).contains(groupState)) {
+            return Result.failure("只允许未付款或已完成的订单取消");
+        }
+
+        //取消订单
+        for (ShoppingOrder order : shoppingOrders) {
+            order.setState(CommonMallConstants.ORDER_CANCEL);
+            order.setCancelTime(new Date());
+            shoppingOrderMapper.updateByPrimaryKeySelective(order);
+
+            //回补库存
+            Goods goodVo = goodsMapper.selectByPrimaryKey(order.getGoodsId());
+            if (Objects.nonNull(goodVo)) {
+                goodVo.setStockCount(goodVo.getStockCount() + order.getCount());
+                goodsMapper.updateByPrimaryKeySelective(goodVo);
+            }
+        }
+
+        return Result.success("操作成功");
+    }
+
+    /**
+     * 根据订单编号取消订单
+     * @param orderNo
+     * @return
+     */
+    @Override
+    public Result cancelOrderByOrderNo(String orderNo) {
+        //订单id为空
+        if (StringUtils.isEmpty(orderNo)) {
+            return Result.failure("订单id为空");
+        }
+
+        //查询订单是否存在
+        ShoppingOrder shoppingOrder = shoppingOrderMapper.selectByPrimaryKey(orderNo);
+        if(Objects.isNull(shoppingOrder)){
+            return Result.failure("数据不存在");
+        }
+
+        //判断订单状态
+        //1初始化 2取消 3已付款 4已发货 5已收货 6已评价 7已完成
+        Map<String, Integer> orderStateMap = findOrderStateByOrderNoSet(Sets.asSets(orderNo));
+        Integer orderStatus = orderStateMap.get(orderNo);
+        if (!Lists.asList(OrderStatusEnum.INIT.getOrderStatus(),OrderStatusEnum.COMPLETED.getOrderStatus()).contains(orderStatus)) {
+            return Result.failure("只允许未付款或已完成的订单取消");
+        }
+
+        //取消订单
+        shoppingOrder.setState(CommonMallConstants.ORDER_CANCEL);
+        shoppingOrder.setCancelTime(new Date());
+        shoppingOrderMapper.updateByPrimaryKeySelective(shoppingOrder);
+
+        //回补库存
+        Goods goodVo = goodsMapper.selectByPrimaryKey(shoppingOrder.getGoodsId());
+        if (Objects.nonNull(goodVo)) {
+            goodVo.setStockCount(goodVo.getStockCount() + shoppingOrder.getCount());
+            goodsMapper.updateByPrimaryKeySelective(goodVo);
         }
         return Result.success("操作成功");
     }

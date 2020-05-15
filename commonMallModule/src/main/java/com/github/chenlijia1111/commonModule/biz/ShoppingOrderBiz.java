@@ -1,6 +1,5 @@
 package com.github.chenlijia1111.commonModule.biz;
 
-import com.github.chenlijia1111.commonModule.common.enums.OrderStatusEnum;
 import com.github.chenlijia1111.commonModule.common.enums.OrderTypeEnum;
 import com.github.chenlijia1111.commonModule.common.pojo.CommonMallConstants;
 import com.github.chenlijia1111.commonModule.common.pojo.IDGenerateFactory;
@@ -42,6 +41,8 @@ import java.util.stream.Collectors;
  * @author chenLiJia
  * @see OrderCancelTimeLimitTask 超时未支付自动取消订单，这里已经实现了，调用者只需注入即可
  * 设置超时时间 {@link CommonMallConstants#CANCEL_NOT_PAY_ORDER_LIMIT_MINUTES}
+ * 这里为取消订单设置了钩子函数，调用者可以把自己需要在取消的业务实现的逻辑写在{@link ICancelOrderHook} 中
+ *
  * <p>
  * 下单后一段时间内自动收货  这里已经实现了，调用者只需要注入即可，因为可能涉及物流的查询，一般都是物流查询签收了之后一段时间内自动收货
  * 所以调用者需要定时查询物流情况，物流签收了之后就需要修改发货单的物流签收状态以及物流签收时间
@@ -457,43 +458,40 @@ public class ShoppingOrderBiz {
      * @since 下午 5:51 2019/11/22 0022
      **/
     public Result customCancelOrder(String groupId) {
-
-        //组订单id为空
-        if (StringUtils.isEmpty(groupId)) {
-            return Result.failure("组订单id为空");
-        }
-
-        //查询订单是否存在
-        ShoppingOrder shoppingOrderCondition = new ShoppingOrder().
-                setGroupId(groupId);
-        List<ShoppingOrder> shoppingOrders = shoppingOrderService.listByCondition(shoppingOrderCondition);
-        if (Lists.isEmpty(shoppingOrders)) {
-            return Result.failure("订单不存在");
-        }
-
-        //判断订单状态
-        //1初始化 2取消 3已付款 4已发货 5已收货 6已评价 7已完成
-        Map<String, Integer> groupStateMap = shoppingOrderService.findGroupStateByGroupIdSet(Sets.asSets(groupId));
-        Integer groupState = groupStateMap.get(groupId);
-        if (!Objects.equals(OrderStatusEnum.INIT.getOrderStatus(), groupState)) {
-            return Result.failure("订单已付款,不允许取消");
-        }
-
-        //取消订单
-        for (ShoppingOrder order : shoppingOrders) {
-            order.setState(CommonMallConstants.ORDER_CANCEL);
-            order.setCancelTime(new Date());
-            shoppingOrderService.update(order);
-
-            //回补库存
-            GoodVo goodVo = goodsService.findByGoodId(order.getGoodsId());
-            if (Objects.nonNull(goodVo)) {
-                goodVo.setStockCount(goodVo.getStockCount() + order.getCount());
-                goodsService.update(goodVo);
+        Result result = shoppingOrderService.cancelOrder(groupId);
+        if (result.getSuccess()) {
+            //执行钩子函数
+            try {
+                ICancelOrderHook cancelOrderHook = SpringContextHolder.getBean(ICancelOrderHook.class);
+                cancelOrderHook.cancelOrderByGroupId(groupId);
+            } catch (Exception e) {
+//                e.printStackTrace();
             }
         }
+        return result;
+    }
 
-        return Result.success("操作成功");
+
+    /**
+     * 客户取消订单
+     * 客户主动取消订单,只能是待支付或者已完成的订单
+     *
+     * @param orderNo 1
+     * @return com.github.chenlijia1111.utils.common.Result
+     * @since 下午 5:51 2019/11/22 0022
+     **/
+    public Result customCancelOrderByOrderNo(String orderNo) {
+        Result result = shoppingOrderService.cancelOrderByOrderNo(orderNo);
+        if (result.getSuccess()) {
+            //执行钩子函数
+            try {
+                ICancelOrderHook cancelOrderHook = SpringContextHolder.getBean(ICancelOrderHook.class);
+                cancelOrderHook.cancelOrderByOrderNo(orderNo);
+            } catch (Exception e) {
+//                e.printStackTrace();
+            }
+        }
+        return result;
     }
 
     /**
