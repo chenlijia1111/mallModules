@@ -32,4 +32,5 @@ public interface EvaluationMapper extends Mapper<Evaluation> {
      * @return
      */
     List<EvaluateListVo> listPage(QueryParams params);
+
 }

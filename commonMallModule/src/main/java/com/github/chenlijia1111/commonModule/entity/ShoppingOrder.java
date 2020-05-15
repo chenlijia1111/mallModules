@@ -248,6 +248,15 @@ public class ShoppingOrder {
     private Date cancelTime;
 
     /**
+     * 是否已完成 0否1是
+     * 表示归档
+     */
+    @ApiModelProperty("是否已完成 0否1是")
+    @PropertyCheck(name = "是否已完成")
+    @Column(name = "complete_status")
+    private Integer completeStatus;
+
+    /**
      * 订单使用的券
      *
      * @see #orderCoupon

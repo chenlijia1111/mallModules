@@ -1,6 +1,8 @@
 package com.github.chenlijia1111.commonModule.dao;
 
+import com.github.chenlijia1111.commonModule.common.responseVo.order.DelayNotEvaluateOrder;
 import com.github.chenlijia1111.commonModule.common.responseVo.order.DelayNotPayOrder;
+import com.github.chenlijia1111.commonModule.common.responseVo.order.DelayNotReceiveOrder;
 import com.github.chenlijia1111.commonModule.entity.ShoppingOrder;
 import com.github.chenlijia1111.utils.common.Result;
 import org.apache.ibatis.annotations.Param;
@@ -87,6 +89,19 @@ public interface ShoppingOrderMapper extends Mapper<ShoppingOrder> {
      * @return
      */
     Integer findOrderState(@Param("groupId") String groupId);
+
+    /**
+     * 查询未评价订单到延时队列处理
+     * @return
+     */
+    List<DelayNotEvaluateOrder> listDelayNotEvaluateOrder();
+
+
+    /**
+     * 查询物流已签收但是还没有收货的订单 放到延时队列 自动收货
+     * @return
+     */
+    List<DelayNotReceiveOrder> listDelayNotReceiveOrder();
 
 
 }

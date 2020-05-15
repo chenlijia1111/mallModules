@@ -135,6 +135,12 @@ public class EvaluationBiz {
             evaluationLabelService.batchAdd(evaluationLabels);
         }
 
+        //评价之后，订单修改为已完成
+        if (!Objects.equals(order.getCompleteStatus(), BooleanConstant.YES_INTEGER)) {
+            order.setCompleteStatus(BooleanConstant.YES_INTEGER);
+            shoppingOrderService.update(order);
+        }
+
         return Result.success("操作成功");
     }
 

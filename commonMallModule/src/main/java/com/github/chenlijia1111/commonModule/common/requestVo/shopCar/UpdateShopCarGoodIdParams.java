@@ -30,4 +30,11 @@ public class UpdateShopCarGoodIdParams {
     @PropertyCheck(name = "商品id")
     private String goodId;
 
+    /**
+     * 商品数量
+     */
+    @ApiModelProperty(value = "商品数量")
+    @PropertyCheck(name = "商品数量")
+    private Integer goodCount;
+
 }

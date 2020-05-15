@@ -56,6 +56,47 @@
           AND s_evaluation.images IS NOT NULL AND s_evaluation.images != '' AND s_evaluation.images != '[]'
         </if>
       </if>
-      ORDER BY s_evaluation.create_time DESC
+      <trim prefix="ORDER BY " suffixOverrides=",">
+        <if test="orderByProductLevel != null">
+          <if test="orderByProductLevel == 0">
+            s_evaluation.product_level,
+          </if>
+          <if test="orderByProductLevel == 1">
+            s_evaluation.product_level DESC ,
+          </if>
+        </if>
+        <if test="orderByServiceLevel != null">
+          <if test="orderByServiceLevel == 0">
+            s_evaluation.service_level,
+          </if>
+          <if test="orderByServiceLevel == 1">
+            s_evaluation.service_level DESC ,
+          </if>
+        </if>
+        <if test="orderByShopLevel != null">
+          <if test="orderByShopLevel == 0">
+            s_evaluation.shop_level,
+          </if>
+          <if test="orderByShopLevel == 1">
+            s_evaluation.shop_level DESC ,
+          </if>
+        </if>
+        <if test="orderByExpressLevel != null">
+          <if test="orderByExpressLevel == 0">
+            s_evaluation.express_level,
+          </if>
+          <if test="orderByExpressLevel == 1">
+            s_evaluation.express_level DESC ,
+          </if>
+        </if>
+        <if test="orderByCreateTime != null">
+          <if test="orderByCreateTime == 0">
+            s_evaluation.create_time,
+          </if>
+          <if test="orderByCreateTime == 1">
+            s_evaluation.create_time DESC ,
+          </if>
+        </if>
+      </trim>
     </select>
 </mapper>

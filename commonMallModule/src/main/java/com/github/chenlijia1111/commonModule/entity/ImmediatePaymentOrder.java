@@ -195,6 +195,22 @@ public class ImmediatePaymentOrder {
     private String recAddr;
 
     /**
+     * 物流签收状态 0否1是
+     */
+    @ApiModelProperty("物流签收状态 0否1是")
+    @PropertyCheck(name = "物流签收状态 0否1是")
+    @Column(name = "express_sign_status")
+    private Integer expressSignStatus;
+
+    /**
+     * 物流签收时间 通过物流api查询
+     */
+    @ApiModelProperty("物流签收时间 通过物流api查询")
+    @PropertyCheck(name = "物流签收时间")
+    @Column(name = "express_sign_time")
+    private Integer expressSignTime;
+
+    /**
      * 发货单对应的收货单
      *
      * @since 上午 10:59 2019/11/22 0022

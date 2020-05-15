@@ -21,8 +21,14 @@ public class CommonMallConstants {
     public static final String BEAN_SUFFIX = "commonModule";
 
 
-    //超时未支付时间 取消订单 允许修改
+    //超时未支付时间 取消订单 允许修改 分钟
     public static Integer CANCEL_NOT_PAY_ORDER_LIMIT_MINUTES = 15;
+
+    //超时未评价时间 自动评价 允许修改 分钟 默认7天
+    public static Integer NOT_EVALUATE_ORDER_LIMIT_MINUTES = 7 * 24 * 60;
+
+    //超时未收货时间 已签收后隔一段时间自动收货 自动评价 允许修改 分钟 默认7天
+    public static Integer NOT_RECEIVE_ORDER_LIMIT_MINUTES = 7 * 24 * 60;
 
 
 }

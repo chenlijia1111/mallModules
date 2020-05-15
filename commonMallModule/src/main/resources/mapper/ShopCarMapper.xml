@@ -28,10 +28,11 @@
   </delete>
   <select id="findShopCarAllGoodsKindCount" resultType="java.lang.Integer">
     SELECT
-      COUNT(good_id)
+      COUNT(DISTINCT good_id)
     FROM
-      s_shop_car,s_product
-    WHERE s_shop_car.product_id = s_product.id
+      s_shop_car,s_product,s_goods
+    WHERE s_shop_car.good_id = s_goods.id
+      AND s_product.id = s_goods.product_id
       AND s_product.delete_status = 0
       AND client_id = #{clientId}
   </select>

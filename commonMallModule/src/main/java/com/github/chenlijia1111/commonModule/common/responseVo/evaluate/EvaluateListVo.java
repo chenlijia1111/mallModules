@@ -1,14 +1,23 @@
 package com.github.chenlijia1111.commonModule.common.responseVo.evaluate;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.github.chenlijia1111.commonModule.common.responseVo.product.AdminProductVo;
+import com.github.chenlijia1111.commonModule.common.responseVo.product.GoodVo;
+import com.github.chenlijia1111.utils.core.JSONUtil;
+import com.github.chenlijia1111.utils.core.StringUtils;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.Date;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 /**
  * 评价列表对象
+ *
  * @author Chen LiJia
  * @since 2020/5/12
  */
@@ -113,4 +122,33 @@ public class EvaluateListVo {
     @ApiModelProperty(value = "用户头像")
     private String userHeadImage;
 
+    /**
+     * 规格名称
+     */
+    @ApiModelProperty(value = "规格名称")
+    private String skuName;
+
+    /**
+     * 订单快照
+     */
+    @JsonIgnore
+    private String detailJson;
+
+    /**
+     * 创建默认的规格名称
+     *
+     * @param detailJson
+     */
+    public void setDetailJson(String detailJson) {
+        this.detailJson = detailJson;
+        if (StringUtils.isNotEmpty(detailJson) && StringUtils.isNotEmpty(this.goodId)) {
+            AdminProductVo adminProductVo = JSONUtil.strToObj(detailJson, AdminProductVo.class);
+            List<GoodVo> goodVoList = adminProductVo.getGoodVoList();
+            Optional<GoodVo> goodVoOptional = goodVoList.stream().filter(e -> Objects.equals(e.getId(), this.goodId)).findAny();
+            if (goodVoOptional.isPresent()) {
+                GoodVo goodVo = goodVoOptional.get();
+                this.skuName = goodVo.releaseSkuName(false, null, " | ");
+            }
+        }
+    }
 }

@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit;
  * 延时队列
  *
  * 如果要使用的话就把他注入到spring中去
- * 在项目启动时，已经进行查询了待支付的订单进延时队列了，调用者不用自己实现，
+ * 在项目启动时，没有进行查询了待支付的订单进延时队列，因为设涉及到物流数据的查询,调用者需要自己实现，
  * 我会判断项目是否注入了这个实例，如果注入了才会去查询
  *
  * @author Chen LiJia
@@ -149,6 +149,8 @@ public class OrderCancelTimeLimitTask {
                                 ShoppingOrder shoppingOrder = shoppingOrders.get(i);
                                 //修改为取消
                                 shoppingOrder.setState(CommonMallConstants.ORDER_CANCEL);
+                                //取消时间
+                                shoppingOrder.setCancelTime(new Date());
                                 shoppingOrderMapper.updateByPrimaryKeySelective(shoppingOrder);
                                 //回补库存
                                 Goods goods = goodsMapper.selectByPrimaryKey(shoppingOrder.getGoodsId());

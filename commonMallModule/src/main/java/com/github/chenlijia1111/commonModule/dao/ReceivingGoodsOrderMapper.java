@@ -38,4 +38,11 @@ public interface ReceivingGoodsOrderMapper extends Mapper<ReceivingGoodsOrder> {
      */
     Integer batchAdd(@Param("receivingGoodsOrderList") List<ReceivingGoodsOrder> receivingGoodsOrderList);
 
+    /**
+     * 根据订单编号查询收货单
+     * @param orderNo
+     * @return
+     */
+    ReceivingGoodsOrder findReceiveOrderByOrderNo(@Param("orderNo") String orderNo);
+
 }

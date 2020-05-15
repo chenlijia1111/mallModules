@@ -9,6 +9,7 @@ import com.github.chenlijia1111.commonModule.common.requestVo.order.*;
 import com.github.chenlijia1111.commonModule.common.responseVo.order.CalculateOrderPriceVo;
 import com.github.chenlijia1111.commonModule.common.responseVo.product.AdminProductVo;
 import com.github.chenlijia1111.commonModule.common.responseVo.product.GoodVo;
+import com.github.chenlijia1111.commonModule.common.schedules.OrderAutoEvaluateTask;
 import com.github.chenlijia1111.commonModule.common.schedules.OrderCancelTimeLimitTask;
 import com.github.chenlijia1111.commonModule.entity.*;
 import com.github.chenlijia1111.commonModule.service.*;
@@ -38,10 +39,17 @@ import java.util.stream.Collectors;
  * 调用者在调用这些方法前可以对这些方法再进行一次封装,进行其他的一些定制操作,
  * 比如在订单之后计算分销等等
  *
- * @see OrderCancelTimeLimitTask 超时未支付自动取消订单
- * 设置超时时间 {@link CommonMallConstants#CANCEL_NOT_PAY_ORDER_LIMIT_MINUTES}
- *
  * @author chenLiJia
+ * @see OrderCancelTimeLimitTask 超时未支付自动取消订单，这里已经实现了，调用者只需注入即可
+ * 设置超时时间 {@link CommonMallConstants#CANCEL_NOT_PAY_ORDER_LIMIT_MINUTES}
+ * <p>
+ * 下单后一段时间内自动收货  这里已经实现了，调用者只需要注入即可，因为可能涉及物流的查询，一般都是物流查询签收了之后一段时间内自动收货
+ * 所以调用者需要定时查询物流情况，物流签收了之后就需要修改发货单的物流签收状态以及物流签收时间
+ * {@link ImmediatePaymentOrder#getExpressSignStatus()} {@link ImmediatePaymentOrder#getExpressSignTime()} ()}
+ * @see com.github.chenlijia1111.commonModule.common.schedules.OrderAutoReceiveTask
+ * <p>
+ * 确认收货后一段时间内自动评价 这里已经实现了，调用者只需要注入即可
+ * @see OrderAutoEvaluateTask
  * @since 2019-11-05 16:39:24
  **/
 @Service(CommonMallConstants.BEAN_SUFFIX + "ShoppingOrderBiz")
@@ -169,7 +177,8 @@ public class ShoppingOrderBiz {
                     setShopGroupId(shopGroupId).
                     setGroupId(groupId).
                     setCreateTime(currentTime).setRemarks(params.getRemarks()).
-                    setDeleteStatus(BooleanConstant.NO_INTEGER);
+                    setDeleteStatus(BooleanConstant.NO_INTEGER).
+                    setCompleteStatus(BooleanConstant.NO_INTEGER);
 
             //订单快照
             AdminProductVo adminProductVo = productService.findAdminProductVoByProductId(goodVo.getProductId());
@@ -197,7 +206,7 @@ public class ShoppingOrderBiz {
                     setRecAddr(params.getRecAddr()).
                     setFrontOrder(orderNo).
                     setShoppingOrder(orderNo).
-                    setCreateTime(currentTime);
+                    setCreateTime(currentTime).setExpressSignStatus(BooleanConstant.NO_INTEGER);
 
             shoppingOrder.setImmediatePaymentOrder(immediatePaymentOrder);
 
@@ -363,7 +372,8 @@ public class ShoppingOrderBiz {
                     setProductAmountTotal(goodVo.getPrice() * count).
                     setOrderAmountTotal(goodVo.getPrice() * count).
                     setGroupId(groupId).
-                    setCreateTime(currentTime).setRemarks(params.getRemarks());
+                    setCreateTime(currentTime).
+                    setRemarks(params.getRemarks());
 
             //订单快照
             AdminProductVo adminProductVo = productService.findAdminProductVoByProductId(goodVo.getProductId());
@@ -383,7 +393,7 @@ public class ShoppingOrderBiz {
         if (Lists.isNotEmpty(couponWithGoodIdsList)) {
             //优惠券id集合
             Set<String> couponIdSet = couponWithGoodIdsList.stream().filter(e -> StringUtils.isNotEmpty(e.getCouponId())).map(e -> e.getCouponId()).collect(Collectors.toSet());
-            if(Sets.isNotEmpty(couponIdSet)){
+            if (Sets.isNotEmpty(couponIdSet)) {
                 List<Coupon> coupons = couponService.listByIdSet(couponIdSet);
                 if (Lists.isNotEmpty(coupons)) {
                     for (CouponWithGoodIds couponWithGoodId : couponWithGoodIdsList) {
@@ -609,9 +619,24 @@ public class ShoppingOrderBiz {
             return Result.failure("该订单已收货,请勿重复请求");
         }
 
+        //当前时间
+        Date currentTime = new Date();
         receivingGoodsOrder.setState(CommonMallConstants.ORDER_COMPLETE);
+        receivingGoodsOrder.setReceiveTime(currentTime);
 
         Result update = receivingGoodsOrderService.update(receivingGoodsOrder);
+
+        if (update.getSuccess()) {
+            //收货之后，添加到自动评价延时队列
+            try {
+                OrderAutoEvaluateTask orderAutoEvaluateTask = SpringContextHolder.getBean(OrderAutoEvaluateTask.class);
+                if (Objects.nonNull(orderAutoEvaluateTask)) {
+                    orderAutoEvaluateTask.addNotReceiveOrder(orderNo, currentTime, CommonMallConstants.NOT_EVALUATE_ORDER_LIMIT_MINUTES);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
         return update;
     }
 
@@ -644,10 +669,11 @@ public class ShoppingOrderBiz {
 
     /**
      * 删除订单
+     *
      * @param orderNo
      * @return
      */
-    public Result deleteOrder(String orderNo){
+    public Result deleteOrder(String orderNo) {
 
         ShoppingOrder shoppingOrder = shoppingOrderService.findByOrderNo(orderNo);
         if (Objects.isNull(shoppingOrder)) {

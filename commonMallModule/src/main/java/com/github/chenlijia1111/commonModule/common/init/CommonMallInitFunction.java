@@ -1,8 +1,12 @@
 package com.github.chenlijia1111.commonModule.common.init;
 
 import com.github.chenlijia1111.commonModule.common.pojo.CommonMallConstants;
+import com.github.chenlijia1111.commonModule.common.responseVo.order.DelayNotEvaluateOrder;
 import com.github.chenlijia1111.commonModule.common.responseVo.order.DelayNotPayOrder;
+import com.github.chenlijia1111.commonModule.common.responseVo.order.DelayNotReceiveOrder;
 import com.github.chenlijia1111.commonModule.common.schedules.AutoClearLimitVerifyCode;
+import com.github.chenlijia1111.commonModule.common.schedules.OrderAutoEvaluateTask;
+import com.github.chenlijia1111.commonModule.common.schedules.OrderAutoReceiveTask;
 import com.github.chenlijia1111.commonModule.common.schedules.OrderCancelTimeLimitTask;
 import com.github.chenlijia1111.commonModule.dao.*;
 import com.github.chenlijia1111.commonModule.service.impl.*;
@@ -43,7 +47,66 @@ public class CommonMallInitFunction implements ApplicationListener<ContextRefres
             addClearVerifyCodeTask();
             //初始化未支付的订单到延时队列进行处理
             initNotPayOrderList();
+            //初始化未评价的订单到延时队列进行处理
+            initNotEvaluateOrderList();
+            //初始化未收货，但是物流已经签收的订单到延时队列进行处理
+            initNotReceiveOrderList();
         }
+    }
+
+    /**
+     * 初始化未评价的订单到延时队列进行处理
+     */
+    private void initNotEvaluateOrderList() {
+        OrderAutoEvaluateTask orderAutoEvaluateTask = null;
+        try {
+            orderAutoEvaluateTask = SpringContextHolder.getBean(OrderAutoEvaluateTask.class);
+            if (Objects.nonNull(orderAutoEvaluateTask)) {
+                ShoppingOrderMapper shoppingOrderMapper = SpringContextHolder.getBean(ShoppingOrderMapper.class);
+                //查询已收货未评价的订单
+                List<DelayNotEvaluateOrder> delayNotEvaluateOrders = shoppingOrderMapper.listDelayNotEvaluateOrder();
+                if (Lists.isNotEmpty(delayNotEvaluateOrders)) {
+                    for (int i = 0; i < delayNotEvaluateOrders.size(); i++) {
+                        DelayNotEvaluateOrder delayNotEvaluateOrder = delayNotEvaluateOrders.get(i);
+                        orderAutoEvaluateTask.addNotReceiveOrder(delayNotEvaluateOrder.getOrderNo(), delayNotEvaluateOrder.getReceiveTime(), CommonMallConstants.NOT_EVALUATE_ORDER_LIMIT_MINUTES);
+                    }
+                }
+            }
+
+        } catch (Exception e) {
+            //没注入
+//            e.printStackTrace();
+        }
+
+
+    }
+
+
+    /**
+     * 初始化未收货，但是物流已经签收的订单到延时队列进行处理
+     */
+    private void initNotReceiveOrderList() {
+        OrderAutoReceiveTask orderAutoReceiveTask = null;
+        try {
+            orderAutoReceiveTask = SpringContextHolder.getBean(OrderAutoReceiveTask.class);
+            if (Objects.nonNull(orderAutoReceiveTask)) {
+                ShoppingOrderMapper shoppingOrderMapper = SpringContextHolder.getBean(ShoppingOrderMapper.class);
+                //查询已收货未评价的订单
+                List<DelayNotReceiveOrder> delayNotReceiveOrders = shoppingOrderMapper.listDelayNotReceiveOrder();
+                if (Lists.isNotEmpty(delayNotReceiveOrders)) {
+                    for (int i = 0; i < delayNotReceiveOrders.size(); i++) {
+                        DelayNotReceiveOrder delayNotReceiveOrder = delayNotReceiveOrders.get(i);
+                        orderAutoReceiveTask.addNotReceiveOrder(delayNotReceiveOrder.getOrderNo(), delayNotReceiveOrder.getSignTime(), CommonMallConstants.NOT_RECEIVE_ORDER_LIMIT_MINUTES);
+                    }
+                }
+            }
+
+        } catch (Exception e) {
+            //没注入
+//            e.printStackTrace();
+        }
+
+
     }
 
     /**
@@ -136,16 +199,16 @@ public class CommonMallInitFunction implements ApplicationListener<ContextRefres
     /**
      * 初始化未支付的订单到延时队列进行处理
      */
-    private void initNotPayOrderList(){
+    private void initNotPayOrderList() {
         try {
             OrderCancelTimeLimitTask task = SpringContextHolder.getBean(OrderCancelTimeLimitTask.class);
-            if(Objects.nonNull(task)){
+            if (Objects.nonNull(task)) {
                 ShoppingOrderMapper shoppingOrderMapper = SpringContextHolder.getBean(ShoppingOrderMapper.class);
                 List<DelayNotPayOrder> delayNotPayOrders = shoppingOrderMapper.listDelayNotPayOrder();
-                if(Lists.isNotEmpty(delayNotPayOrders)){
+                if (Lists.isNotEmpty(delayNotPayOrders)) {
                     for (int i = 0; i < delayNotPayOrders.size(); i++) {
                         DelayNotPayOrder delayNotPayOrder = delayNotPayOrders.get(i);
-                        task.addNotPayOrder(delayNotPayOrder.getGroupId(),delayNotPayOrder.getCreateTime(),
+                        task.addNotPayOrder(delayNotPayOrder.getGroupId(), delayNotPayOrder.getCreateTime(),
                                 CommonMallConstants.CANCEL_NOT_PAY_ORDER_LIMIT_MINUTES);
                     }
                 }

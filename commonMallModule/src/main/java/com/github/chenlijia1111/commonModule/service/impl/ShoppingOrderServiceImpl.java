@@ -9,6 +9,7 @@ import com.github.chenlijia1111.commonModule.entity.ReceivingGoodsOrder;
 import com.github.chenlijia1111.commonModule.entity.ShoppingOrder;
 import com.github.chenlijia1111.commonModule.service.ShoppingOrderServiceI;
 import com.github.chenlijia1111.utils.common.Result;
+import com.github.chenlijia1111.utils.common.constant.BooleanConstant;
 import com.github.chenlijia1111.utils.core.PropertyCheckUtil;
 import com.github.chenlijia1111.utils.core.StringUtils;
 import com.github.chenlijia1111.utils.list.Lists;
@@ -62,12 +63,13 @@ public class ShoppingOrderServiceImpl implements ShoppingOrderServiceI {
 
     /**
      * 批量添加购物单
+     *
      * @param shoppingOrderList
      * @return
      */
     @Override
     public Result batchAdd(List<ShoppingOrder> shoppingOrderList) {
-        if(Lists.isEmpty(shoppingOrderList)){
+        if (Lists.isEmpty(shoppingOrderList)) {
             return Result.failure("数据为空");
         }
 
@@ -149,7 +151,10 @@ public class ShoppingOrderServiceImpl implements ShoppingOrderServiceI {
                 Optional<ShoppingOrder> any = shoppingOrders.stream().filter(e -> Objects.equals(orderNo, e.getOrderNo())).findAny();
                 if (any.isPresent()) {
                     ShoppingOrder shoppingOrder = any.get();
+                    //订单状态
                     Integer state = shoppingOrder.getState();
+                    //完成状态
+                    Integer completeStatus = shoppingOrder.getCompleteStatus();
                     if (Objects.equals(state, CommonMallConstants.ORDER_INIT)) {
                         //初始状态
                         map.put(orderNo, OrderStatusEnum.INIT.getOrderStatus());
@@ -191,6 +196,10 @@ public class ShoppingOrderServiceImpl implements ShoppingOrderServiceI {
                                 }
                             }
                         }
+                    }
+                    if (Objects.equals(BooleanConstant.YES_INTEGER, completeStatus)) {
+                        //已完成
+                        map.put(orderNo, OrderStatusEnum.COMPLETED.getOrderStatus());
                     }
                 }
                 //没有找到,订单不存在
@@ -256,13 +265,14 @@ public class ShoppingOrderServiceImpl implements ShoppingOrderServiceI {
 
     /**
      * 更新
+     *
      * @param shoppingOrder
      * @param condition
      * @return
      */
     @Override
     public Result update(ShoppingOrder shoppingOrder, Example condition) {
-        if(Objects.nonNull(shoppingOrder) && Objects.nonNull(condition)){
+        if (Objects.nonNull(shoppingOrder) && Objects.nonNull(condition)) {
             int i = shoppingOrderMapper.updateByExampleSelective(shoppingOrder, condition);
             return i > 0 ? Result.success("操作成功") : Result.failure("操作失败");
         }

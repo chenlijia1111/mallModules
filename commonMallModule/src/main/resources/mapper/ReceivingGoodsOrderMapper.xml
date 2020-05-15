@@ -42,4 +42,16 @@
        #{receivingGoodsOrder.createTime})
     </foreach>
   </insert>
+  <select id="findReceiveOrderByOrderNo" resultMap="BaseResultMap">
+    SELECT
+    s_receiving_goods_order.order_no, s_receiving_goods_order.custom, s_receiving_goods_order.shops,
+    s_receiving_goods_order.state, s_receiving_goods_order.shopping_order,
+    s_receiving_goods_order.immediate_payment_order, s_receiving_goods_order.receive_time,
+    s_receiving_goods_order.rec_user, s_receiving_goods_order.front_order,
+    s_receiving_goods_order.create_time
+    FROM s_receiving_goods_order,s_immediate_payment_order
+    WHERE s_receiving_goods_order.front_order = s_immediate_payment_order.order_no
+      AND s_immediate_payment_order.front_order = #{orderNo}
+    LIMIT 1
+  </select>
 </mapper>

@@ -26,12 +26,14 @@
     <result column="shop_remarks" jdbcType="VARCHAR" property="shopRemarks" />
     <result column="delete_status" jdbcType="INTEGER" property="deleteStatus" />
     <result column="cancel_time" jdbcType="TIMESTAMP" property="cancelTime" />
+    <result column="complete_status" jdbcType="INTEGER" property="completeStatus" />
   </resultMap>
   <sql id="Base_Column_List">
     order_no, custom, shops, goods_id, count, state, order_type,
            product_amount_total, pay_channel, pay_record, transaction_id,
            good_price, order_amount_total, pay_time, details_json, shop_group_id,
-           group_id, payable, order_coupon, create_time, remarks, shop_remarks, delete_status,cancel_time
+           group_id, payable, order_coupon, create_time, remarks, shop_remarks,
+           delete_status,cancel_time,complete_status
   </sql>
   <select id="listByGroupIdSet" resultMap="BaseResultMap">
     SELECT
@@ -82,7 +84,7 @@
     INSERT INTO s_shopping_order (order_no, custom, shops, goods_id, count, state, order_type, product_amount_total,
                                   pay_channel, pay_record, transaction_id, good_price, order_amount_total, pay_time,
                                   details_json, shop_group_id, group_id, payable, order_coupon, create_time, remarks,
-                                  shop_remarks, delete_status) VALUES
+                                  shop_remarks, delete_status,cancel_time,complete_status) VALUES
     <foreach collection="shoppingOrderList" item="shoppingOrder" separator=",">
       (#{shoppingOrder.orderNo},#{shoppingOrder.custom},#{shoppingOrder.shops},#{shoppingOrder.goodsId},
        #{shoppingOrder.count},#{shoppingOrder.state},
@@ -91,7 +93,8 @@
        #{shoppingOrder.orderAmountTotal},#{shoppingOrder.payTime},#{shoppingOrder.detailsJson},
        #{shoppingOrder.shopGroupId},#{shoppingOrder.groupId},#{shoppingOrder.payable},
       #{shoppingOrder.orderCoupon},#{shoppingOrder.createTime},#{shoppingOrder.remarks},
-       #{shoppingOrder.shopRemarks},#{shoppingOrder.deleteStatus})
+       #{shoppingOrder.shopRemarks},#{shoppingOrder.deleteStatus},#{shoppingOrder.cancelTime},
+      #{shoppingOrder.completeStatus})
     </foreach>
   </insert>
   <select id="listDelayNotPayOrder" resultType="com.github.chenlijia1111.commonModule.common.responseVo.order.DelayNotPayOrder">
@@ -108,5 +111,31 @@
     FROM s_shopping_order
     WHERE s_shopping_order.group_id = #{groupId}
     LIMIT 1
+  </select>
+  <select id="listDelayNotEvaluateOrder"
+          resultType="com.github.chenlijia1111.commonModule.common.responseVo.order.DelayNotEvaluateOrder">
+    SELECT
+    s_shopping_order.order_no orderNo,s_receiving_goods_order.receive_time receiveTime
+    FROM s_immediate_payment_order,s_receiving_goods_order,s_shopping_order
+    WHERE s_immediate_payment_order.front_order = s_shopping_order.order_no
+    AND s_receiving_goods_order.front_order = s_immediate_payment_order.order_no
+    AND s_receiving_goods_order.state = 983042
+    AND NOT exists(
+        SELECT s_evaluation.id
+        FROM s_evaluation
+        WHERE s_evaluation.order_no = s_shopping_order.order_no
+        LIMIT 1
+    )
+  </select>
+  <select id="listDelayNotReceiveOrder"
+          resultType="com.github.chenlijia1111.commonModule.common.responseVo.order.DelayNotReceiveOrder">
+    SELECT
+      s_shopping_order.order_no orderNo,s_immediate_payment_order.express_sign_time signTime
+    FROM s_immediate_payment_order,s_receiving_goods_order,s_shopping_order
+    WHERE s_immediate_payment_order.front_order = s_shopping_order.order_no
+      AND s_receiving_goods_order.front_order = s_immediate_payment_order.order_no
+      AND s_immediate_payment_order.state = 983042
+      AND s_immediate_payment_order.express_sign_status = 1
+      AND s_receiving_goods_order.state = 0
   </select>
 </mapper>

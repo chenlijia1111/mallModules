@@ -320,6 +320,7 @@ public class ShopCarBiz {
 
         //进行修改
         originalShopCar.setGoodId(params.getGoodId());
+        originalShopCar.setGoodCount(params.getGoodCount());
 
         return shopCarService.update(originalShopCar);
     }
