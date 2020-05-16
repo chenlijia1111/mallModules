@@ -103,16 +103,18 @@ public interface ShoppingOrderServiceI {
     /**
      * 取消订单
      * @param groupId
+     * @param canCancelStatus 可以取消订单的状态
      * @return
      */
-    Result cancelOrder(String groupId);
+    Result cancelOrder(String groupId,List<Integer> canCancelStatus);
 
     /**
      * 根据订单编号取消订单
      * @param orderNo
+     * @param canCancelStatus 可以取消订单的状态
      * @return
      */
-    Result cancelOrderByOrderNo(String orderNo);
+    Result cancelOrderByOrderNo(String orderNo,List<Integer> canCancelStatus);
 
 
 }

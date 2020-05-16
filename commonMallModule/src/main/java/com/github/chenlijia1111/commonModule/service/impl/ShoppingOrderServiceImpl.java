@@ -282,10 +282,11 @@ public class ShoppingOrderServiceImpl implements ShoppingOrderServiceI {
      * 客户主动取消订单,只能是待支付或已完成的订单
      * 并且是组订单全部取消
      * @param groupId
+     * @param canCancelStatus 可以取消订单的状态
      * @return
      */
     @Override
-    public Result cancelOrder(String groupId) {
+    public Result cancelOrder(String groupId,List<Integer> canCancelStatus) {
         //组订单id为空
         if (StringUtils.isEmpty(groupId)) {
             return Result.failure("组订单id为空");
@@ -303,8 +304,8 @@ public class ShoppingOrderServiceImpl implements ShoppingOrderServiceI {
         //1初始化 2取消 3已付款 4已发货 5已收货 6已评价 7已完成
         Map<String, Integer> groupStateMap = findGroupStateByGroupIdSet(Sets.asSets(groupId));
         Integer groupState = groupStateMap.get(groupId);
-        if (!Lists.asList(OrderStatusEnum.INIT.getOrderStatus(),OrderStatusEnum.COMPLETED.getOrderStatus()).contains(groupState)) {
-            return Result.failure("只允许未付款或已完成的订单取消");
+        if (!canCancelStatus.contains(groupState)) {
+            return Result.failure("操作失败");
         }
 
         //取消订单
@@ -327,10 +328,11 @@ public class ShoppingOrderServiceImpl implements ShoppingOrderServiceI {
     /**
      * 根据订单编号取消订单
      * @param orderNo
+     * @param canCancelStatus 可以取消订单的状态
      * @return
      */
     @Override
-    public Result cancelOrderByOrderNo(String orderNo) {
+    public Result cancelOrderByOrderNo(String orderNo,List<Integer> canCancelStatus) {
         //订单id为空
         if (StringUtils.isEmpty(orderNo)) {
             return Result.failure("订单id为空");
@@ -346,8 +348,8 @@ public class ShoppingOrderServiceImpl implements ShoppingOrderServiceI {
         //1初始化 2取消 3已付款 4已发货 5已收货 6已评价 7已完成
         Map<String, Integer> orderStateMap = findOrderStateByOrderNoSet(Sets.asSets(orderNo));
         Integer orderStatus = orderStateMap.get(orderNo);
-        if (!Lists.asList(OrderStatusEnum.INIT.getOrderStatus(),OrderStatusEnum.COMPLETED.getOrderStatus()).contains(orderStatus)) {
-            return Result.failure("只允许未付款或已完成的订单取消");
+        if (!canCancelStatus.contains(orderStatus)) {
+            return Result.failure("操作失败");
         }
 
         //取消订单

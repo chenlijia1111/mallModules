@@ -453,12 +453,19 @@ public class ShoppingOrderBiz {
      * 客户主动取消订单,只能是待支付的订单
      * 并且是组订单全部取消
      *
-     * @param groupId 1
+     * @param groupId         1
+     * @param canCancelStatus 可以取消的订单状态
      * @return com.github.chenlijia1111.utils.common.Result
      * @since 下午 5:51 2019/11/22 0022
      **/
-    public Result customCancelOrder(String groupId) {
-        Result result = shoppingOrderService.cancelOrder(groupId);
+    public Result customCancelOrder(String groupId, List<Integer> canCancelStatus) {
+
+        //校验参数
+        if (StringUtils.isEmpty(groupId) || Lists.isEmpty(canCancelStatus)) {
+            return Result.failure("参数不合法");
+        }
+
+        Result result = shoppingOrderService.cancelOrder(groupId, canCancelStatus);
         if (result.getSuccess()) {
             //执行钩子函数
             try {
@@ -476,12 +483,19 @@ public class ShoppingOrderBiz {
      * 客户取消订单
      * 客户主动取消订单,只能是待支付或者已完成的订单
      *
-     * @param orderNo 1
+     * @param orderNo         1
+     * @param canCancelStatus 可以取消的订单状态
      * @return com.github.chenlijia1111.utils.common.Result
      * @since 下午 5:51 2019/11/22 0022
      **/
-    public Result customCancelOrderByOrderNo(String orderNo) {
-        Result result = shoppingOrderService.cancelOrderByOrderNo(orderNo);
+    public Result customCancelOrderByOrderNo(String orderNo, List<Integer> canCancelStatus) {
+
+        //校验参数
+        if (StringUtils.isEmpty(orderNo) || Lists.isEmpty(canCancelStatus)) {
+            return Result.failure("参数不合法");
+        }
+
+        Result result = shoppingOrderService.cancelOrderByOrderNo(orderNo, canCancelStatus);
         if (result.getSuccess()) {
             //执行钩子函数
             try {
