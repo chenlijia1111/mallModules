@@ -2,6 +2,8 @@ package com.github.chenlijia1111.commonModule.common.schedules;
 
 import com.github.chenlijia1111.commonModule.common.pojo.CommonMallConstants;
 import com.github.chenlijia1111.commonModule.dao.ReceivingGoodsOrderMapper;
+import com.github.chenlijia1111.commonModule.dao.ShoppingOrderMapper;
+import com.github.chenlijia1111.commonModule.entity.ImmediatePaymentOrder;
 import com.github.chenlijia1111.commonModule.entity.ReceivingGoodsOrder;
 import com.github.chenlijia1111.utils.core.StringUtils;
 import org.joda.time.DateTime;
@@ -20,6 +22,10 @@ import java.util.concurrent.TimeUnit;
  * <p>
  * 如果要使用的话就把他注入到spring中去
  * 在项目启动时，已经进行查询了待支付的订单进延时队列了，调用者不用自己实现，
+ * {@link ShoppingOrderMapper#listDelayNotReceiveOrder()} 查询已签收但是没收货的订单，
+ * 调用者需要定时查询物流状态，修改发货单的签收状态为已签收，并把数据放到延时队列
+ * {@link ImmediatePaymentOrder#getExpressSignStatus()}
+ * {@link ImmediatePaymentOrder#getExpressSignTime()}
  * 我会判断项目是否注入了这个实例，如果注入了才会去查询
  *
  * @author Chen LiJia
@@ -49,11 +55,17 @@ public class OrderAutoReceiveTask {
      */
     public void addNotReceiveOrder(String orderNo, Date signTime, Integer limitMinutes) {
         if (StringUtils.isNotEmpty(orderNo) && Objects.nonNull(signTime) && Objects.nonNull(limitMinutes)) {
+
             DelayNotReceiveOrder delayNotReceiveOrder = new DelayNotReceiveOrder();
             delayNotReceiveOrder.orderNo = orderNo;
             delayNotReceiveOrder.signTime = signTime;
             delayNotReceiveOrder.limitTime = new DateTime(signTime.getTime()).plusMinutes(limitMinutes).toDate();
-            notReceiveOrderList.put(delayNotReceiveOrder);
+
+            //判断这个orderNo是否已经是待处理了，如果已经存在就不重复处理了
+            boolean contains = notReceiveOrderList.contains(delayNotReceiveOrder);
+            if(!contains){
+                notReceiveOrderList.put(delayNotReceiveOrder);
+            }
         }
     }
 
@@ -78,6 +90,20 @@ public class OrderAutoReceiveTask {
          */
         private Date limitTime;
 
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            DelayNotReceiveOrder that = (DelayNotReceiveOrder) o;
+            return Objects.equals(orderNo, that.orderNo) &&
+                    Objects.equals(signTime, that.signTime) &&
+                    Objects.equals(limitTime, that.limitTime);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(orderNo, signTime, limitTime);
+        }
 
         /**
          * 核心方法，根据这个方法来延时等待
@@ -145,5 +171,6 @@ public class OrderAutoReceiveTask {
             }
         }
     }
+
 
 }

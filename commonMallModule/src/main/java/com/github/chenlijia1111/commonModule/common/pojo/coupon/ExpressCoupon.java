@@ -110,10 +110,26 @@ public class ExpressCoupon extends AbstractCoupon {
 
             }
             //按比例计算单个订单的
-            for (ShoppingOrder order : orderList) {
+            //防止除不均匀，最后一个算上除不尽的
+            Double sumExpressMoney = 0.0;
+            for (int i = 0; i < orderList.size(); i++) {
+                ShoppingOrder order = orderList.get(i);
                 Double orderAmountTotal = order.getOrderAmountTotal();
-                //这个订单的运费
-                double orderExpressMoney = effectMoney * (orderAmountTotal / allOrderAmountTotal);
+                //订单物流费
+                double orderExpressMoney = 0.0;
+                //这个订单的运费，如果订单金额为0，就直接平分
+                if (Objects.equals(allOrderAmountTotal, 0.0)) {
+                    orderExpressMoney = effectMoney * (1 / orderList.size());
+                } else {
+                    orderExpressMoney = effectMoney * (orderAmountTotal / allOrderAmountTotal);
+                }
+                sumExpressMoney += orderExpressMoney;
+                if (i == orderList.size() - 1) {
+                    //最后一个，看看有没有除尽
+                    if (sumExpressMoney < effectMoney) {
+                        orderExpressMoney += (effectMoney - sumExpressMoney);
+                    }
+                }
                 //保留两位小数
                 orderExpressMoney = NumberUtil.doubleToFixLengthDouble(orderExpressMoney, 2);
 

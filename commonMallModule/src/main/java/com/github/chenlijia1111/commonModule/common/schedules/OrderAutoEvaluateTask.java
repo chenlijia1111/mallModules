@@ -1,5 +1,6 @@
 package com.github.chenlijia1111.commonModule.common.schedules;
 
+import com.github.chenlijia1111.commonModule.common.pojo.IDGenerateFactory;
 import com.github.chenlijia1111.commonModule.common.responseVo.product.AdminProductVo;
 import com.github.chenlijia1111.commonModule.dao.EvaluationMapper;
 import com.github.chenlijia1111.commonModule.dao.GoodsMapper;
@@ -8,6 +9,7 @@ import com.github.chenlijia1111.commonModule.dao.ShoppingOrderMapper;
 import com.github.chenlijia1111.commonModule.entity.Evaluation;
 import com.github.chenlijia1111.commonModule.entity.ShoppingOrder;
 import com.github.chenlijia1111.utils.common.constant.BooleanConstant;
+import com.github.chenlijia1111.utils.core.IDUtil;
 import com.github.chenlijia1111.utils.core.JSONUtil;
 import com.github.chenlijia1111.utils.core.StringUtils;
 import com.github.chenlijia1111.utils.list.Lists;
@@ -185,7 +187,9 @@ public class OrderAutoEvaluateTask {
                             String detailsJson = shoppingOrder.getDetailsJson();
                             AdminProductVo adminProductVo = JSONUtil.strToObj(detailsJson, AdminProductVo.class);
                             //添加评价
-                            Evaluation evaluation = new Evaluation().setClientId(shoppingOrder.getCustom()).
+                            String evaluateId = String.valueOf(IDGenerateFactory.EVALUATION_ID_UTIL.nextId());
+                            Evaluation evaluation = new Evaluation().setId(evaluateId).
+                                    setClientId(shoppingOrder.getCustom()).
                                     setShopId(shoppingOrder.getShops()).
                                     setOrderNo(shoppingOrder.getOrderNo()).
                                     setGoodId(shoppingOrder.getGoodsId()).

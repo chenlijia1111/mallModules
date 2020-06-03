@@ -45,4 +45,11 @@ public interface ReceivingGoodsOrderMapper extends Mapper<ReceivingGoodsOrder> {
      */
     ReceivingGoodsOrder findReceiveOrderByOrderNo(@Param("orderNo") String orderNo);
 
+
+    /**
+     * 根据售后订单删除收货单
+     * @param returnNo
+     */
+    Integer deleteByReturnNo(@Param("returnNo") String returnNo);
+
 }

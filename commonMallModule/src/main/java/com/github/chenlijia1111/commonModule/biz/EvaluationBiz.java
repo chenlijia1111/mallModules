@@ -29,6 +29,9 @@ import java.util.stream.Collectors;
 
 /**
  * 评价表
+ * TODO
+ * 将要修改的东西
+ * 1.5新增是否启用状态 后台可以设置前端可以看到的评论
  *
  * @author chenLiJia
  * @since 2019-11-25 13:45:34
@@ -81,7 +84,7 @@ public class EvaluationBiz {
         }
 
         //如果是追评,判断父评价是否存在
-        if (Objects.nonNull(params.getParentEvalua())) {
+        if (StringUtils.isNotEmpty(params.getParentEvalua())) {
             Evaluation parentEvaluation = evaluationService.findById(params.getParentEvalua());
             if (Objects.isNull(parentEvaluation) || Objects.equals(BooleanConstant.YES_INTEGER, parentEvaluation.getDeleteStatus())) {
                 return Result.failure("父评价不存在");

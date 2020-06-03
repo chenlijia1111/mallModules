@@ -45,4 +45,10 @@ public interface ImmediatePaymentOrderMapper extends Mapper<ImmediatePaymentOrde
      */
     Integer batchAdd(@Param("immediatePaymentOrderList") List<ImmediatePaymentOrder> immediatePaymentOrderList);
 
+    /**
+     * 查询已经发货了还没有签收的发货单
+     * @return
+     */
+    List<ImmediatePaymentOrder> listNotReceiveSendOrder();
+
 }

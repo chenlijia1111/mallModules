@@ -77,4 +77,20 @@
       #{immediatePaymentOrder.expressSignTime})
     </foreach>
   </insert>
+    <select id="listNotReceiveSendOrder" resultMap="BaseResultMap">
+      SELECT
+      s_immediate_payment_order.order_no, s_immediate_payment_order.custom,
+      s_immediate_payment_order.shops, s_immediate_payment_order.state, s_immediate_payment_order.rec_user,
+      rec_tel, rec_addr, rec_province, rec_city, rec_area, star_user,
+      star_tel, star_addr, express_no, express_com, express_name,
+      s_immediate_payment_order.front_order, s_immediate_payment_order.shopping_order,
+      send_time, s_immediate_payment_order.create_time, express_sign_status, express_sign_time
+      FROM s_immediate_payment_order,s_receiving_goods_order
+      WHERE s_immediate_payment_order.order_no = s_receiving_goods_order.front_order
+      AND s_immediate_payment_order.state = 983042
+      AND s_immediate_payment_order.express_no IS NOT NULL
+      AND s_immediate_payment_order.express_com IS NOT NULL
+      AND s_receiving_goods_order.state = 0
+      AND s_immediate_payment_order.express_sign_status = 0
+    </select>
 </mapper>

@@ -4,6 +4,8 @@ import com.github.chenlijia1111.utils.common.Result;
 import com.github.chenlijia1111.commonModule.entity.ReturnGoodsOrder;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * 退货单
@@ -47,4 +49,33 @@ public interface ReturnGoodsOrderServiceI {
      * @return com.github.chenlijia1111.commonModule.entity.ReturnGoodsOrder
      **/
     ReturnGoodsOrder findByReturnNo(String returnNo);
+
+    /**
+     * 根据退货单号集合查询退货状态
+     * @param returnOrderNoSet
+     * @return
+     */
+    Map<String,Integer> findReturnStatusByReturnOrderNoSet(Set<String> returnOrderNoSet);
+
+    /**
+     * 根据订单编号集合查询退货状态
+     * @param orderNoSet
+     * @return
+     */
+    Map<String,Integer> findReturnStatusByOrderNoSet(Set<String> orderNoSet);
+
+    /**
+     * 根据订单编号查询售后信息
+     * @param orderNo
+     * @return
+     */
+    ReturnGoodsOrder findByOrderNo(String orderNo);
+
+    /**
+     * 根据售后订单集合查询售后订单列表
+     * @param returnOrderNoSet
+     * @return
+     */
+    List<ReturnGoodsOrder> listByReturnOrderNoSet(Set<String> returnOrderNoSet);
+
 }

@@ -49,4 +49,16 @@ public interface ImmediatePaymentOrderServiceI {
      **/
     List<ImmediatePaymentOrder> listByFrontNoSet(Set<String> frontNoSet);
 
+    /**
+     * 删除售后的发货单
+     * @param returnOrderNo
+     */
+    void deleteByReturnOrderNoSet(String returnOrderNo);
+
+    /**
+     * 查询已经发货了还没有签收的发货单
+     * @return
+     */
+    List<ImmediatePaymentOrder> listNotReceiveSendOrder();
+
 }

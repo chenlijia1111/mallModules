@@ -179,7 +179,8 @@ public class ShoppingOrderBiz {
                     setGroupId(groupId).
                     setCreateTime(currentTime).setRemarks(params.getRemarks()).
                     setDeleteStatus(BooleanConstant.NO_INTEGER).
-                    setCompleteStatus(BooleanConstant.NO_INTEGER);
+                    setCompleteStatus(BooleanConstant.NO_INTEGER).
+                    setOrderType(params.getOrderType());
 
             //订单快照
             AdminProductVo adminProductVo = productService.findAdminProductVoByProductId(goodVo.getProductId());
@@ -207,7 +208,8 @@ public class ShoppingOrderBiz {
                     setRecAddr(params.getRecAddr()).
                     setFrontOrder(orderNo).
                     setShoppingOrder(orderNo).
-                    setCreateTime(currentTime).setExpressSignStatus(BooleanConstant.NO_INTEGER);
+                    setCreateTime(currentTime).
+                    setExpressSignStatus(BooleanConstant.NO_INTEGER);
 
             shoppingOrder.setImmediatePaymentOrder(immediatePaymentOrder);
 
@@ -334,7 +336,7 @@ public class ShoppingOrderBiz {
         }
 
 
-        //组订单Id
+        //组订单Id 只做计算，不消耗实际id
         String groupId = String.valueOf(IDGenerateFactory.ORDER_ID_UTIL.nextId());
         //当前时间
         Date currentTime = new Date();
@@ -361,7 +363,7 @@ public class ShoppingOrderBiz {
                 return Result.failure("产品未上架");
             }
 
-            //订单编号
+            //订单编号 只做计算，不消耗实际id
             String orderNo = String.valueOf(IDGenerateFactory.ORDER_ID_UTIL.nextId());
 
             ShoppingOrder shoppingOrder = new ShoppingOrder().setOrderNo(orderNo).
@@ -370,11 +372,15 @@ public class ShoppingOrderBiz {
                     setGoodsId(goodId).
                     setCount(count).
                     setState(CommonMallConstants.ORDER_INIT).
+                    setOrderType(OrderTypeEnum.ORDINARY_ORDER.getType()).
                     setProductAmountTotal(goodVo.getPrice() * count).
+                    setGoodPrice(goodVo.getPrice()).
                     setOrderAmountTotal(goodVo.getPrice() * count).
                     setGroupId(groupId).
-                    setCreateTime(currentTime).
-                    setRemarks(params.getRemarks());
+                    setCreateTime(currentTime).setRemarks(params.getRemarks()).
+                    setDeleteStatus(BooleanConstant.NO_INTEGER).
+                    setCompleteStatus(BooleanConstant.NO_INTEGER).
+                    setOrderType(params.getOrderType());
 
             //订单快照
             AdminProductVo adminProductVo = productService.findAdminProductVoByProductId(goodVo.getProductId());
@@ -456,6 +462,7 @@ public class ShoppingOrderBiz {
      * @param groupId         1
      * @param canCancelStatus 可以取消的订单状态
      * @return com.github.chenlijia1111.utils.common.Result
+     * @see com.github.chenlijia1111.commonModule.common.enums.OrderStatusEnum
      * @since 下午 5:51 2019/11/22 0022
      **/
     public Result customCancelOrder(String groupId, List<Integer> canCancelStatus) {
@@ -486,6 +493,7 @@ public class ShoppingOrderBiz {
      * @param orderNo         1
      * @param canCancelStatus 可以取消的订单状态
      * @return com.github.chenlijia1111.utils.common.Result
+     * @see com.github.chenlijia1111.commonModule.common.enums.OrderStatusEnum
      * @since 下午 5:51 2019/11/22 0022
      **/
     public Result customCancelOrderByOrderNo(String orderNo, List<Integer> canCancelStatus) {
@@ -683,9 +691,16 @@ public class ShoppingOrderBiz {
      * 删除订单
      *
      * @param orderNo
+     * @param canDeleteOrderStatus 可以删除的订单状态
      * @return
+     * @see com.github.chenlijia1111.commonModule.common.enums.OrderStatusEnum
      */
-    public Result deleteOrder(String orderNo) {
+    public Result deleteOrder(String orderNo, List<Integer> canDeleteOrderStatus) {
+
+        //校验参数
+        if (StringUtils.isEmpty(orderNo) || Lists.isEmpty(canDeleteOrderStatus)) {
+            return Result.failure("参数不合法");
+        }
 
         ShoppingOrder shoppingOrder = shoppingOrderService.findByOrderNo(orderNo);
         if (Objects.isNull(shoppingOrder)) {
@@ -694,8 +709,8 @@ public class ShoppingOrderBiz {
 
         Map<String, Integer> orderStateMap = shoppingOrderService.findOrderStateByOrderNoSet(Sets.asSets(orderNo));
         Integer orderStatus = orderStateMap.get(orderNo);
-        if (!Lists.asList(2, 6).contains(orderStatus)) {
-            return Result.failure("只能删除已取消或者已完成的订单");
+        if (!canDeleteOrderStatus.contains(orderStatus)) {
+            return Result.failure("操作失败");
         }
 
         shoppingOrder.setDeleteStatus(BooleanConstant.YES_INTEGER);

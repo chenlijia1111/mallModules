@@ -2,7 +2,6 @@ package com.github.chenlijia1111.commonModule.service.impl;
 
 import com.github.chenlijia1111.commonModule.common.enums.OrderStatusEnum;
 import com.github.chenlijia1111.commonModule.common.pojo.CommonMallConstants;
-import com.github.chenlijia1111.commonModule.common.responseVo.product.GoodVo;
 import com.github.chenlijia1111.commonModule.dao.*;
 import com.github.chenlijia1111.commonModule.entity.*;
 import com.github.chenlijia1111.commonModule.service.ShoppingOrderServiceI;
@@ -281,12 +280,13 @@ public class ShoppingOrderServiceImpl implements ShoppingOrderServiceI {
      * 取消订单
      * 客户主动取消订单,只能是待支付或已完成的订单
      * 并且是组订单全部取消
+     *
      * @param groupId
      * @param canCancelStatus 可以取消订单的状态
      * @return
      */
     @Override
-    public Result cancelOrder(String groupId,List<Integer> canCancelStatus) {
+    public Result cancelOrder(String groupId, List<Integer> canCancelStatus) {
         //组订单id为空
         if (StringUtils.isEmpty(groupId)) {
             return Result.failure("组订单id为空");
@@ -327,12 +327,13 @@ public class ShoppingOrderServiceImpl implements ShoppingOrderServiceI {
 
     /**
      * 根据订单编号取消订单
+     *
      * @param orderNo
      * @param canCancelStatus 可以取消订单的状态
      * @return
      */
     @Override
-    public Result cancelOrderByOrderNo(String orderNo,List<Integer> canCancelStatus) {
+    public Result cancelOrderByOrderNo(String orderNo, List<Integer> canCancelStatus) {
         //订单id为空
         if (StringUtils.isEmpty(orderNo)) {
             return Result.failure("订单id为空");
@@ -340,7 +341,7 @@ public class ShoppingOrderServiceImpl implements ShoppingOrderServiceI {
 
         //查询订单是否存在
         ShoppingOrder shoppingOrder = shoppingOrderMapper.selectByPrimaryKey(orderNo);
-        if(Objects.isNull(shoppingOrder)){
+        if (Objects.isNull(shoppingOrder)) {
             return Result.failure("数据不存在");
         }
 
@@ -364,5 +365,34 @@ public class ShoppingOrderServiceImpl implements ShoppingOrderServiceI {
             goodsMapper.updateByPrimaryKeySelective(goodVo);
         }
         return Result.success("操作成功");
+    }
+
+
+    /**
+     * 根据订单编号集合查询订单集合
+     *
+     * @param orderNoSet
+     * @return
+     */
+    @Override
+    public List<ShoppingOrder> listByOrderNoSet(Set<String> orderNoSet) {
+        if (Sets.isNotEmpty(orderNoSet)) {
+            return shoppingOrderMapper.listByOrderNoSet(orderNoSet);
+        }
+        return new ArrayList<>();
+    }
+
+    /**
+     * 条件查询
+     *
+     * @param condition
+     * @return
+     */
+    @Override
+    public List<ShoppingOrder> listByCondition(Example condition) {
+        if (Objects.nonNull(condition)) {
+            return shoppingOrderMapper.selectByExample(condition);
+        }
+        return new ArrayList<>();
     }
 }

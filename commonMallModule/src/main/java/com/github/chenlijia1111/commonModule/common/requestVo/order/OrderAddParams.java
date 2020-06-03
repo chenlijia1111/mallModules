@@ -100,5 +100,12 @@ public class OrderAddParams {
     @ApiModelProperty(value = "优惠券id集合以及优惠券在当前订单中对应的作用的商品id")
     private List<CouponWithGoodIds> couponWithGoodIdsList;
 
+    /**
+     * 订单类型
+     * 调用者用于自定义订单类型，便于区分不同订单
+     */
+    @ApiModelProperty(value = "订单类型")
+    private Integer orderType;
+
 
 }

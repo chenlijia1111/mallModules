@@ -2,6 +2,7 @@ package com.github.chenlijia1111.commonModule.service.impl;
 
 import com.github.chenlijia1111.commonModule.common.pojo.CommonMallConstants;
 import com.github.chenlijia1111.utils.common.Result;
+import com.github.chenlijia1111.utils.core.StringUtils;
 import com.github.chenlijia1111.utils.list.Lists;
 import com.github.chenlijia1111.utils.list.Sets;
 import com.github.chenlijia1111.commonModule.dao.ReceivingGoodsOrderMapper;
@@ -43,12 +44,13 @@ public class ReceivingGoodsOrderServiceImpl implements ReceivingGoodsOrderServic
 
     /**
      * 批量添加
+     *
      * @param receivingGoodsOrderList
      * @return
      */
     @Override
     public Result batchAdd(List<ReceivingGoodsOrder> receivingGoodsOrderList) {
-        if(Lists.isEmpty(receivingGoodsOrderList)){
+        if (Lists.isEmpty(receivingGoodsOrderList)) {
             return Result.failure("数据为空");
         }
 
@@ -87,5 +89,15 @@ public class ReceivingGoodsOrderServiceImpl implements ReceivingGoodsOrderServic
         return Lists.newArrayList();
     }
 
-
+    /**
+     * 根据售后订单删除收货单
+     *
+     * @param returnNo
+     */
+    @Override
+    public void deleteByReturnNo(String returnNo) {
+        if (StringUtils.isNotEmpty(returnNo)) {
+            receivingGoodsOrderMapper.deleteByReturnNo(returnNo);
+        }
+    }
 }

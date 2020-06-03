@@ -49,4 +49,10 @@ public interface ReceivingGoodsOrderServiceI {
      * @since 上午 10:00 2019/11/8 0008
      **/
     List<ReceivingGoodsOrder> listByFrontNoSet(Set<String> frontNoSet);
+
+    /**
+     * 根据售后订单删除收货单
+     * @param returnNo
+     */
+    void deleteByReturnNo(String returnNo);
 }

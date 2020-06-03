@@ -30,6 +30,8 @@ import java.util.*;
  * 在查询订单的退货状态的时候都是直接根据最后一个退货单的状态来进行判断的
  * 对于发货、收货，对于大部分的商城来说，这个发货收货都是可有可无，
  * 可以在线下沟通完成
+ * <p>
+ * 申请售后的时候判断之前有没有申请过售后，如果申请过就直接是修改信息
  *
  * @author chenlijia
  * @version 1.0
@@ -75,19 +77,29 @@ public class ReturnOrderBiz {
         //判断订单的状态,之后已收货的订单才可以申请退货退款
         Map<String, Integer> orderStateMap = shoppingOrderService.findOrderStateByOrderNoSet(Sets.asSets(params.getOrderNo()));
         Integer orderStatus = orderStateMap.get(params.getOrderNo());
+        //待发货可以申请售后
         //不合法的订单状态
         List<Integer> illegalStatus = Lists.asList(OrderStatusEnum.INIT.getOrderStatus(),
                 OrderStatusEnum.CANCEL.getOrderStatus(),
-                OrderStatusEnum.PAYED.getOrderStatus(),
-                OrderStatusEnum.SEND.getOrderStatus());
+                OrderStatusEnum.PAYED.getOrderStatus());
         if (illegalStatus.contains(orderStatus)) {
             return Result.failure("订单不合法,只有已收货的订单才可以退货退款");
         }
 
         Date currentTime = new Date();
 
+        //查询之前有没有售后，如果已经有了，就是修改
+        ReturnGoodsOrder originalReturnOrder = returnGoodsOrderService.findByOrderNo(params.getOrderNo());
+        if (Objects.nonNull(originalReturnOrder)) {
+            //删除收货单
+            receivingGoodsOrderService.deleteByReturnNo(originalReturnOrder.getReOrderNo());
+            //删除发货单
+            immediatePaymentOrderService.deleteByReturnOrderNoSet(originalReturnOrder.getReOrderNo());
+        }
+
+
         //退货单
-        String returnNo = returnOrderNoGenerator.createOrderNo();
+        String returnNo = Objects.isNull(originalReturnOrder) ? returnOrderNoGenerator.createOrderNo() : originalReturnOrder.getReOrderNo();
         ReturnGoodsOrder returnGoodsOrder = new ReturnGoodsOrder().
                 setReOrderNo(returnNo).
                 setCustom(order.getCustom()).
@@ -103,7 +115,12 @@ public class ReturnOrderBiz {
                 setState(CommonMallConstants.ORDER_INIT).
                 setReType(ReturnTypeEnum.RETURN_GOOD_AND_MONEY.getReturnType()).
                 setDeleteStatus(BooleanConstant.NO_INTEGER);
-        returnGoodsOrderService.add(returnGoodsOrder);
+        if(Objects.nonNull(originalReturnOrder)){
+            returnGoodsOrderService.update(returnGoodsOrder);
+        }else {
+            returnGoodsOrderService.add(returnGoodsOrder);
+        }
+
 
         //添加发货单
         //发货单单号
@@ -115,7 +132,8 @@ public class ReturnOrderBiz {
                 setState(CommonMallConstants.ORDER_INIT).
                 setFrontOrder(returnNo).
                 setShoppingOrder(order.getOrderNo()).
-                setCreateTime(currentTime);
+                setCreateTime(currentTime).
+                setExpressSignStatus(BooleanConstant.NO_INTEGER);
         immediatePaymentOrderService.add(immediatePaymentOrder);
 
         //添加收货单
@@ -132,7 +150,7 @@ public class ReturnOrderBiz {
                 setCreateTime(currentTime);
         receivingGoodsOrderService.add(receivingGoodsOrder);
 
-        return Result.success("操作成功",returnNo);
+        return Result.success("操作成功", returnNo);
     }
 
     /**
@@ -162,18 +180,27 @@ public class ReturnOrderBiz {
         Map<String, Integer> orderStateMap = shoppingOrderService.findOrderStateByOrderNoSet(Sets.asSets(params.getOrderNo()));
         Integer orderStatus = orderStateMap.get(params.getOrderNo());
         //不合法的订单状态
+        //待发货可以售后
         List<Integer> illegalStatus = Lists.asList(OrderStatusEnum.INIT.getOrderStatus(),
                 OrderStatusEnum.CANCEL.getOrderStatus(),
-                OrderStatusEnum.PAYED.getOrderStatus(),
-                OrderStatusEnum.SEND.getOrderStatus());
+                OrderStatusEnum.PAYED.getOrderStatus());
         if (illegalStatus.contains(orderStatus)) {
             return Result.failure("订单不合法,只有已收货的订单才可以退货");
         }
 
         Date currentTime = new Date();
+        //查询之前有没有售后，如果已经有了，就是修改
+        ReturnGoodsOrder originalReturnOrder = returnGoodsOrderService.findByOrderNo(params.getOrderNo());
+        if (Objects.nonNull(originalReturnOrder)) {
+            //删除收货单
+            receivingGoodsOrderService.deleteByReturnNo(originalReturnOrder.getReOrderNo());
+            //删除发货单
+            immediatePaymentOrderService.deleteByReturnOrderNoSet(originalReturnOrder.getReOrderNo());
+        }
+
 
         //退货单
-        String returnNo = returnOrderNoGenerator.createOrderNo();
+        String returnNo = Objects.isNull(originalReturnOrder) ? returnOrderNoGenerator.createOrderNo() : originalReturnOrder.getReOrderNo();
         ReturnGoodsOrder returnGoodsOrder = new ReturnGoodsOrder().
                 setReOrderNo(returnNo).
                 setCustom(order.getCustom()).
@@ -189,7 +216,12 @@ public class ReturnOrderBiz {
                 setState(CommonMallConstants.ORDER_INIT).
                 setReType(ReturnTypeEnum.RETURN_GOOD.getReturnType()).
                 setDeleteStatus(BooleanConstant.NO_INTEGER);
-        returnGoodsOrderService.add(returnGoodsOrder);
+
+        if(Objects.nonNull(originalReturnOrder)){
+            returnGoodsOrderService.update(returnGoodsOrder);
+        }else {
+            returnGoodsOrderService.add(returnGoodsOrder);
+        }
 
         //添加发货单
         //发货单单号
@@ -201,7 +233,8 @@ public class ReturnOrderBiz {
                 setState(CommonMallConstants.ORDER_INIT).
                 setFrontOrder(returnNo).
                 setShoppingOrder(order.getOrderNo()).
-                setCreateTime(currentTime);
+                setCreateTime(currentTime).
+                setExpressSignStatus(BooleanConstant.NO_INTEGER);
         immediatePaymentOrderService.add(immediatePaymentOrder);
 
         //添加收货单
@@ -218,7 +251,7 @@ public class ReturnOrderBiz {
                 setCreateTime(currentTime);
         receivingGoodsOrderService.add(receivingGoodsOrder);
 
-        return Result.success("操作成功",returnNo);
+        return Result.success("操作成功", returnNo);
     }
 
     /**
@@ -245,6 +278,7 @@ public class ReturnOrderBiz {
         Map<String, Integer> orderStateMap = shoppingOrderService.findOrderStateByOrderNoSet(Sets.asSets(params.getOrderNo()));
         Integer orderStatus = orderStateMap.get(params.getOrderNo());
         //不合法的订单状态
+        //待发货可以售后
         List<Integer> illegalStatus = Lists.asList(OrderStatusEnum.INIT.getOrderStatus(),
                 OrderStatusEnum.CANCEL.getOrderStatus(),
                 OrderStatusEnum.PAYED.getOrderStatus());
@@ -253,9 +287,18 @@ public class ReturnOrderBiz {
         }
 
         Date currentTime = new Date();
+        //查询之前有没有售后，如果已经有了，就是修改
+        ReturnGoodsOrder originalReturnOrder = returnGoodsOrderService.findByOrderNo(params.getOrderNo());
+        if (Objects.nonNull(originalReturnOrder)) {
+            //删除收货单
+            receivingGoodsOrderService.deleteByReturnNo(originalReturnOrder.getReOrderNo());
+            //删除发货单
+            immediatePaymentOrderService.deleteByReturnOrderNoSet(originalReturnOrder.getReOrderNo());
+        }
+
 
         //退货单
-        String returnNo = returnOrderNoGenerator.createOrderNo();
+        String returnNo = Objects.isNull(originalReturnOrder) ? returnOrderNoGenerator.createOrderNo() : originalReturnOrder.getReOrderNo();
         ReturnGoodsOrder returnGoodsOrder = new ReturnGoodsOrder().
                 setReOrderNo(returnNo).
                 setCustom(order.getCustom()).
@@ -271,8 +314,12 @@ public class ReturnOrderBiz {
                 setState(CommonMallConstants.ORDER_INIT).
                 setReType(ReturnTypeEnum.RETURN_MONEY.getReturnType()).
                 setDeleteStatus(BooleanConstant.NO_INTEGER);
-        returnGoodsOrderService.add(returnGoodsOrder);
-        return Result.success("操作成功",returnNo);
+        if(Objects.nonNull(originalReturnOrder)){
+            returnGoodsOrderService.update(returnGoodsOrder);
+        }else {
+            returnGoodsOrderService.add(returnGoodsOrder);
+        }
+        return Result.success("操作成功", returnNo);
     }
 
     /**

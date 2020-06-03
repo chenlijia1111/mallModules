@@ -116,5 +116,19 @@ public interface ShoppingOrderServiceI {
      */
     Result cancelOrderByOrderNo(String orderNo,List<Integer> canCancelStatus);
 
+    /**
+     * 根据订单编号集合查询订单集合
+     * @param orderNoSet
+     * @return
+     */
+    List<ShoppingOrder> listByOrderNoSet(Set<String> orderNoSet);
+
+    /**
+     * 条件查询
+     * @param condition
+     * @return
+     */
+    List<ShoppingOrder> listByCondition(Example condition);
+
 
 }

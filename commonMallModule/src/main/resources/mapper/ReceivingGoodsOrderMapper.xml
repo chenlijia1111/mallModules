@@ -54,4 +54,17 @@
       AND s_immediate_payment_order.front_order = #{orderNo}
     LIMIT 1
   </select>
+  <delete id="deleteByReturnNo">
+    DELETE
+    FROM s_receiving_goods_order
+    WHERE exists(
+            SELECT  s_immediate_payment_order.order_no
+            FROM s_immediate_payment_order,s_return_goods_order
+            WHERE s_immediate_payment_order.front_order = s_return_goods_order.re_order_no
+            AND s_immediate_payment_order.order_no =  s_receiving_goods_order.front_order
+            AND s_return_goods_order.re_order_no = #{returnNo}
+            LIMIT 1
+            )
+  </delete>
+
 </mapper>

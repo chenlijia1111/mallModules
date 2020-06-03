@@ -208,7 +208,7 @@ public class ImmediatePaymentOrder {
     @ApiModelProperty("物流签收时间 通过物流api查询")
     @PropertyCheck(name = "物流签收时间")
     @Column(name = "express_sign_time")
-    private Integer expressSignTime;
+    private Date expressSignTime;
 
     /**
      * 发货单对应的收货单
