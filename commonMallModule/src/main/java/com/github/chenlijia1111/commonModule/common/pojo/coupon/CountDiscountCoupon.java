@@ -83,6 +83,7 @@ public class CountDiscountCoupon extends AbstractCoupon {
                     effectMoney = NumberUtil.doubleToFixLengthDouble(effectMoney, 2);
                     this.setEffectiveMoney(effectMoney);
                     couponList.add(this);
+                    order.setCouponList(couponList);
                 }
             }
         }

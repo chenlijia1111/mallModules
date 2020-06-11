@@ -74,6 +74,10 @@ public class CountSubCoupon extends AbstractCoupon{
                 //享受折扣
                 //这些订单总共优惠的金额
                 effectMoney = this.getSubMoney();
+                //如果总价格小于优惠抵扣价格，赋值为总价格
+                if(allOrderAmountTotal < effectMoney){
+                    effectMoney = allOrderAmountTotal;
+                }
                 //按比例计算单个订单优惠了多少钱
                 for (ShoppingOrder order : orderList) {
                     Double orderAmountTotal = order.getOrderAmountTotal();

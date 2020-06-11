@@ -143,6 +143,7 @@ public class ExpressCoupon extends AbstractCoupon {
                 List<AbstractCoupon> couponList = order.getCouponList();
                 this.setEffectiveMoney(orderExpressMoney);
                 couponList.add(this);
+                order.setCouponList(couponList);
             }
         }
         return effectMoney;

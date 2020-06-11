@@ -280,10 +280,9 @@ public class ReturnOrderBiz {
         //不合法的订单状态
         //待发货可以售后
         List<Integer> illegalStatus = Lists.asList(OrderStatusEnum.INIT.getOrderStatus(),
-                OrderStatusEnum.CANCEL.getOrderStatus(),
-                OrderStatusEnum.PAYED.getOrderStatus());
+                OrderStatusEnum.CANCEL.getOrderStatus());
         if (illegalStatus.contains(orderStatus)) {
-            return Result.failure("订单不合法,只有已付款的订单才可以退货");
+            return Result.failure("订单不合法,只有已付款的订单才可以退款");
         }
 
         Date currentTime = new Date();

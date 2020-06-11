@@ -70,19 +70,20 @@ public class PriceDiscountCoupon extends AbstractCoupon{
                 for (ShoppingOrder order : orderList) {
                     Double orderAmountTotal = order.getOrderAmountTotal();
                     //优惠之后的订单金额
-                    double v = orderAmountTotal * this.getDiscount();
+                    double subAfterOrderAmount = orderAmountTotal * this.getDiscount();
+                    subAfterOrderAmount = NumberUtil.doubleToFixLengthDouble(subAfterOrderAmount, 2);
                     //优惠的金额
-                    double subMoney = orderAmountTotal - v;
+                    double subMoney = orderAmountTotal - subAfterOrderAmount;
                     //保留两位小数
                     subMoney = NumberUtil.doubleToFixLengthDouble(subMoney, 2);
                     //保留两位小数
-                    v = NumberUtil.doubleToFixLengthDouble(v, 2);
-                    order.setOrderAmountTotal(v);
+                    order.setOrderAmountTotal(subAfterOrderAmount);
 
                     //添加当前的优惠券进去
                     List<AbstractCoupon> couponList = order.getCouponList();
                     this.setEffectiveMoney(subMoney);
                     couponList.add(this);
+                    order.setCouponList(couponList);
                 }
             }
         }

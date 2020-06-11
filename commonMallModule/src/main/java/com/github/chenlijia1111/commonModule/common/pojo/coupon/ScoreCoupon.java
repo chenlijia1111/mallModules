@@ -126,6 +126,7 @@ public class ScoreCoupon extends AbstractCoupon {
                     List<AbstractCoupon> couponList = order.getCouponList();
                     this.setEffectiveMoney(orderSubMoney);
                     couponList.add(this);
+                    order.setCouponList(couponList);
                 }
             }
         }
