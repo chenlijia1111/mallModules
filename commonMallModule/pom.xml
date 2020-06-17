@@ -15,6 +15,7 @@
 
     <properties>
         <java.version>1.8</java.version>
+        <jsoup.version>1.13.1</jsoup.version>
     </properties>
     <dependencies>
         <!--工具类-->
@@ -86,6 +87,11 @@
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jsoup</groupId>
+            <artifactId>jsoup</artifactId>
+            <version>${jsoup.version}</version>
         </dependency>
     </dependencies>
 

@@ -492,6 +492,7 @@ public class ProductBiz {
         return Result.success("操作成功");
     }
 
+    //-------------------------------------为前端构建规格信息 V1------------------------------------
 
     /**
      * 添加产品时根据产品规格信息构建sku
@@ -693,6 +694,215 @@ public class ProductBiz {
 
         return null;
     }
+
+    //-------------------------------------为前端构建规格信息 V1------------------------------------
+
+
+    //-------------------------------------为前端构建规格信息 V2   返回添加商品参数，前端无需转换------------------------------------
+
+    /**
+     * 添加产品时根据产品规格信息构建sku
+     * 供前端调用
+     * 2020-06-17 直接返回添加参数供前端使用，前端无需转换
+     *
+     * @param productSpecParamsList
+     * @return
+     */
+    public Result releaseProductSkuVoV2(List<ProductSpecParams> productSpecParamsList) {
+
+        //校验一下数据
+        if (Lists.isEmpty(productSpecParamsList)) {
+            return Result.failure("产品参数为空");
+        }
+        for (ProductSpecParams productSpecParams : productSpecParamsList) {
+            String specName = productSpecParams.getSpecName();
+            if (StringUtils.isEmpty(specName)) {
+                return Result.failure("规格名称为空");
+            }
+            List<ProductSpecValueParams> specValueList = productSpecParams.getSpecValueList();
+            if (Lists.isEmpty(specValueList)) {
+                return Result.failure("规格值数组为空");
+            }
+        }
+
+        List<GoodAddParams> list = releaseProductSkuSpecVoV2(productSpecParamsList);
+
+        return Result.success("查询成功", list);
+    }
+
+
+    /**
+     * 根据产品规格为前端构建sku信息
+     * 2020-06-17 直接返回添加参数供前端使用，前端无需转换
+     *
+     * @param productSpecParamsList
+     * @return
+     */
+    public List<GoodAddParams> releaseProductSkuSpecVoV2(List<ProductSpecParams> productSpecParamsList) {
+
+        List<GoodAddParams> list = new ArrayList<>();
+
+        if (Lists.isNotEmpty(productSpecParamsList)) {
+            //开始构建
+
+            for (int i = 0; i < productSpecParamsList.size(); i++) {
+
+                ProductSpecParams productSpecParams = productSpecParamsList.get(i);
+                String specName = productSpecParams.getSpecName();
+                List<ProductSpecValueParams> specValueList = productSpecParams.getSpecValueList();
+
+                if (i == 0) {
+                    for (int j = 0; j < specValueList.size(); j++) {
+                        //第一个规格,直接创建
+                        ProductSpecValueParams specValueParams = specValueList.get(j);
+
+                        GoodAddParams goodAddParams = new GoodAddParams();
+
+                        List<GoodSpecParams> goodSpecParamsList = new ArrayList<>();
+                        GoodSpecParams goodSpecParams = releaseReleaseProductSkuSpecVoV2(specName, specValueParams);
+                        goodSpecParamsList.add(goodSpecParams);
+
+                        goodAddParams.setGoodSpecParamsList(goodSpecParamsList);
+
+                        list.add(goodAddParams);
+
+                    }
+                } else {
+                    //不是第一个就直接在直接的基础上拼接即可
+                    List<GoodAddParams> copyList = list.stream().collect(Collectors.toList());
+                    list.clear();
+
+                    for (GoodAddParams goodAddParams : copyList) {
+                        for (int j = 0; j < specValueList.size(); j++) {
+
+                            GoodAddParams goodAddParams1 = new GoodAddParams();
+
+                            ProductSpecValueParams specValueParams = specValueList.get(j);
+                            GoodSpecParams goodSpecParams = releaseReleaseProductSkuSpecVoV2(specName, specValueParams);
+                            List<GoodSpecParams> collect = goodAddParams.getGoodSpecParamsList().stream().collect(Collectors.toList());
+                            collect.add(goodSpecParams);
+
+                            goodAddParams1.setGoodSpecParamsList(collect);
+
+                            list.add(goodAddParams1);
+
+                        }
+                    }
+
+                }
+            }
+            return list;
+        }
+
+        return list;
+    }
+
+
+    /**
+     * 构建sku单个属性信息
+     * 2020-06-17 直接返回添加参数供前端使用，前端无需转换
+     *
+     * @param specName
+     * @param productSpecValueParams
+     * @return
+     */
+    private GoodSpecParams releaseReleaseProductSkuSpecVoV2(String specName, ProductSpecValueParams productSpecValueParams) {
+        GoodSpecParams goodSpecParams = new GoodSpecParams();
+        goodSpecParams.setSpecName(specName);
+        goodSpecParams.setSpecValue(productSpecValueParams.getValue());
+        goodSpecParams.setSpecImageValue(productSpecValueParams.getImageValue());
+        return goodSpecParams;
+    }
+
+    /**
+     * 修改产品时根据产品规格信息构建sku
+     * 供前端调用
+     * 2020-06-17 直接返回添加参数供前端使用，前端无需转换
+     *
+     * @param params
+     * @return
+     */
+    public Result releaseUpdateProductSkuVoV2(ReleaseUpdateProductSkuParams params) {
+        List<ProductSpecParams> productSpecParamsList = params.getProductSpecParamsList();
+
+        //校验一下数据
+        if (Objects.isNull(params.getProductId())) {
+            return Result.failure("产品id为空");
+        }
+        if (Lists.isEmpty(productSpecParamsList)) {
+            return Result.failure("产品参数为空");
+        }
+        for (ProductSpecParams productSpecParams : productSpecParamsList) {
+            String specName = productSpecParams.getSpecName();
+            if (StringUtils.isEmpty(specName)) {
+                return Result.failure("规格名称为空");
+            }
+            List<ProductSpecValueParams> specValueList = productSpecParams.getSpecValueList();
+            if (Lists.isEmpty(specValueList)) {
+                return Result.failure("规格值数组为空");
+            }
+        }
+
+        List<GoodAddParams> list = releaseProductSkuSpecVoV2(productSpecParamsList);
+
+        //查询这个商品信息
+        AdminProductVo adminProductVo = productService.findAdminProductVoByProductId(params.getProductId());
+        List<GoodVo> goodVoList = adminProductVo.getGoodVoList();
+
+        for (GoodAddParams goodAddParams : list) {
+            GoodVo matchGoodVo = findMatchGoodVoV2(goodAddParams, goodVoList);
+            if (Objects.nonNull(matchGoodVo)) {
+                //找到了对应的商品 赋值价格 库存
+                goodAddParams.setPrice(matchGoodVo.getPrice());
+                goodAddParams.setVipPrice(matchGoodVo.getVipPrice());
+                goodAddParams.setMarketPrice(matchGoodVo.getMarketPrice());
+                goodAddParams.setStockCount(matchGoodVo.getStockCount());
+            }
+        }
+
+        return Result.success("查询成功", list);
+    }
+
+
+    /**
+     * 查询规格所匹配到的商品信息
+     * 2020-06-17 直接返回添加参数供前端使用，前端无需转换
+     *
+     * @param goodAddParams
+     * @param goodVoList
+     * @return
+     */
+    private GoodVo findMatchGoodVoV2(GoodAddParams goodAddParams, List<GoodVo> goodVoList) {
+
+        //如果规格的数量相同 且 都能再 goodsVo里面找到 那就是这个商品了
+        List<GoodSpecParams> goodSpecParamsList = goodAddParams.getGoodSpecParamsList();
+        for (GoodVo goodVo : goodVoList) {
+            List<GoodSpecVo> goodSpecVoList = goodVo.getGoodSpecVoList();
+            if (goodSpecParamsList.size() != goodSpecVoList.size()) {
+                continue;
+            }
+
+            for (int i = 0; i < goodSpecVoList.size(); i++) {
+                GoodSpecVo specVo = goodSpecVoList.get(i);
+                String specName = specVo.getSpecName();
+                String specValue = specVo.getSpecValue();
+                Optional<GoodSpecParams> any = goodSpecParamsList.stream().filter(e -> StringUtils.equalsIgnoreBlank(e.getSpecName(), specName) && StringUtils.equalsIgnoreBlank(e.getSpecValue(), specValue)).findAny();
+                if (!any.isPresent()) {
+                    //有一个没找到 直接结束循环 去判断下一个商品
+                    break;
+                }
+
+                //到了最后一个了 说明就是匹配到的 good 对象
+                if (i == goodSpecVoList.size() - 1) {
+                    //找到了
+                    return goodVo;
+                }
+            }
+        }
+
+        return null;
+    }
+
 
 
 }
