@@ -4,7 +4,9 @@ import com.github.chenlijia1111.commonModule.common.enums.OrderStatusEnum;
 import com.github.chenlijia1111.commonModule.common.pojo.CommonMallConstants;
 import com.github.chenlijia1111.commonModule.dao.*;
 import com.github.chenlijia1111.commonModule.entity.*;
+import com.github.chenlijia1111.commonModule.service.IFindOrderStateHook;
 import com.github.chenlijia1111.commonModule.service.ShoppingOrderServiceI;
+import com.github.chenlijia1111.commonModule.utils.SpringContextHolder;
 import com.github.chenlijia1111.utils.common.Result;
 import com.github.chenlijia1111.utils.common.constant.BooleanConstant;
 import com.github.chenlijia1111.utils.core.PropertyCheckUtil;
@@ -203,6 +205,13 @@ public class ShoppingOrderServiceImpl implements ShoppingOrderServiceI {
             }
         }
 
+        //执行钩子函数
+        try {
+            IFindOrderStateHook findOrderStateHook = SpringContextHolder.getBean(IFindOrderStateHook.class);
+            map = findOrderStateHook.findOrderStateByOrderNoSet(orderNoSet, map);
+        } catch (Exception e) {
+        }
+
         return map;
     }
 
@@ -239,6 +248,13 @@ public class ShoppingOrderServiceImpl implements ShoppingOrderServiceI {
                     map.put(groupId, minStatus.get());
                 }
             }
+        }
+
+        //执行钩子函数
+        try {
+            IFindOrderStateHook findOrderStateHook = SpringContextHolder.getBean(IFindOrderStateHook.class);
+            map = findOrderStateHook.findGroupStateByGroupIdSet(groupIdSet, map);
+        } catch (Exception e) {
         }
 
         return map;
