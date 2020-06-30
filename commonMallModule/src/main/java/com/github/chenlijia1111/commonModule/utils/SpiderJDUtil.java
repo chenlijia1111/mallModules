@@ -133,9 +133,9 @@ public class SpiderJDUtil {
                     if (Lists.isNotEmpty(goodAddParams)) {
                         //默认值
                         for (GoodAddParams goodAddParam : goodAddParams) {
-                            goodAddParam.setPrice(100.0);
-                            goodAddParam.setVipPrice(100.0);
-                            goodAddParam.setMarketPrice(100.0);
+                            goodAddParam.setPrice(2.0);
+                            goodAddParam.setVipPrice(2.0);
+                            goodAddParam.setMarketPrice(2.0);
                             goodAddParam.setGoodNo("001");
                             goodAddParam.setStockCount(100);
                         }

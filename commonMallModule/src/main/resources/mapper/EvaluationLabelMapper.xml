@@ -9,10 +9,19 @@
   <sql id="Base_Column_List">
     id, evalua_id, label_name
   </sql>
-  <select id="batchAdd">
+  <select id="batchAdd" resultType="java.lang.Integer">
     INSERT INTO s_evaluation_label (id,evalua_id,label_name) VALUES
     <foreach collection="labelList" item="label" separator=",">
       (#{label.id},#{label.evaluaId},#{label.labelName})
     </foreach>
+  </select>
+  <select id="listLabelCountVo"
+          resultType="com.github.chenlijia1111.commonModule.common.responseVo.evaluation.LabelCountVo">
+    SELECT
+    s_evaluation_label.label_name labelName,COUNT(s_evaluation_label.id) count
+    FROM s_evaluation_label,s_evaluation
+    WHERE s_evaluation_label.evalua_id = s_evaluation.id
+    AND s_evaluation.product_id = #{productId}
+    GROUP BY s_evaluation_label.label_name
   </select>
 </mapper>

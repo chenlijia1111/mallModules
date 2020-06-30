@@ -79,7 +79,7 @@
       SELECT
       s_product.shops
       FROM s_product,s_goods
-      WHERE s_product.id = s_goods.id
+      WHERE s_product.id = s_goods.product_id
       AND s_product.shops IS NOT NULL
       <foreach collection="goodIdSet" item="goodId" open=" AND s_goods.id IN (" close=")" separator=",">
         #{goodId}

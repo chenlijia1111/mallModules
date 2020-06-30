@@ -1,5 +1,6 @@
 package com.github.chenlijia1111.commonModule.dao;
 
+import com.github.chenlijia1111.commonModule.common.responseVo.evaluation.LabelCountVo;
 import com.github.chenlijia1111.commonModule.entity.EvaluationLabel;
 import com.github.chenlijia1111.utils.common.Result;
 import org.apache.ibatis.annotations.Param;
@@ -21,6 +22,13 @@ public interface EvaluationLabelMapper extends Mapper<EvaluationLabel> {
      * @param labelList 1
      * @return com.github.chenlijia1111.utils.common.Result
      **/
-    Result batchAdd(@Param("labelList") List<EvaluationLabel> labelList);
+    Integer batchAdd(@Param("labelList") List<EvaluationLabel> labelList);
+
+    /**
+     * 统计评价标签数量
+     * @param productId
+     * @return
+     */
+    List<LabelCountVo> listLabelCountVo(@Param("productId") String productId);
 
 }

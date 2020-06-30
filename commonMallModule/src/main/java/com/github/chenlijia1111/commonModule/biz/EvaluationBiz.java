@@ -4,6 +4,7 @@ import com.github.chenlijia1111.commonModule.common.pojo.IDGenerateFactory;
 import com.github.chenlijia1111.commonModule.common.requestVo.evaluation.AddEvaluationParams;
 import com.github.chenlijia1111.commonModule.common.requestVo.evaluation.QueryParams;
 import com.github.chenlijia1111.commonModule.common.responseVo.evaluate.EvaluateListVo;
+import com.github.chenlijia1111.commonModule.common.responseVo.evaluation.LabelCountVo;
 import com.github.chenlijia1111.commonModule.common.responseVo.product.AdminProductVo;
 import com.github.chenlijia1111.commonModule.common.responseVo.user.CommonSimpleUser;
 import com.github.chenlijia1111.commonModule.entity.Evaluation;
@@ -52,6 +53,7 @@ public class EvaluationBiz {
 
     /**
      * 添加评价
+     * 返回评价Id
      *
      * @param params           1
      * @param repeatEvaluation 是否可重复评价
@@ -144,7 +146,7 @@ public class EvaluationBiz {
             shoppingOrderService.update(order);
         }
 
-        return Result.success("操作成功");
+        return Result.success("操作成功", evaluationId);
     }
 
     /**
@@ -176,6 +178,22 @@ public class EvaluationBiz {
             }
         }
         return Result.success("查询成功", pageInfo);
+    }
+
+    /**
+     * 统计评价标签数量
+     *
+     * @param productId
+     * @return
+     */
+    public Result labelCount(String productId) {
+
+        if (StringUtils.isEmpty(productId)) {
+            return Result.failure("产品id为空");
+        }
+
+        List<LabelCountVo> labelCountVos = evaluationLabelService.listLabelCountVo(productId);
+        return Result.success("查询成功", labelCountVos);
     }
 
 }

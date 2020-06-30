@@ -1,13 +1,16 @@
 package com.github.chenlijia1111.commonModule.service.impl;
 
+import com.github.chenlijia1111.commonModule.common.responseVo.evaluation.LabelCountVo;
 import com.github.chenlijia1111.commonModule.dao.EvaluationLabelMapper;
 import com.github.chenlijia1111.commonModule.entity.EvaluationLabel;
 import com.github.chenlijia1111.commonModule.service.EvaluationLabelServiceI;
 import com.github.chenlijia1111.utils.common.Result;
+import com.github.chenlijia1111.utils.core.StringUtils;
 import com.github.chenlijia1111.utils.list.Lists;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -69,4 +72,17 @@ public class EvaluationLabelServiceImpl implements EvaluationLabelServiceI {
     }
 
 
+    /**
+     * 统计评价标签数量
+     * @param productId
+     * @return
+     */
+    @Override
+    public List<LabelCountVo> listLabelCountVo(String productId) {
+        if(StringUtils.isEmpty(productId)){
+            return new ArrayList<>();
+        }
+
+        return evaluationLabelMapper.listLabelCountVo(productId);
+    }
 }
