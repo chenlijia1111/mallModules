@@ -22,6 +22,8 @@
     FROM s_evaluation_label,s_evaluation
     WHERE s_evaluation_label.evalua_id = s_evaluation.id
     AND s_evaluation.product_id = #{productId}
+    AND s_evaluation.delete_status = 0
+    AND s_evaluation.open_status = 1
     GROUP BY s_evaluation_label.label_name
   </select>
 </mapper>

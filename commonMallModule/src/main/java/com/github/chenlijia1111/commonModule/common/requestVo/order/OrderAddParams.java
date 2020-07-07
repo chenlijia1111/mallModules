@@ -1,5 +1,6 @@
 package com.github.chenlijia1111.commonModule.common.requestVo.order;
 
+import com.github.chenlijia1111.utils.common.constant.BooleanConstant;
 import com.github.chenlijia1111.utils.core.annos.PropertyCheck;
 import com.github.chenlijia1111.utils.core.enums.PropertyCheckType;
 import io.swagger.annotations.ApiModel;
@@ -106,6 +107,13 @@ public class OrderAddParams {
      */
     @ApiModelProperty(value = "订单类型")
     private Integer orderType;
+
+    /**
+     * 下单是否需要判断库存
+     * 默认是需要判断
+     * 因为有一些场景没库存也能买，比如预订单这些，可以付定金购买
+     */
+    private Integer checkGoodStockStatus = BooleanConstant.YES_INTEGER;
 
 
 }

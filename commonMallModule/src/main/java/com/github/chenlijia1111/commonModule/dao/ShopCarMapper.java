@@ -17,7 +17,6 @@ import java.util.Set;
  * @since 2020-02-19 17:37:03
  **/
 public interface ShopCarMapper extends Mapper<ShopCar> {
-    ShopCar selectByPrimaryKey(Integer id);
 
 
     /**
@@ -40,6 +39,17 @@ public interface ShopCarMapper extends Mapper<ShopCar> {
      * @since 下午 12:41 2019/8/17 0017
      **/
     Integer findShopCarAllGoodsKindCount(@Param("clientId") String clientId);
+
+    /**
+     * 查找用户购物车中商品种类总数量
+     * 只查询上架的
+     *
+     * @param clientId 1
+     * @return java.lang.Integer
+     * @author chenlijia
+     * @since 下午 12:41 2019/8/17 0017
+     **/
+    Integer findShopCarAllGoodsKindCountWithShelf(@Param("clientId") String clientId);
 
 
     /**

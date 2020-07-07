@@ -191,7 +191,7 @@ public class CommonMallInitFunction implements ApplicationListener<ContextRefres
         String groupName = "autoClearCode";
 
         //每天3点运行
-        Trigger autoClearTrigger = TriggerUtil.createCronTrigger("0 0 3 * * ? ", "autoClearCodeTrigger", groupName);
+        Trigger autoClearTrigger = TriggerUtil.createCronTrigger("0 0 3 * * ?", "autoClearCodeTrigger", groupName);
 
         TimerTaskUtil.doTask(autoClearTrigger, AutoClearLimitVerifyCode.class, AutoClearLimitVerifyCode.class.getSimpleName(), groupName);
     }

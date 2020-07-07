@@ -24,6 +24,13 @@ public class QueryParams extends PageAbleVo {
     private String productId;
 
     /**
+     * 是否启用 0否1是
+     */
+    @ApiModelProperty(value = "是否启用 0否1是")
+    private Integer openStatus;
+
+
+    /**
      * 标签名称
      */
     @ApiModelProperty(value = "标签名称")

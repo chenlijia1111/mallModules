@@ -123,7 +123,8 @@ public class EvaluationBiz {
                 setExpressLevel(params.getExpressLevel()).
                 setParentEvalua(params.getParentEvalua()).
                 setCreateTime(new Date()).
-                setDeleteStatus(BooleanConstant.NO_INTEGER);
+                setDeleteStatus(BooleanConstant.NO_INTEGER).
+                setOpenStatus(BooleanConstant.YES_INTEGER);
 
         evaluationService.add(evaluation);
 

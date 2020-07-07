@@ -135,6 +135,12 @@ public class EvaluateListVo {
     private String detailJson;
 
     /**
+     * 是否启用 0否1是
+     */
+    @ApiModelProperty(value = "是否启用 0否1是")
+    private Integer openStatus;
+
+    /**
      * 创建默认的规格名称
      *
      * @param detailJson

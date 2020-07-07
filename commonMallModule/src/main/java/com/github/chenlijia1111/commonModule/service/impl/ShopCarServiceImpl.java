@@ -108,6 +108,20 @@ public class ShopCarServiceImpl implements ShopCarServiceI {
     }
 
     /**
+     * 查找用户购物车中商品种类总数量
+     * 只查询上架的
+     *
+     * @param clientId 1
+     * @return java.lang.Integer
+     * @author chenlijia
+     * @since 下午 12:41 2019/8/17 0017
+     **/
+    @Override
+    public Integer findShopCarAllGoodsKindCountWithShelf(String clientId) {
+        return shopCarMapper.findShopCarAllGoodsKindCountWithShelf(clientId);
+    }
+
+    /**
      * 查询客户端购物车列表
      * 已商家进行分组
      * 排序按对应的最近的交易时间进行排序

@@ -143,5 +143,13 @@ public class Evaluation {
     @Column(name = "delete_status")
     private Integer deleteStatus;
 
+    /**
+     * 是否启用 0否1是
+     */
+    @ApiModelProperty("是否启用 0否 1是")
+    @PropertyCheck(name = "是否启用 0否 1是")
+    @Column(name = "open_status")
+    private Integer openStatus;
+
 
 }

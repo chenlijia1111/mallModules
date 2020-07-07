@@ -161,8 +161,8 @@ public class OrderAutoEvaluateTask {
          */
         @Override
         public int compareTo(Delayed o) {
-            Long l = limitTime.getTime() - System.currentTimeMillis();
-            return l.intValue();
+            DelayNotEvaluateOrder that = (DelayNotEvaluateOrder) o;
+            return this.limitTime.compareTo(that.limitTime);
         }
     }
 

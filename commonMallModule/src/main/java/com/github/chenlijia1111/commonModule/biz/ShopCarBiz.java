@@ -1,5 +1,6 @@
 package com.github.chenlijia1111.commonModule.biz;
 
+import com.github.chenlijia1111.commonModule.common.pojo.CommonMallConstants;
 import com.github.chenlijia1111.commonModule.common.requestVo.PageAbleVo;
 import com.github.chenlijia1111.commonModule.common.requestVo.shopCar.ShopCarAddOrUpdateParams;
 import com.github.chenlijia1111.commonModule.common.requestVo.shopCar.UpdateShopCarGoodIdParams;
@@ -94,8 +95,7 @@ public class ShopCarBiz {
             shopCar.setUpdateTime(new Date());
             Result add = shopCarService.add(shopCar);
             //返回购物车中当前商品种类的数量
-            Integer shopCarAllGoodsKindCount = shopCarService.findShopCarAllGoodsKindCount(currentUserId);
-            shopCarAllGoodsKindCount = Objects.isNull(shopCarAllGoodsKindCount) ? 0 : shopCarAllGoodsKindCount;
+            Integer shopCarAllGoodsKindCount = findShopCarAllGoodsKindCount(currentUserId);
             add.setData(shopCarAllGoodsKindCount);
             return add;
         } else {
@@ -104,12 +104,32 @@ public class ShopCarBiz {
             shopCar.setGoodCount(shopCar.getGoodCount() + params.getGoodsCount());
             Result update = shopCarService.update(shopCar);
             //返回购物车中当前商品种类的数量
-            Integer shopCarAllGoodsKindCount = shopCarService.findShopCarAllGoodsKindCount(currentUserId);
-            shopCarAllGoodsKindCount = Objects.isNull(shopCarAllGoodsKindCount) ? 0 : shopCarAllGoodsKindCount;
+            Integer shopCarAllGoodsKindCount = findShopCarAllGoodsKindCount(currentUserId);
             update.setData(shopCarAllGoodsKindCount);
             return update;
         }
 
+    }
+
+    /**
+     * 查找用户购物车中商品种类总数量
+     * @param client
+     * @return
+     */
+    private Integer findShopCarAllGoodsKindCount(String client){
+        //返回购物车中当前商品种类的数量
+        Integer shopCarAllGoodsKindCount;
+        if(CommonMallConstants.SHOP_CAR_FILTER_NOT_SHELF_PRODUCT){
+            //要过滤未上架的商品
+            shopCarAllGoodsKindCount = shopCarService.findShopCarAllGoodsKindCountWithShelf(client);
+        }else {
+            //不需要过滤未上架的商品
+            shopCarAllGoodsKindCount = shopCarService.findShopCarAllGoodsKindCount(client);
+        }
+        if(Objects.isNull(shopCarAllGoodsKindCount)){
+            shopCarAllGoodsKindCount = 0;
+        }
+        return shopCarAllGoodsKindCount;
     }
 
 
@@ -275,8 +295,8 @@ public class ShopCarBiz {
         String currentUserId = clientUserService.currentUserId();
         if (StringUtils.isNotEmpty(currentUserId)) {
             //获取当前用户的购物车数量
-            Integer kindCount = shopCarService.findShopCarAllGoodsKindCount(currentUserId);
-            return Result.success("查询成功", kindCount);
+            Integer shopCarAllGoodsKindCount = findShopCarAllGoodsKindCount(currentUserId);
+            return Result.success("查询成功", shopCarAllGoodsKindCount);
         }
         return Result.success("查询成功", 0);
     }

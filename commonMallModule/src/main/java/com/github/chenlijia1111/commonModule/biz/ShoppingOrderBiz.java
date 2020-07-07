@@ -72,6 +72,7 @@ public class ShoppingOrderBiz {
     @Autowired
     private CouponServiceI couponService;//优惠券
 
+
     /**
      * 添加订单
      * 如果需要在此基础上进行扩展，调用者可以继承这个类，然后进行扩展
@@ -152,7 +153,8 @@ public class ShoppingOrderBiz {
             }
 
             //判断库存是否充足
-            if (goodVo.getStockCount() < addParams.getCount()) {
+            if (Objects.equals(BooleanConstant.YES_INTEGER , params.getCheckGoodStockStatus()) &&
+                    goodVo.getStockCount() < addParams.getCount()) {
                 return Result.failure("商品库存不足");
             }
 

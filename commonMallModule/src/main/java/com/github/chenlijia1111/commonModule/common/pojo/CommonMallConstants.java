@@ -30,5 +30,8 @@ public class CommonMallConstants {
     //超时未收货时间 已签收后隔一段时间自动收货 自动评价 允许修改 分钟 默认7天
     public static Integer NOT_RECEIVE_ORDER_LIMIT_MINUTES = 7 * 24 * 60;
 
+    //购物车 计算数量 是否需要过滤未上架的商品 默认否
+    public static boolean SHOP_CAR_FILTER_NOT_SHELF_PRODUCT = false;
+
 
 }

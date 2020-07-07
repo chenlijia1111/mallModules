@@ -17,10 +17,11 @@
     <result column="parent_evalua" jdbcType="VARCHAR" property="parentEvalua" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="delete_status" jdbcType="INTEGER" property="deleteStatus" />
+    <result column="open_status" jdbcType="INTEGER" property="openStatus" />
   </resultMap>
   <sql id="Base_Column_List">
     id, client_id, shop_id, order_no, good_id, product_id, comment, images, product_level,
-    shop_level, service_level, express_level, parent_evalua, create_time, delete_status
+    shop_level, service_level, express_level, parent_evalua, create_time, delete_status,open_status
   </sql>
   <select id="listByOrderNoSet" resultMap="BaseResultMap">
     SELECT 
@@ -35,11 +36,14 @@
       SELECT
       id, client_id clientId, shop_id shopId, order_no orderNo, good_id goodId, product_id productId, comment comment, images images,
       product_level productLevel, shop_level shopLevel, service_level serviceLevel, express_level expressLevel, parent_evalua parentEvalua,
-      create_time createTime
+      create_time createTime,open_status openStatus
       FROM s_evaluation
       WHERE s_evaluation.delete_status = 0
       <if test="productId != null and productId != ''">
         AND s_evaluation.product_id = #{productId}
+      </if>
+      <if test="openStatus != null">
+        AND s_evaluation.open_status = #{openStatus}
       </if>
       <if test="labelName != null and labelName != ''">
         AND exists(

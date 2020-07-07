@@ -67,6 +67,17 @@ public interface ShopCarServiceI {
      **/
     Integer findShopCarAllGoodsKindCount(String clientId);
 
+    /**
+     * 查找用户购物车中商品种类总数量
+     * 只查询上架的
+     *
+     * @param clientId 1
+     * @return java.lang.Integer
+     * @author chenlijia
+     * @since 下午 12:41 2019/8/17 0017
+     **/
+    Integer findShopCarAllGoodsKindCountWithShelf(String clientId);
+
 
     /**
      * 查询客户端购物车列表

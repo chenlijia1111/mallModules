@@ -131,8 +131,8 @@ public class OrderCancelTimeLimitTask {
          */
         @Override
         public int compareTo(Delayed o) {
-            Long l = limitTime.getTime() - System.currentTimeMillis();
-            return l.intValue();
+            DelayNotPayOrder that = (DelayNotPayOrder) o;
+            return this.limitTime.compareTo(that.limitTime);
         }
     }
 
@@ -158,14 +158,10 @@ public class OrderCancelTimeLimitTask {
                                 //取消时间
                                 shoppingOrder.setCancelTime(new Date());
                                 shoppingOrderMapper.updateByPrimaryKeySelective(shoppingOrder);
-                                //回补库存
-                                Goods goods = goodsMapper.selectByPrimaryKey(shoppingOrder.getGoodsId());
-                                if (Objects.nonNull(goods)) {
-                                    goods.setStockCount(goods.getStockCount() + shoppingOrder.getCount());
-                                    goodsMapper.updateByPrimaryKeySelective(goods);
-                                }
                             }
-                            //执行钩子函数
+                            //执行钩子函数  回补库存放到钩子函数进行执行
+                            //因为可能不是每一个订单都需要回补库存的，比如预订单，他下定金的时候是不扣库存，到了付尾款才扣库存
+                            //如果是待支付，取消就不需要回补库存了
                             try {
                                 ICancelOrderHook cancelOrderHook = SpringContextHolder.getBean(ICancelOrderHook.class);
                                 cancelOrderHook.cancelOrderByGroupId(delayNotPayOrder.groupId);

@@ -36,6 +36,17 @@
       AND s_product.delete_status = 0
       AND client_id = #{clientId}
   </select>
+  <select id="findShopCarAllGoodsKindCountWithShelf" resultType="java.lang.Integer">
+    SELECT
+      COUNT(DISTINCT good_id)
+    FROM
+      s_shop_car,s_product,s_goods
+    WHERE s_shop_car.good_id = s_goods.id
+      AND s_product.id = s_goods.product_id
+      AND s_product.delete_status = 0
+      AND s_product.shelf_status = 1
+      AND client_id = #{clientId}
+  </select>
   <select id="listPageWithClientShopCarGroupByShopVo" resultType="com.github.chenlijia1111.commonModule.common.responseVo.shopCar.ClientShopCarGroupByShopVo">
     SELECT s_product.shops shopId, max(s_shop_car.update_time) updateTime
     FROM s_shop_car,

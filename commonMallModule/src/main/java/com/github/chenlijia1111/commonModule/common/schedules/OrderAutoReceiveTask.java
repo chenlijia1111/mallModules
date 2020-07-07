@@ -141,8 +141,8 @@ public class OrderAutoReceiveTask {
          */
         @Override
         public int compareTo(Delayed o) {
-            Long l = limitTime.getTime() - System.currentTimeMillis();
-            return l.intValue();
+            DelayNotReceiveOrder that = (DelayNotReceiveOrder) o;
+            return this.limitTime.compareTo(that.limitTime);
         }
     }
 

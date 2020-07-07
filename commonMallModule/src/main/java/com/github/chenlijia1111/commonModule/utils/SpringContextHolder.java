@@ -1,5 +1,6 @@
 package com.github.chenlijia1111.commonModule.utils;
 
+import com.github.chenlijia1111.utils.core.LogUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
@@ -17,7 +18,7 @@ public class SpringContextHolder implements ApplicationContextAware {
 
     private static ApplicationContext applicationContext = null;
 
-    private static Logger logger = LoggerFactory.getLogger(SpringContextHolder.class);
+    private static Logger logger = new LogUtil(SpringContextHolder.class);
 
     /**
      * 取得存储在静态变量中的ApplicationContext.
@@ -59,7 +60,7 @@ public class SpringContextHolder implements ApplicationContextAware {
      * 实现ApplicationContextAware接口, 注入Context到静态变量中.
      */
     public void setApplicationContext(ApplicationContext applicationContext) {
-//		logger.debug("注入ApplicationContext到SpringContextHolder:{}", applicationContext);
+		logger.info("注入ApplicationContext到SpringContextHolder:{}", applicationContext);
 
         if (SpringContextHolder.applicationContext != null) {
             logger.info("SpringContextHolder中的ApplicationContext被覆盖, 原有ApplicationContext为:" + SpringContextHolder.applicationContext);
