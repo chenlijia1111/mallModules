@@ -14,7 +14,7 @@ public enum OrderTypeEnum {
 
     ORDINARY_ORDER(1), //普通订单
     SPIKE_ORDER(2), //秒杀订单
-    FIGHT_GROUP_ORDER(3), //拼图订单
+    FIGHT_GROUP_ORDER(3), //拼团订单
     ;
 
     private Integer type;

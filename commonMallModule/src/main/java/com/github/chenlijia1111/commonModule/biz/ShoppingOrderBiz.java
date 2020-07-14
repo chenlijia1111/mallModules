@@ -41,7 +41,7 @@ import java.util.stream.Collectors;
  * @author chenLiJia
  * @see OrderCancelTimeLimitTask 超时未支付自动取消订单，这里已经实现了，调用者只需注入即可
  * 设置超时时间 {@link CommonMallConstants#CANCEL_NOT_PAY_ORDER_LIMIT_MINUTES}
- * 这里为取消订单设置了钩子函数，调用者可以把自己需要在取消的业务实现的逻辑写在{@link ICancelOrderHook} 中
+ * 这里为取消订单设置了钩子函数，调用者可以把自己需要在取消的业务实现的逻辑(像回补库存之类的业务)写在{@link ICancelOrderHook} 中
  *
  * <p>
  * 下单后一段时间内自动收货  这里已经实现了，调用者只需要注入即可，因为可能涉及物流的查询，一般都是物流查询签收了之后一段时间内自动收货

@@ -112,4 +112,13 @@ public class AuthResources {
     @Column(name = "delete_status")
     private Integer deleteStatus;
 
+    /**
+     * 权限类型 适配需要多个后台的项目，用于表示不同的平台的权限资源
+     * 看是否需要，不需要可以不用管
+     */
+    @ApiModelProperty("权限类型 适配需要多个后台的项目，用于表示不同的平台的权限资源")
+    @PropertyCheck(name = "权限类型")
+    @Column(name = "auth_type")
+    private Integer authType;
+
 }
