@@ -179,4 +179,14 @@ public class AuthResourcesServiceImpl implements AuthResourcesServiceI {
     }
 
 
+    /**
+     * 条件删除
+     * @param condition
+     */
+    @Override
+    public void deleteByExample(Example condition) {
+        if(Objects.nonNull(condition)){
+            authResourcesMapper.deleteByExample(condition);
+        }
+    }
 }

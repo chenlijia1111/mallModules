@@ -9,6 +9,7 @@ import com.github.chenlijia1111.utils.core.PropertyCheckUtil;
 import com.github.chenlijia1111.utils.list.Lists;
 import com.github.chenlijia1111.utils.list.Sets;
 import org.springframework.stereotype.Service;
+import tk.mybatis.mapper.entity.Example;
 
 import javax.annotation.Resource;
 import java.util.*;
@@ -75,6 +76,8 @@ public class CategoryServiceImpl implements CategoryServiceI {
 
     /**
      * 递归查询这些类别所有的下级类别
+     * 这里不将子类整理好，如有需要，可以用树节点工具进行整理返回前端
+     * @see com.github.chenlijia1111.utils.math.treeNode.TreeNodeUtil
      *
      * @param idSet
      * @return
@@ -83,20 +86,6 @@ public class CategoryServiceImpl implements CategoryServiceI {
     public List<CategoryVo> listAllChildCategory(Set<Integer> idSet) {
         if (Sets.isNotEmpty(idSet)) {
             List<CategoryVo> categories = categoryMapper.listAllChildCategory(idSet);
-            if (Lists.isNotEmpty(categories)) {
-                //下级类别id集合
-                Set<Integer> childIdSet = categories.stream().map(e -> e.getId()).collect(Collectors.toSet());
-                //查询下级有没有下级
-                List<CategoryVo> categoryList = listAllChildCategory(childIdSet);
-                if (Lists.isNotEmpty(categoryList)) {
-                    //处理下级列表
-                    Map<Integer, List<CategoryVo>> parentChildList = categoryList.stream().collect(Collectors.groupingBy(Category::getParentId));
-                    for (CategoryVo category : categories) {
-                        List<CategoryVo> childCategoryList = parentChildList.get(category.getId());
-                        category.setChildCategory(childCategoryList);
-                    }
-                }
-            }
             return categories;
         }
         return new ArrayList<>();
@@ -129,5 +118,18 @@ public class CategoryServiceImpl implements CategoryServiceI {
         return Result.success("操作成功");
     }
 
-
+    /**
+     * 修改
+     * @param category set 内容
+     * @param condition where 条件
+     * @return
+     */
+    @Override
+    public Result updateByCondition(Category category, Example condition) {
+        if(Objects.nonNull(category) && Objects.nonNull(condition)){
+            int i = categoryMapper.updateByExample(category, condition);
+            return i > 0 ? Result.success("操作成功") : Result.failure("操作失败");
+        }
+        return Result.success("操作成功");
+    }
 }

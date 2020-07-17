@@ -93,5 +93,11 @@ public interface AuthResourcesServiceI {
      */
     List<AuthResources> listByCondition(Example condition);
 
+    /**
+     * 条件删除
+     * @param condition
+     */
+    void deleteByExample(Example condition);
+
 
 }

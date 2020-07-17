@@ -35,8 +35,7 @@ public class CodeGenerateTest {
         mybatisCodeGeneratorUtil.setCommonCode(false);
 
         Map<String, String> tableToDomain = mybatisCodeGeneratorUtil.getTableToDoMain();
-        tableToDomain.put("s_auth_resources", "AuthResources");
-        tableToDomain.put("s_role_auth", "RoleAuth");
+        tableToDomain.put("s_category_ancestor", "CategoryAncestor");
 
         List<String> ignoreDoMainToBusiness = mybatisCodeGeneratorUtil.getIgnoreDoMainToBusiness();
     }

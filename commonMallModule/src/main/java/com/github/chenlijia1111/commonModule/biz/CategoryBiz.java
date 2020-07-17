@@ -4,6 +4,8 @@ import com.github.chenlijia1111.commonModule.common.requestVo.category.AddCatego
 import com.github.chenlijia1111.commonModule.common.requestVo.category.UpdateCategoryParams;
 import com.github.chenlijia1111.commonModule.common.responseVo.category.CategoryVo;
 import com.github.chenlijia1111.commonModule.entity.Category;
+import com.github.chenlijia1111.commonModule.entity.CategoryAncestor;
+import com.github.chenlijia1111.commonModule.service.CategoryAncestorServiceI;
 import com.github.chenlijia1111.commonModule.service.CategoryServiceI;
 import com.github.chenlijia1111.utils.common.Result;
 import com.github.chenlijia1111.utils.common.constant.BooleanConstant;
@@ -12,11 +14,19 @@ import com.github.chenlijia1111.utils.list.Sets;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import tk.mybatis.mapper.entity.Example;
+import tk.mybatis.mapper.util.Sqls;
 
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * 商品分类
+ * <p>
+ * TODO 优化上下级，新增祖宗类别进行管理，使用树节点
  *
  * @author chenLiJia
  * @since 2020-03-12 15:35:34
@@ -26,6 +36,8 @@ public class CategoryBiz {
 
     @Autowired
     private CategoryServiceI categoryService;//类别
+    @Autowired
+    private CategoryAncestorServiceI categoryAncestorService;//类别祖宗
 
     /**
      * 添加类别
@@ -45,10 +57,33 @@ public class CategoryBiz {
         Category category = new Category();
         BeanUtils.copyProperties(params, category);
 
+        Date currentTime = new Date();
+
         category.setDeleteStatus(BooleanConstant.NO_INTEGER).
-                setCreateTime(new Date()).
-                setUpdateTime(new Date());
-        return categoryService.add(category);
+                setCreateTime(currentTime).
+                setUpdateTime(currentTime);
+
+        Result result = categoryService.add(category);
+        if (result.getSuccess()) {
+            //如果有上级，需要把上级的祖宗关系复制过来
+            Integer parentId = params.getParentId();
+            if (Objects.nonNull(parentId)) {
+                //查询上级的祖宗关系
+                List<CategoryAncestor> categoryAncestorList = categoryAncestorService.listByCondition(new CategoryAncestor().setCategoryId(parentId));
+                //修改信息
+                categoryAncestorList.stream().forEach(e -> e.setCategoryId(category.getId()).setCreateTime(currentTime));
+                //添加当前父类别
+                CategoryAncestor categoryAncestor = new CategoryAncestor().
+                        setCategoryId(category.getId()).
+                        setAncestorId(parentId).
+                        setCreateTime(currentTime).
+                        setId(null);
+                categoryAncestorList.add(categoryAncestor);
+                //批量添加祖宗关系
+                categoryAncestorService.batchAdd(categoryAncestorList);
+            }
+        }
+        return result;
     }
 
     /**
@@ -73,36 +108,28 @@ public class CategoryBiz {
         category.setUpdateTime(new Date());
         Result result = categoryService.update(category);
         if (result.getSuccess()) {
+            //判断有没有更新上级，如果更新了上级，那么需要将所有下级的祖宗关系进行修改
+            if (!Objects.equals(originalCategory.getParentId(), params.getParentId()) ||
+                    !Objects.equals(originalCategory.getOpenStatus(), params.getOpenStatus())) {
+                categoryAncestorService.recursiveUpdateAncestor(params.getId());
+            }
+
             //判断有没有更新启用状态
             if (!Objects.equals(originalCategory.getOpenStatus(), params.getOpenStatus())) {
                 //改变所有下级的启用状态
                 List<CategoryVo> childCategoryList = categoryService.listAllChildCategory(Sets.asSets(params.getId()));
-                Set<Integer> childIdSet = categoryListToIdSet(childCategoryList);
-                categoryService.batchUpdateStatus(params.getOpenStatus(), childIdSet);
-            }
-        }
-        return result;
-    }
-
-    /**
-     * 将类别集合转化为id集合
-     *
-     * @param categories
-     * @return
-     */
-    private Set<Integer> categoryListToIdSet(List<CategoryVo> categories) {
-        Set<Integer> idSet = new HashSet<>();
-        if (Lists.isNotEmpty(categories)) {
-            for (int i = 0; i < categories.size(); i++) {
-                CategoryVo categoryVo = categories.get(i);
-                idSet.add(categoryVo.getId());
-                List<CategoryVo> childCategory = categoryVo.getChildCategory();
-                if (Lists.isNotEmpty(childCategory)) {
-                    idSet.addAll(categoryListToIdSet(childCategory));
+                Set<Integer> childIdSet = childCategoryList.stream().map(e -> e.getId()).collect(Collectors.toSet());
+                if (Sets.isNotEmpty(childIdSet)) {
+                    //set内容
+                    Category setCondition = new Category().setOpenStatus(params.getOpenStatus());
+                    //where内容
+                    Example whereCondition = Example.builder(Category.class).where(Sqls.custom().andIn("id", childIdSet)).build();
+                    categoryService.updateByCondition(setCondition, whereCondition);
                 }
             }
+
         }
-        return idSet;
+        return result;
     }
 
 
@@ -126,8 +153,14 @@ public class CategoryBiz {
         if (result.getSuccess()) {
             //改变所有下级的启用状态
             List<CategoryVo> childCategoryList = categoryService.listAllChildCategory(Sets.asSets(id));
-            Set<Integer> childIdSet = categoryListToIdSet(childCategoryList);
-            categoryService.batchUpdateStatus(BooleanConstant.YES_INTEGER, childIdSet);
+            Set<Integer> childIdSet = childCategoryList.stream().map(e -> e.getId()).collect(Collectors.toSet());
+            if (Sets.isNotEmpty(childIdSet)) {
+                //set内容
+                Category setCondition = new Category().setOpenStatus(BooleanConstant.YES_INTEGER);
+                //where内容
+                Example whereCondition = Example.builder(Category.class).where(Sqls.custom().andIn("id", childIdSet)).build();
+                categoryService.updateByCondition(setCondition, whereCondition);
+            }
         }
         return result;
     }
@@ -149,10 +182,15 @@ public class CategoryBiz {
         Result result = categoryService.batchUpdateStatus(BooleanConstant.YES_INTEGER, idSet);
         if (result.getSuccess()) {
             //连带修改下级状态
+            //改变所有下级的启用状态
             List<CategoryVo> childCategoryList = categoryService.listAllChildCategory(idSet);
-            if (Lists.isNotEmpty(childCategoryList)) {
-                Set<Integer> childIdSet = categoryListToIdSet(childCategoryList);
-                categoryService.batchUpdateStatus(BooleanConstant.YES_INTEGER, childIdSet);
+            Set<Integer> childIdSet = childCategoryList.stream().map(e -> e.getId()).collect(Collectors.toSet());
+            if (Sets.isNotEmpty(childIdSet)) {
+                //set内容
+                Category setCondition = new Category().setOpenStatus(BooleanConstant.YES_INTEGER);
+                //where内容
+                Example whereCondition = Example.builder(Category.class).where(Sqls.custom().andIn("id", childIdSet)).build();
+                categoryService.updateByCondition(setCondition, whereCondition);
             }
         }
 
@@ -180,8 +218,14 @@ public class CategoryBiz {
         if (result.getSuccess()) {
             //改变所有下级的启用状态
             List<CategoryVo> childCategoryList = categoryService.listAllChildCategory(Sets.asSets(id));
-            Set<Integer> childIdSet = categoryListToIdSet(childCategoryList);
-            categoryService.batchUpdateStatus(BooleanConstant.NO_INTEGER, childIdSet);
+            Set<Integer> childIdSet = childCategoryList.stream().map(e -> e.getId()).collect(Collectors.toSet());
+            if (Sets.isNotEmpty(childIdSet)) {
+                //set内容
+                Category setCondition = new Category().setOpenStatus(BooleanConstant.NO_INTEGER);
+                //where内容
+                Example whereCondition = Example.builder(Category.class).where(Sqls.custom().andIn("id", childIdSet)).build();
+                categoryService.updateByCondition(setCondition, whereCondition);
+            }
         }
         return result;
     }
@@ -201,11 +245,15 @@ public class CategoryBiz {
         //进行批量修改
         Result result = categoryService.batchUpdateStatus(BooleanConstant.NO_INTEGER, idSet);
         if (result.getSuccess()) {
-            //连带修改下级状态
+            //改变所有下级的启用状态
             List<CategoryVo> childCategoryList = categoryService.listAllChildCategory(idSet);
-            if (Lists.isNotEmpty(childCategoryList)) {
-                Set<Integer> childIdSet = categoryListToIdSet(childCategoryList);
-                categoryService.batchUpdateStatus(BooleanConstant.NO_INTEGER, childIdSet);
+            Set<Integer> childIdSet = childCategoryList.stream().map(e -> e.getId()).collect(Collectors.toSet());
+            if (Sets.isNotEmpty(childIdSet)) {
+                //set内容
+                Category setCondition = new Category().setOpenStatus(BooleanConstant.NO_INTEGER);
+                //where内容
+                Example whereCondition = Example.builder(Category.class).where(Sqls.custom().andIn("id", childIdSet)).build();
+                categoryService.updateByCondition(setCondition, whereCondition);
             }
         }
 
@@ -232,8 +280,14 @@ public class CategoryBiz {
         if (result.getSuccess()) {
             //删除所有下级
             List<CategoryVo> childCategoryList = categoryService.listAllChildCategory(Sets.asSets(id));
-            Set<Integer> childIdSet = categoryListToIdSet(childCategoryList);
-            categoryService.batchDelete(childIdSet);
+            Set<Integer> childIdSet = childCategoryList.stream().map(e -> e.getId()).collect(Collectors.toSet());
+            if (Sets.isNotEmpty(childIdSet)) {
+                //set内容
+                Category setCondition = new Category().setDeleteStatus(BooleanConstant.YES_INTEGER);
+                //where内容
+                Example whereCondition = Example.builder(Category.class).where(Sqls.custom().andIn("id", childIdSet)).build();
+                categoryService.updateByCondition(setCondition, whereCondition);
+            }
         }
         return result;
     }
@@ -254,11 +308,15 @@ public class CategoryBiz {
         //进行批量修改
         Result result = categoryService.batchDelete(idSet);
         if (result.getSuccess()) {
-            //连带删除下级
+            //删除所有下级
             List<CategoryVo> childCategoryList = categoryService.listAllChildCategory(idSet);
-            if (Lists.isNotEmpty(childCategoryList)) {
-                Set<Integer> childIdSet = categoryListToIdSet(childCategoryList);
-                categoryService.batchDelete(childIdSet);
+            Set<Integer> childIdSet = childCategoryList.stream().map(e -> e.getId()).collect(Collectors.toSet());
+            if (Sets.isNotEmpty(childIdSet)) {
+                //set内容
+                Category setCondition = new Category().setDeleteStatus(BooleanConstant.YES_INTEGER);
+                //where内容
+                Example whereCondition = Example.builder(Category.class).where(Sqls.custom().andIn("id", childIdSet)).build();
+                categoryService.updateByCondition(setCondition, whereCondition);
             }
         }
 

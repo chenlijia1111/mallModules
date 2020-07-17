@@ -7,6 +7,8 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 
+import java.util.Map;
+
 /**
  * 以静态变量保存Spring ApplicationContext, 可在任何代码任何地方任何时候取出ApplicaitonContext.
  *
@@ -76,5 +78,16 @@ public class SpringContextHolder implements ApplicationContextAware {
         if (null == applicationContext) {
             logger.error("applicaitonContext属性未注入, 请在applicationContext.xml中定义SpringContextHolder.");
         }
+    }
+
+    /**
+     * 根据类型获取所有实现
+     * @param requiredType
+     * @param <T>
+     * @return
+     */
+    public static <T> Map<String, T> getBeansOfType(Class<T> requiredType) {
+        Map<String, T> beansOfType = applicationContext.getBeansOfType(requiredType);
+        return beansOfType;
     }
 }

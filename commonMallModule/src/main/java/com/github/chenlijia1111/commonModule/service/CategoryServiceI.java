@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Set;
 
 import com.github.chenlijia1111.commonModule.entity.Category;
+import tk.mybatis.mapper.entity.Example;
 
 /**
  * 商品分类
@@ -44,7 +45,8 @@ public interface CategoryServiceI {
     List<Category> listByCondition(Category condition);
 
     /**
-     * 递归查询这些类别所有的下级类别
+     * 利用祖宗关系
+     * 查询这些类别所有的下级类别
      * @param idSet
      * @return
      */
@@ -64,6 +66,14 @@ public interface CategoryServiceI {
      * @return
      */
     Result batchDelete(Set<Integer> idSet);
+
+    /**
+     * 修改
+     * @param category set 内容
+     * @param condition where 条件
+     * @return
+     */
+    Result updateByCondition(Category category,Example condition);
 
 
 }

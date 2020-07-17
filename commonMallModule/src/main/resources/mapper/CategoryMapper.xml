@@ -23,9 +23,13 @@
     <include refid="Base_Column_List"></include>
     FROM s_category
     WHERE s_category.delete_status = 0
-    <foreach collection="idSet" item="id" open="AND parent_id IN (" close=")" separator=",">
-      #{id}
-    </foreach>
+    AND exists(
+        SELECT s_category_ancestor.id FROM s_category_ancestor
+        WHERE s_category_ancestor.category_id = s_category.id
+        <foreach collection="idSet" item="id" open="AND s_category_ancestor.ancestor_id IN (" close=")" separator=",">
+          #{id}
+        </foreach>
+    )
     ORDER BY create_time DESC
   </select>
   <update id="batchUpdateStatus">
