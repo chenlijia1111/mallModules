@@ -55,11 +55,28 @@ public class ShopCarBiz {
      * @since 上午 11:25 2019/8/17 0017
      **/
     public Result add(ShopCarAddOrUpdateParams params) {
+        return add(params, null);
+    }
 
-        //验证用户是否登录
-        String currentUserId = clientUserService.currentUserId();
+
+    /**
+     * 加入购物车
+     * 并返回购物车商品总数量
+     *
+     * @param params        1
+     * @param currentUserId 用户id 如果传了，就使用这个id，如果没传就通过接口获取当前用户id
+     * @return
+     * @author chenlijia
+     * @since 上午 11:25 2019/8/17 0017
+     **/
+    public Result add(ShopCarAddOrUpdateParams params, String currentUserId) {
+
         if (StringUtils.isEmpty(currentUserId)) {
-            return Result.notLogin();
+            //验证用户是否登录
+            currentUserId = clientUserService.currentUserId();
+            if (StringUtils.isEmpty(currentUserId)) {
+                return Result.notLogin();
+            }
         }
 
         //验证参数
@@ -111,22 +128,24 @@ public class ShopCarBiz {
 
     }
 
+
     /**
      * 查找用户购物车中商品种类总数量
+     *
      * @param client
      * @return
      */
-    private Integer findShopCarAllGoodsKindCount(String client){
+    private Integer findShopCarAllGoodsKindCount(String client) {
         //返回购物车中当前商品种类的数量
         Integer shopCarAllGoodsKindCount;
-        if(CommonMallConstants.SHOP_CAR_FILTER_NOT_SHELF_PRODUCT){
+        if (CommonMallConstants.SHOP_CAR_FILTER_NOT_SHELF_PRODUCT) {
             //要过滤未上架的商品
             shopCarAllGoodsKindCount = shopCarService.findShopCarAllGoodsKindCountWithShelf(client);
-        }else {
+        } else {
             //不需要过滤未上架的商品
             shopCarAllGoodsKindCount = shopCarService.findShopCarAllGoodsKindCount(client);
         }
-        if(Objects.isNull(shopCarAllGoodsKindCount)){
+        if (Objects.isNull(shopCarAllGoodsKindCount)) {
             shopCarAllGoodsKindCount = 0;
         }
         return shopCarAllGoodsKindCount;
@@ -142,10 +161,39 @@ public class ShopCarBiz {
      * @since 上午 11:26 2019/8/17 0017
      **/
     public Result batchDelete(List<Integer> shopCarIdList) {
+        return batchDelete(shopCarIdList, null);
+    }
+
+    /**
+     * 批量删除购物车
+     *
+     * @param shopCarIdList 1
+     * @param currentUserId 用户id 如果传了，就使用这个id，如果没传就通过接口获取当前用户id
+     * @return
+     * @author chenlijia
+     * @since 上午 11:26 2019/8/17 0017
+     **/
+    public Result batchDelete(List<Integer> shopCarIdList, String currentUserId) {
 
         //校验参数
         if (Lists.isEmpty(shopCarIdList)) {
             return Result.failure("请选择要删除的商品");
+        }
+
+        if (StringUtils.isEmpty(currentUserId)) {
+            //验证用户是否登录
+            currentUserId = clientUserService.currentUserId();
+            if (StringUtils.isEmpty(currentUserId)) {
+                return Result.notLogin();
+            }
+        }
+
+        //判断这些数据是否是当前用户的
+        List<ShopCar> shopCarList = shopCarService.listByShopCarIdSet(shopCarIdList.stream().collect(Collectors.toSet()));
+        String finalCurrentUserId = currentUserId;
+        Optional<ShopCar> shopCarOptional = shopCarList.stream().filter(e -> !Objects.equals(finalCurrentUserId, e.getClientId())).findAny();
+        if (shopCarOptional.isPresent()) {
+            return Result.failure("权限不足，无法删除其他用户的购物车数据");
         }
 
         return shopCarService.batchDelete(shopCarIdList);
@@ -162,10 +210,27 @@ public class ShopCarBiz {
      * @since 上午 11:26 2019/8/17 0017
      **/
     public Result updateShopCarCount(ShopCarAddOrUpdateParams params) {
-        //验证用户是否登录
-        String currentUserId = clientUserService.currentUserId();
+        return updateShopCarCount(params, null);
+    }
+
+    /**
+     * 修改购物车商品数量
+     * 修改成功之后 返回商品当前的价格
+     *
+     * @param params        1
+     * @param currentUserId 用户id 如果传了，就使用这个id，如果没传就通过接口获取当前用户id
+     * @return
+     * @author chenlijia
+     * @since 上午 11:26 2019/8/17 0017
+     **/
+    public Result updateShopCarCount(ShopCarAddOrUpdateParams params, String currentUserId) {
+
         if (StringUtils.isEmpty(currentUserId)) {
-            return Result.notLogin();
+            //验证用户是否登录
+            currentUserId = clientUserService.currentUserId();
+            if (StringUtils.isEmpty(currentUserId)) {
+                return Result.notLogin();
+            }
         }
 
         //验证参数
@@ -203,7 +268,7 @@ public class ShopCarBiz {
             Result add = shopCarService.add(shopCar);
             return add;
         } else {
-            //加入过  在原来的基础上增加数量
+            //加入过  在原来的基础上修改数量
             ShopCar shopCar = shopCars.get(0);
             shopCar.setGoodCount(params.getGoodsCount());
             Result update = shopCarService.update(shopCar);
@@ -311,11 +376,26 @@ public class ShopCarBiz {
      * @return
      */
     public Result updateShopCarGoodId(UpdateShopCarGoodIdParams params) {
+        return updateShopCarGoodId(params, null);
+    }
 
-        //当前用户
-        String currentUserId = clientUserService.currentUserId();
+    /**
+     * 修改购物车商品
+     * 如果购物车中已经有这个商品了，那么就把之前的商品的购物车删除
+     * 如果没有则个商品，就直接修改
+     *
+     * @param params
+     * @param currentUserId 用户id 如果传了，就使用这个id，如果没传就通过接口获取当前用户id
+     * @return
+     */
+    public Result updateShopCarGoodId(UpdateShopCarGoodIdParams params, String currentUserId) {
+
         if (StringUtils.isEmpty(currentUserId)) {
-            return Result.notLogin();
+            //当前用户
+            currentUserId = clientUserService.currentUserId();
+            if (StringUtils.isEmpty(currentUserId)) {
+                return Result.notLogin();
+            }
         }
 
         //判断购物车是否存在

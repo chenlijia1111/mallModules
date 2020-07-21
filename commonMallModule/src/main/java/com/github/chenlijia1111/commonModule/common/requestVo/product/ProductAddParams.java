@@ -7,7 +7,9 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * 产品添加参数
@@ -112,4 +114,22 @@ public class ProductAddParams {
     @ApiModelProperty(value = "商品列表")
     @PropertyCheck(name = "商品列表")
     private List<GoodAddParams> goodList;
+
+    /**
+     * 获取最大价格
+     * @return
+     */
+    public Double getMaxPrice(){
+        Double maxPrice = goodList.stream().map(e -> e.getPrice()).max(Comparator.comparingDouble(o -> o)).orElse(0.0);
+        return maxPrice;
+    }
+
+    /**
+     * 获取最小价格
+     * @return
+     */
+    public Double getMinPrice(){
+        Double minPrice = goodList.stream().map(e -> e.getPrice()).min(Comparator.comparingDouble(o -> o)).orElse(0.0);
+        return minPrice;
+    }
 }

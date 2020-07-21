@@ -111,5 +111,4 @@ public interface ShopCarServiceI {
      */
     List<ShopCar> listByShopCarIdSet(Set<Integer> shopCarIdSet);
 
-
 }

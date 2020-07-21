@@ -37,4 +37,12 @@ public class SingleOrderAddParams {
     @PropertyCheck(name = "商品数量", checkFunction = PositiveNumberCheck.class)
     private Integer count;
 
+    /**
+     * 单个订单补充参数
+     * 适用于，添加订单的时候想给订单添加额外标记，但是又不想添加字段
+     * 该字段为字符串形式，调用者可自定义保存内容
+     */
+    @ApiModelProperty(value = "单个订单补充参数")
+    private String singleOrderAppend;
+
 }

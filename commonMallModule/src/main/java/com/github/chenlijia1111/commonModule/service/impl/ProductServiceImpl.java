@@ -218,6 +218,63 @@ public class ProductServiceImpl implements ProductServiceI {
     }
 
     /**
+     * 根据产品id集合查询产品详细信息
+     *
+     * @param productIdSet
+     * @return
+     */
+    @Override
+    public List<AdminProductVo> listAdminProductVoByProductIdSet(Set<String> productIdSet) {
+
+        ArrayList<AdminProductVo> list = new ArrayList<>();
+
+        if (Sets.isNotEmpty(productIdSet)) {
+            List<Product> productList = productMapper.listByProductIdSet(productIdSet);
+
+            //查询产品的规格信息
+            List<ProductSpecVo> productSpecVos = productSpecMapper.listProductSpecVoByProductIdSet(productIdSet);
+            //查询这些产品规格所对应的值
+            Set<Integer> productSpecIdSet = productSpecVos.stream().map(e -> e.getId()).collect(Collectors.toSet());
+            List<ProductSpecValue> productSpecValueList = productSpecValueMapper.listBySpecIdSet(productSpecIdSet);
+            //关联规格值数据
+            for (ProductSpecVo specVo : productSpecVos) {
+                List<ProductSpecValue> collect = productSpecValueList.stream().filter(e -> Objects.equals(e.getProductSpecId(), specVo.getId())).collect(Collectors.toList());
+                specVo.setProductSpecValueList(collect);
+            }
+
+            //商品信息
+            List<GoodVo> goodVoList = goodsMapper.listByProductIdSet(productIdSet);
+            //商品id集合
+            Set<String> goodIdSet = goodVoList.stream().map(e -> e.getId()).collect(Collectors.toSet());
+            //关联商品的规格值
+            List<GoodSpecVo> goodSpecVos = goodSpecMapper.listGoodSpecVoByGoodIdSet(goodIdSet);
+            for (GoodVo goodVo : goodVoList) {
+                List<GoodSpecVo> collect = goodSpecVos.stream().filter(e -> Objects.equals(e.getGoodId(), goodVo.getId())).collect(Collectors.toList());
+                goodVo.setGoodSpecVoList(collect);
+            }
+
+
+            //构建数据
+            for (String productId : productIdSet) {
+                Product product = productList.stream().filter(e -> Objects.equals(productId, e.getId())).findAny().orElse(null);
+                if (Objects.nonNull(product)) {
+                    //构建数据
+                    AdminProductVo productVo = new AdminProductVo();
+                    BeanUtils.copyProperties(product, productVo);
+                    //产品的规格值
+                    List<ProductSpecVo> currentProductProductSpecVoList = productSpecVos.stream().filter(e -> Objects.equals(e.getProductId(), productId)).collect(Collectors.toList());
+                    productVo.setProductSpecVoList(currentProductProductSpecVoList);
+                    //产品的商品列表
+                    List<GoodVo> currentProductGoodVoList = goodVoList.stream().filter(e -> Objects.equals(e.getProductId(), productId)).collect(Collectors.toList());
+                    productVo.setGoodVoList(currentProductGoodVoList);
+                    list.add(productVo);
+                }
+            }
+        }
+        return list;
+    }
+
+    /**
      * 获取后台商品详细细信息
      *
      * @param list 1

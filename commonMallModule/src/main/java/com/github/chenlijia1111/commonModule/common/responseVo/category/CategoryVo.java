@@ -9,6 +9,7 @@ import lombok.Setter;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -81,6 +82,20 @@ public class CategoryVo extends TreeNodeVo {
      */
     @ApiModelProperty(value = "下级分类")
     private List<CategoryVo> childCategory;
+
+    public void setId(Integer id) {
+        this.id = id;
+        if (Objects.nonNull(id)) {
+            setTreeId(String.valueOf(id));
+        }
+    }
+
+    public void setParentId(Integer parentId) {
+        this.parentId = parentId;
+        if (Objects.nonNull(parentId)) {
+            setTreeParentId(String.valueOf(parentId));
+        }
+    }
 
     @Override
     public void setChildTreeNodeList(List<TreeNodeVo> childTreeNodeList) {

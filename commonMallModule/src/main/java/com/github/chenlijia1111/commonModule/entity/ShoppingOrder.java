@@ -257,6 +257,17 @@ public class ShoppingOrder {
     private Integer completeStatus;
 
     /**
+     * 单个订单补充参数
+     * 适用于，添加订单的时候想给订单添加额外标记，但是又不想添加字段
+     * 该字段为字符串形式，调用者可自定义保存内容
+     * {@link com.github.chenlijia1111.commonModule.common.requestVo.order.SingleOrderAddParams}
+     */
+    @ApiModelProperty("单个订单补充参数")
+    @PropertyCheck(name = "单个订单补充参数")
+    @Column(name = "single_order_append")
+    private String singleOrderAppend;
+
+    /**
      * 订单使用的券
      *
      * @see #orderCoupon

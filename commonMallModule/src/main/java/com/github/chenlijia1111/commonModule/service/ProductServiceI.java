@@ -67,6 +67,13 @@ public interface ProductServiceI {
     AdminProductVo findAdminProductVoByProductId(String productId);
 
     /**
+     * 根据产品id集合查询产品详细信息
+     * @param productIdSet
+     * @return
+     */
+    List<AdminProductVo> listAdminProductVoByProductIdSet(Set<String> productIdSet);
+
+    /**
      * 根据产品id集合查询产品信息
      * @param productIdSet
      * @return

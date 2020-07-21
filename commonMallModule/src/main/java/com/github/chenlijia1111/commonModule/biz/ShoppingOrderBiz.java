@@ -135,8 +135,9 @@ public class ShoppingOrderBiz {
         for (SingleOrderAddParams addParams : singleOrderList) {
             //商品id
             String goodId = addParams.getGoodId();
-            //商品数量
-            Integer count = addParams.getCount();
+            //商品数量  添加参数允许添加多个相同的商品id->商品数量
+            Integer count = singleOrderList.stream().filter(e -> Objects.equals(e.getGoodId(), goodId)).
+                    collect(Collectors.summingInt(e -> e.getCount()));
 
             //查询商品信息
             GoodVo goodVo = goodsService.findByGoodId(goodId);
@@ -153,7 +154,7 @@ public class ShoppingOrderBiz {
             }
 
             //判断库存是否充足
-            if (Objects.equals(BooleanConstant.YES_INTEGER , params.getCheckGoodStockStatus()) &&
+            if (Objects.equals(BooleanConstant.YES_INTEGER, params.getCheckGoodStockStatus()) &&
                     goodVo.getStockCount() < addParams.getCount()) {
                 return Result.failure("商品库存不足");
             }
@@ -182,7 +183,8 @@ public class ShoppingOrderBiz {
                     setCreateTime(currentTime).setRemarks(params.getRemarks()).
                     setDeleteStatus(BooleanConstant.NO_INTEGER).
                     setCompleteStatus(BooleanConstant.NO_INTEGER).
-                    setOrderType(params.getOrderType());
+                    setOrderType(params.getOrderType()).
+                    setSingleOrderAppend(addParams.getSingleOrderAppend());
 
             //订单快照
             AdminProductVo adminProductVo = productService.findAdminProductVoByProductId(goodVo.getProductId());

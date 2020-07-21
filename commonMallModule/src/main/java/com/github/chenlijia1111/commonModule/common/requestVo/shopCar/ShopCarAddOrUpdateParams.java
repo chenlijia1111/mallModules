@@ -41,4 +41,5 @@ public class ShopCarAddOrUpdateParams {
     @PropertyCheck(name = "商品数量", checkFunction = PositiveNumberCheck.class)
     private Integer goodsCount;
 
+
 }

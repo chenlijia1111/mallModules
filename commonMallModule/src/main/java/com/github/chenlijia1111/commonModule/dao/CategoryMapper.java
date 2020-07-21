@@ -25,6 +25,13 @@ public interface CategoryMapper extends Mapper<Category> {
      */
     List<CategoryVo> listAllChildCategory(@Param("idSet") Set<Integer> idSet);
 
+    /**
+     * 查询所有的上级类别，包含自己
+     * @param idSet
+     * @return
+     */
+    List<CategoryVo> listAllParentCategory(@Param("idSet") Set<Integer> idSet);
+
 
     /**
      * 批量修改状态

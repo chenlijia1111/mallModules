@@ -53,6 +53,13 @@ public interface CategoryServiceI {
     List<CategoryVo> listAllChildCategory(Set<Integer> idSet);
 
     /**
+     * 查询所有的上级类别，包含自己
+     * @param idSet
+     * @return
+     */
+    List<CategoryVo> listAllParentCategory(Set<Integer> idSet);
+
+    /**
      * 批量修改状态
      * @param openStatus
      * @param idSet
@@ -75,5 +82,19 @@ public interface CategoryServiceI {
      */
     Result updateByCondition(Category category,Example condition);
 
+    /**
+     * 主键查询
+     * @param id
+     * @return
+     */
+    Category findById(Integer id);
+
+
+    /**
+     * 条件查询
+     * @param condition
+     * @return
+     */
+    List<Category> listByCondition(Example condition);
 
 }

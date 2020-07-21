@@ -27,13 +27,14 @@
     <result column="delete_status" jdbcType="INTEGER" property="deleteStatus" />
     <result column="cancel_time" jdbcType="TIMESTAMP" property="cancelTime" />
     <result column="complete_status" jdbcType="INTEGER" property="completeStatus" />
+    <result column="single_order_append" jdbcType="VARCHAR" property="singleOrderAppend" />
   </resultMap>
   <sql id="Base_Column_List">
     order_no, custom, shops, goods_id, count, state, order_type,
            product_amount_total, pay_channel, pay_record, transaction_id,
            good_price, order_amount_total, pay_time, details_json, shop_group_id,
            group_id, payable, order_coupon, create_time, remarks, shop_remarks,
-           delete_status,cancel_time,complete_status
+           delete_status,cancel_time,complete_status, single_order_append
   </sql>
   <select id="listByGroupIdSet" resultMap="BaseResultMap">
     SELECT
