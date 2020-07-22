@@ -2,6 +2,7 @@ package com.github.chenlijia1111.commonModule.service;
 
 import com.github.chenlijia1111.commonModule.entity.ReceivingGoodsOrder;
 import com.github.chenlijia1111.utils.common.Result;
+import tk.mybatis.mapper.entity.Example;
 
 import java.util.List;
 import java.util.Set;
@@ -55,4 +56,12 @@ public interface ReceivingGoodsOrderServiceI {
      * @param returnNo
      */
     void deleteByReturnNo(String returnNo);
+
+    /**
+     * 修改
+     * @param receivingGoodsOrder
+     * @param condition
+     * @return
+     */
+    Result update(ReceivingGoodsOrder receivingGoodsOrder, Example condition);
 }

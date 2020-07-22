@@ -384,6 +384,48 @@ public class ShoppingOrderServiceImpl implements ShoppingOrderServiceI {
     }
 
 
+
+
+    /**
+     * 条件查询
+     *
+     * @param condition
+     * @return
+     */
+    @Override
+    public List<ShoppingOrder> listByCondition(Example condition) {
+        if (Objects.nonNull(condition)) {
+            return shoppingOrderMapper.selectByExample(condition);
+        }
+        return new ArrayList<>();
+    }
+
+    /**
+     * 根据组订单编号查询
+     * @param groupIdSet 1
+     * @return
+     */
+    @Override
+    public List<ShoppingOrder> listByGroupIdSet(Set<String> groupIdSet) {
+        if(Sets.isNotEmpty(groupIdSet)){
+            return shoppingOrderMapper.listByGroupIdSet(groupIdSet);
+        }
+        return new ArrayList<>();
+    }
+
+    /**
+     * 根据组订单编号查询-忽略长字段，加快查询速度
+     * @param groupIdSet 1
+     * @return
+     */
+    @Override
+    public List<ShoppingOrder> listByGroupIdSetFilterLongField(Set<String> groupIdSet) {
+        if(Sets.isNotEmpty(groupIdSet)){
+            return shoppingOrderMapper.listByGroupIdSetFilterLongField(groupIdSet);
+        }
+        return new ArrayList<>();
+    }
+
     /**
      * 根据订单编号集合查询订单集合
      *
@@ -399,15 +441,40 @@ public class ShoppingOrderServiceImpl implements ShoppingOrderServiceI {
     }
 
     /**
-     * 条件查询
-     *
-     * @param condition
+     * 根据订单编号查询-忽略长字段，加快查询速度
+     * @param orderNoSet 1
      * @return
      */
     @Override
-    public List<ShoppingOrder> listByCondition(Example condition) {
-        if (Objects.nonNull(condition)) {
-            return shoppingOrderMapper.selectByExample(condition);
+    public List<ShoppingOrder> listByOrderNoSetFilterLongField(Set<String> orderNoSet) {
+        if(Sets.isNotEmpty(orderNoSet)){
+            return shoppingOrderMapper.listByOrderNoSetFilterLongField(orderNoSet);
+        }
+        return new ArrayList<>();
+    }
+
+    /**
+     * 根据商家组订单编号查询
+     * @param shopGroupIdSet
+     * @return
+     */
+    @Override
+    public List<ShoppingOrder> listByShopGroupIdSet(Set<String> shopGroupIdSet) {
+        if(Sets.isNotEmpty(shopGroupIdSet)){
+            return shoppingOrderMapper.listByShopGroupIdSet(shopGroupIdSet);
+        }
+        return new ArrayList<>();
+    }
+
+    /**
+     * 根据商家组订单编号查询
+     * @param shopGroupIdSet
+     * @return
+     */
+    @Override
+    public List<ShoppingOrder> listByShopGroupIdSetFilterLongField(Set<String> shopGroupIdSet) {
+        if(Sets.isNotEmpty(shopGroupIdSet)){
+            return shoppingOrderMapper.listByShopGroupIdSetFilterLongField(shopGroupIdSet);
         }
         return new ArrayList<>();
     }

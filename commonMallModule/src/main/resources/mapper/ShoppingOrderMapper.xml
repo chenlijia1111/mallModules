@@ -45,6 +45,19 @@
       #{groupId}
     </foreach>
   </select>
+  <select id="listByGroupIdSetFilterLongField" resultMap="BaseResultMap">
+    SELECT
+    order_no, custom, shops, goods_id, count, state, order_type,
+    product_amount_total, pay_channel, pay_record, transaction_id,
+    good_price, order_amount_total, pay_time, shop_group_id,
+    group_id, payable, create_time, remarks, shop_remarks,
+    delete_status,cancel_time,complete_status, single_order_append
+    FROM
+    s_shopping_order
+    <foreach collection="groupIdSet" item="groupId" open="WHERE group_id IN (" close=")" separator=",">
+      #{groupId}
+    </foreach>
+  </select>
   <select id="listByOrderNoSet" resultMap="BaseResultMap">
     SELECT
     <include refid="Base_Column_List"></include>
@@ -54,9 +67,35 @@
       #{orderNo}
     </foreach>
   </select>
+  <select id="listByOrderNoSetFilterLongField" resultMap="BaseResultMap">
+    SELECT
+    order_no, custom, shops, goods_id, count, state, order_type,
+    product_amount_total, pay_channel, pay_record, transaction_id,
+    good_price, order_amount_total, pay_time, shop_group_id,
+    group_id, payable, create_time, remarks, shop_remarks,
+    delete_status,cancel_time,complete_status, single_order_append
+    FROM
+    s_shopping_order
+    <foreach collection="orderNoSet" item="orderNo" open="WHERE order_no IN (" close=")" separator=",">
+      #{orderNo}
+    </foreach>
+  </select>
   <select id="listByShopGroupIdSet" resultMap="BaseResultMap">
     SELECT
     <include refid="Base_Column_List"></include>
+    FROM
+    s_shopping_order
+    <foreach collection="shopGroupIdSet" item="shopGroupId" open="WHERE shop_group_id IN (" close=")" separator=",">
+      #{shopGroupId}
+    </foreach>
+  </select>
+  <select id="listByShopGroupIdSetFilterLongField" resultMap="BaseResultMap">
+    SELECT
+    order_no, custom, shops, goods_id, count, state, order_type,
+    product_amount_total, pay_channel, pay_record, transaction_id,
+    good_price, order_amount_total, pay_time, shop_group_id,
+    group_id, payable, create_time, remarks, shop_remarks,
+    delete_status,cancel_time,complete_status, single_order_append
     FROM
     s_shopping_order
     <foreach collection="shopGroupIdSet" item="shopGroupId" open="WHERE shop_group_id IN (" close=")" separator=",">
@@ -85,7 +124,7 @@
     INSERT INTO s_shopping_order (order_no, custom, shops, goods_id, count, state, order_type, product_amount_total,
                                   pay_channel, pay_record, transaction_id, good_price, order_amount_total, pay_time,
                                   details_json, shop_group_id, group_id, payable, order_coupon, create_time, remarks,
-                                  shop_remarks, delete_status,cancel_time,complete_status) VALUES
+                                  shop_remarks, delete_status,cancel_time,complete_status,single_order_append) VALUES
     <foreach collection="shoppingOrderList" item="shoppingOrder" separator=",">
       (#{shoppingOrder.orderNo},#{shoppingOrder.custom},#{shoppingOrder.shops},#{shoppingOrder.goodsId},
        #{shoppingOrder.count},#{shoppingOrder.state},
@@ -95,7 +134,7 @@
        #{shoppingOrder.shopGroupId},#{shoppingOrder.groupId},#{shoppingOrder.payable},
       #{shoppingOrder.orderCoupon},#{shoppingOrder.createTime},#{shoppingOrder.remarks},
        #{shoppingOrder.shopRemarks},#{shoppingOrder.deleteStatus},#{shoppingOrder.cancelTime},
-      #{shoppingOrder.completeStatus})
+      #{shoppingOrder.completeStatus},#{shoppingOrder.singleOrderAppend})
     </foreach>
   </insert>
   <select id="listDelayNotPayOrder" resultType="com.github.chenlijia1111.commonModule.common.responseVo.order.DelayNotPayOrder">

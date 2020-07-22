@@ -26,6 +26,7 @@ public interface ShoppingOrderServiceI {
 
     /**
      * 批量添加购物单
+     *
      * @param shoppingOrderList
      * @return
      */
@@ -94,6 +95,7 @@ public interface ShoppingOrderServiceI {
 
     /**
      * 更新
+     *
      * @param shoppingOrder
      * @param condition
      * @return
@@ -102,33 +104,83 @@ public interface ShoppingOrderServiceI {
 
     /**
      * 取消订单
+     *
      * @param groupId
      * @param canCancelStatus 可以取消订单的状态
      * @return
      */
-    Result cancelOrder(String groupId,List<Integer> canCancelStatus);
+    Result cancelOrder(String groupId, List<Integer> canCancelStatus);
 
     /**
      * 根据订单编号取消订单
+     *
      * @param orderNo
      * @param canCancelStatus 可以取消订单的状态
      * @return
      */
-    Result cancelOrderByOrderNo(String orderNo,List<Integer> canCancelStatus);
+    Result cancelOrderByOrderNo(String orderNo, List<Integer> canCancelStatus);
 
-    /**
-     * 根据订单编号集合查询订单集合
-     * @param orderNoSet
-     * @return
-     */
-    List<ShoppingOrder> listByOrderNoSet(Set<String> orderNoSet);
 
     /**
      * 条件查询
+     *
      * @param condition
      * @return
      */
     List<ShoppingOrder> listByCondition(Example condition);
+
+
+    /**
+     * 通过组订单Id集合查询订单集合
+     *
+     * @param groupIdSet 1
+     * @return java.util.List<com.github.chenlijia1111.commonModule.entity.ShoppingOrder>
+     * @since 下午 3:29 2019/11/7 0007
+     **/
+    List<ShoppingOrder> listByGroupIdSet(Set<String> groupIdSet);
+
+    /**
+     * 通过组订单Id集合查询订单集合---过滤掉长内容的字段，减少查询时间
+     *
+     * @param groupIdSet 1
+     * @return java.util.List<com.github.chenlijia1111.commonModule.entity.ShoppingOrder>
+     * @since 下午 3:29 2019/11/7 0007
+     **/
+    List<ShoppingOrder> listByGroupIdSetFilterLongField(Set<String> groupIdSet);
+
+    /**
+     * 根据订单编号查询
+     *
+     * @param orderNoSet 1
+     * @return java.util.List<com.github.chenlijia1111.commonModule.entity.ShoppingOrder>
+     * @since 下午 3:42 2019/11/7 0007
+     **/
+    List<ShoppingOrder> listByOrderNoSet(Set<String> orderNoSet);
+
+    /**
+     * 根据订单编号查询---过滤掉长内容的字段，减少查询时间
+     *
+     * @param orderNoSet 1
+     * @return java.util.List<com.github.chenlijia1111.commonModule.entity.ShoppingOrder>
+     * @since 下午 3:42 2019/11/7 0007
+     **/
+    List<ShoppingOrder> listByOrderNoSetFilterLongField(Set<String> orderNoSet);
+
+    /**
+     * 根据shopGroupId集合查询订单
+     *
+     * @param shopGroupIdSet
+     * @return
+     */
+    List<ShoppingOrder> listByShopGroupIdSet(Set<String> shopGroupIdSet);
+
+    /**
+     * 根据shopGroupId集合查询订单---过滤掉长内容的字段，减少查询时间
+     *
+     * @param shopGroupIdSet
+     * @return
+     */
+    List<ShoppingOrder> listByShopGroupIdSetFilterLongField(Set<String> shopGroupIdSet);
 
 
 }

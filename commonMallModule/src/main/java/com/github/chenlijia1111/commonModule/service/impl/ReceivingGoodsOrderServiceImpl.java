@@ -9,9 +9,11 @@ import com.github.chenlijia1111.commonModule.dao.ReceivingGoodsOrderMapper;
 import com.github.chenlijia1111.commonModule.entity.ReceivingGoodsOrder;
 import com.github.chenlijia1111.commonModule.service.ReceivingGoodsOrderServiceI;
 import org.springframework.stereotype.Service;
+import tk.mybatis.mapper.entity.Example;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -99,5 +101,20 @@ public class ReceivingGoodsOrderServiceImpl implements ReceivingGoodsOrderServic
         if (StringUtils.isNotEmpty(returnNo)) {
             receivingGoodsOrderMapper.deleteByReturnNo(returnNo);
         }
+    }
+
+    /**
+     * 修改
+     * @param receivingGoodsOrder
+     * @param condition
+     * @return
+     */
+    @Override
+    public Result update(ReceivingGoodsOrder receivingGoodsOrder, Example condition) {
+        if(Objects.nonNull(receivingGoodsOrder) && Objects.nonNull(condition)){
+            int i = receivingGoodsOrderMapper.updateByExample(receivingGoodsOrder, condition);
+            return i > 0 ? Result.success("操作成功") : Result.failure("操作失败");
+        }
+        return Result.success("操作成功");
     }
 }

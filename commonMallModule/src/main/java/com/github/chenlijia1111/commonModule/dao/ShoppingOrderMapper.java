@@ -29,7 +29,15 @@ public interface ShoppingOrderMapper extends Mapper<ShoppingOrder> {
     List<ShoppingOrder> listByGroupIdSet(@Param("groupIdSet") Set<String> groupIdSet);
 
     /**
-     * 根据订单
+     * 通过组订单Id集合查询订单集合---过滤掉长内容的字段，减少查询时间
+     * @since 下午 3:29 2019/11/7 0007
+     * @param groupIdSet 1
+     * @return java.util.List<com.github.chenlijia1111.commonModule.entity.ShoppingOrder>
+     **/
+    List<ShoppingOrder> listByGroupIdSetFilterLongField(@Param("groupIdSet") Set<String> groupIdSet);
+
+    /**
+     * 根据订单编号查询
      * @since 下午 3:42 2019/11/7 0007
      * @param orderNoSet 1
      * @return java.util.List<com.github.chenlijia1111.commonModule.entity.ShoppingOrder>
@@ -37,11 +45,26 @@ public interface ShoppingOrderMapper extends Mapper<ShoppingOrder> {
     List<ShoppingOrder> listByOrderNoSet(@Param("orderNoSet") Set<String> orderNoSet);
 
     /**
+     * 根据订单编号查询---过滤掉长内容的字段，减少查询时间
+     * @since 下午 3:42 2019/11/7 0007
+     * @param orderNoSet 1
+     * @return java.util.List<com.github.chenlijia1111.commonModule.entity.ShoppingOrder>
+     **/
+    List<ShoppingOrder> listByOrderNoSetFilterLongField(@Param("orderNoSet") Set<String> orderNoSet);
+
+    /**
      * 根据shopGroupId集合查询订单
      * @param shopGroupIdSet
      * @return
      */
     List<ShoppingOrder> listByShopGroupIdSet(@Param("shopGroupIdSet") Set<String> shopGroupIdSet);
+
+    /**
+     * 根据shopGroupId集合查询订单---过滤掉长内容的字段，减少查询时间
+     * @param shopGroupIdSet
+     * @return
+     */
+    List<ShoppingOrder> listByShopGroupIdSetFilterLongField(@Param("shopGroupIdSet") Set<String> shopGroupIdSet);
 
 
     /**
