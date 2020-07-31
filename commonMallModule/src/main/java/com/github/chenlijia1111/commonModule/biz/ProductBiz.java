@@ -29,6 +29,18 @@ import java.util.stream.Collectors;
 @Service(CommonMallConstants.BEAN_SUFFIX + "ProductBiz")
 public class ProductBiz {
 
+    /**
+     * 更新产品信息的时候
+     * 跟新商品信息
+     * 是否需要忽略 goodNo
+     * 默认否 不忽略
+     * 为什么会有这个需求呢
+     * 有时候这个goodNo 是后台生成的，但是前端传递数据的时候不好处理哪些是变化的了商品信息
+     * 哪些是没变化的商品信息，并且还要去做一系列的匹配操作等等
+     * 所以这里给一个字段，编辑的时候 goodNo 就跟 goodId 一样，不会变
+     */
+    public static Integer UPDATE_PRODUCT_IGNORE_GOOD_NO = BooleanConstant.NO_INTEGER;
+
     @Autowired
     private ProductServiceI productService;//产品
     @Autowired
@@ -132,6 +144,10 @@ public class ProductBiz {
                     setStockCount(goodAddParams.getStockCount()).
                     setGoodImage(goodAddParams.getGoodImage());
 
+            if (Objects.equals(BooleanConstant.YES_INTEGER, UPDATE_PRODUCT_IGNORE_GOOD_NO)) {
+                //忽略 goodNo
+                goods.setGoodNo(null);
+            }
             goodsList.add(goods);
 
             //添加这个商品的规格属性
@@ -253,7 +269,7 @@ public class ProductBiz {
         List<GoodSpec> batchAddGoodSpecList = new ArrayList<>();
 
         for (GoodAddParams goodAddParams : goodList) {
-
+            //看能不能找到匹配的商品信息，找到了，就用更新操作，没找到就用添加操作
             GoodVo goodVo = findMatchGoodVo(goodAddParams.transferToReleaseProductSkuVo(), listByCondition);
             Goods goods = null;
             if (Objects.nonNull(goodVo)) {
@@ -902,7 +918,6 @@ public class ProductBiz {
 
         return null;
     }
-
 
 
 }

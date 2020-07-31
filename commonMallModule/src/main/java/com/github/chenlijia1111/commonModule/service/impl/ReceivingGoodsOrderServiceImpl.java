@@ -112,7 +112,7 @@ public class ReceivingGoodsOrderServiceImpl implements ReceivingGoodsOrderServic
     @Override
     public Result update(ReceivingGoodsOrder receivingGoodsOrder, Example condition) {
         if(Objects.nonNull(receivingGoodsOrder) && Objects.nonNull(condition)){
-            int i = receivingGoodsOrderMapper.updateByExample(receivingGoodsOrder, condition);
+            int i = receivingGoodsOrderMapper.updateByExampleSelective(receivingGoodsOrder, condition);
             return i > 0 ? Result.success("操作成功") : Result.failure("操作失败");
         }
         return Result.success("操作成功");

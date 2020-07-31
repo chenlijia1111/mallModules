@@ -42,6 +42,12 @@ public class GoodVo extends Goods {
      */
     public static String specDelimiter = "/";
 
+    /**
+     * 规格名称
+     * 默认不进行构建，调用者自行构建
+     */
+    private String skuName;
+
 
     /**
      * 商品规格

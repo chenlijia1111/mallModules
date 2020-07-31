@@ -14,6 +14,7 @@ import tk.mybatis.mapper.util.Sqls;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -109,5 +110,20 @@ public class ImmediatePaymentOrderServiceImpl implements ImmediatePaymentOrderSe
     @Override
     public List<ImmediatePaymentOrder> listNotReceiveSendOrder() {
         return immediatePaymentOrderMapper.listNotReceiveSendOrder();
+    }
+
+    /**
+     * 修改
+     * @param immediatePaymentOrder
+     * @param condition
+     * @return
+     */
+    @Override
+    public Result update(ImmediatePaymentOrder immediatePaymentOrder, Example condition) {
+        if(Objects.nonNull(immediatePaymentOrder) && Objects.nonNull(condition)){
+            int i = immediatePaymentOrderMapper.updateByExampleSelective(immediatePaymentOrder, condition);
+            return i > 0 ? Result.success("操作成功") : Result.failure("操作失败");
+        }
+        return Result.success("操作成功");
     }
 }

@@ -2,6 +2,7 @@ package com.github.chenlijia1111.commonModule.service;
 
 import com.github.chenlijia1111.utils.common.Result;
 import com.github.chenlijia1111.commonModule.entity.ImmediatePaymentOrder;
+import tk.mybatis.mapper.entity.Example;
 
 import java.util.List;
 import java.util.Set;
@@ -60,5 +61,13 @@ public interface ImmediatePaymentOrderServiceI {
      * @return
      */
     List<ImmediatePaymentOrder> listNotReceiveSendOrder();
+
+    /**
+     * 修改
+     * @param immediatePaymentOrder
+     * @param condition
+     * @return
+     */
+    Result update(ImmediatePaymentOrder immediatePaymentOrder, Example condition);
 
 }
