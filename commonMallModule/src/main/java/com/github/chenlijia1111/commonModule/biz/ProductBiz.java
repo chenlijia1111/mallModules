@@ -144,10 +144,6 @@ public class ProductBiz {
                     setStockCount(goodAddParams.getStockCount()).
                     setGoodImage(goodAddParams.getGoodImage());
 
-            if (Objects.equals(BooleanConstant.YES_INTEGER, UPDATE_PRODUCT_IGNORE_GOOD_NO)) {
-                //忽略 goodNo
-                goods.setGoodNo(null);
-            }
             goodsList.add(goods);
 
             //添加这个商品的规格属性
@@ -226,7 +222,7 @@ public class ProductBiz {
                 setUpdateTime(currentTime).
                 setDeleteStatus(BooleanConstant.NO_INTEGER);
 
-        //添加产品
+        //修改产品
         productService.update(product);
 
         //查询出这个产品原先的所有商品
@@ -289,6 +285,11 @@ public class ProductBiz {
                         setUpdateTime(currentTime).
                         setStockCount(goodAddParams.getStockCount()).
                         setGoodImage(goodAddParams.getGoodImage());
+
+                if (Objects.equals(BooleanConstant.YES_INTEGER, UPDATE_PRODUCT_IGNORE_GOOD_NO)) {
+                    //忽略 修改 goodNo
+                    goods.setGoodNo(null);
+                }
 
                 goodsService.update(goods);
 
