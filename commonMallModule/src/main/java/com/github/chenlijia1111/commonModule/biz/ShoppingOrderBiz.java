@@ -50,9 +50,8 @@ import java.util.stream.Collectors;
  * @see com.github.chenlijia1111.commonModule.common.schedules.OrderAutoReceiveTask
  * <p>
  * 确认收货后一段时间内自动评价 这里已经实现了，调用者只需要注入即可
- *
- * TODO 1.6 把下单是否需要判断库存 从参数中移除，修改为系统变量。放在参数中还是不太安全，有可能会忘记验证
- *
+ * <p>
+ * 1.6 修改 把下单是否需要判断库存 从参数中移除，修改为系统变量。放在参数中还是不太安全，有可能会忘记验证
  * @see OrderAutoEvaluateTask
  * @since 2019-11-05 16:39:24
  **/
@@ -74,6 +73,15 @@ public class ShoppingOrderBiz {
     private CommonModuleUserServiceI commonModuleUserService;//用户
     @Autowired
     private CouponServiceI couponService;//优惠券
+
+
+    /**
+     * 下单是否需要判断库存
+     * 默认是需要判断
+     * 因为有一些场景没库存也能买，比如预订单这些，可以付定金购买 CHECK_GOOD_STOCK_STATUS
+     * 默认要检查
+     */
+    public static Integer CHECK_GOOD_STOCK_STATUS = BooleanConstant.YES_INTEGER;
 
 
     /**
@@ -157,7 +165,7 @@ public class ShoppingOrderBiz {
             }
 
             //判断库存是否充足
-            if (Objects.equals(BooleanConstant.YES_INTEGER, params.getCheckGoodStockStatus()) &&
+            if (Objects.equals(BooleanConstant.YES_INTEGER, CHECK_GOOD_STOCK_STATUS) &&
                     goodVo.getStockCount() < addParams.getCount()) {
                 return Result.failure("商品库存不足");
             }

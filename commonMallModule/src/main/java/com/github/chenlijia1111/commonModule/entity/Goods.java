@@ -116,6 +116,16 @@ public class Goods {
     @Column(name = "delete_status")
     private Integer deleteStatus;
 
+    /**
+     * 规格名称
+     * 用于在创建商品的时候就直接生成规格名称，查询的时候就可以直接使用
+     * 避免另外查询
+     */
+    @ApiModelProperty("规格名称")
+    @PropertyCheck(name = "规格名称")
+    @Column(name = "default_sku_name")
+    private String defaultSkuName;
+
 
     public Goods setStockCount(Integer stockCount) {
         this.stockCount = (Objects.isNull(stockCount) || stockCount < 0) ? 0 : stockCount;

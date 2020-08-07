@@ -6,7 +6,7 @@
 
     <groupId>com.github.chenlijia1111</groupId>
     <artifactId>mallModules</artifactId>
-    <version>1.5-SNAPSHOT</version>
+    <version>1.6-SNAPSHOT</version>
     <description>商城多模块系统</description>
     <packaging>pom</packaging>
 

@@ -2,8 +2,10 @@ package com.github.chenlijia1111.commonModule.common.requestVo.product;
 
 import com.github.chenlijia1111.commonModule.common.checkFunction.NaturalNumberCheck;
 import com.github.chenlijia1111.commonModule.common.checkFunction.PriceCheck;
+import com.github.chenlijia1111.commonModule.common.responseVo.product.GoodVo;
 import com.github.chenlijia1111.commonModule.common.responseVo.product.ReleaseProductSkuSpecVo;
 import com.github.chenlijia1111.commonModule.common.responseVo.product.ReleaseProductSkuVo;
+import com.github.chenlijia1111.utils.core.StringUtils;
 import com.github.chenlijia1111.utils.core.annos.PropertyCheck;
 import com.github.chenlijia1111.utils.list.Lists;
 import io.swagger.annotations.ApiModel;
@@ -79,16 +81,17 @@ public class GoodAddParams {
 
     /**
      * 转换 为构建规格对象
+     *
      * @return
      */
-    public ReleaseProductSkuVo transferToReleaseProductSkuVo(){
+    public ReleaseProductSkuVo transferToReleaseProductSkuVo() {
         ReleaseProductSkuVo vo = new ReleaseProductSkuVo();
         vo.setPrice(this.price);
         vo.setMarketPrice(this.marketPrice);
         vo.setVipPrice(this.vipPrice);
         vo.setStockCount(this.stockCount);
 
-        if(Lists.isNotEmpty(this.goodSpecParamsList)){
+        if (Lists.isNotEmpty(this.goodSpecParamsList)) {
             List<GoodSpecParams> goodSpecParamsList = this.goodSpecParamsList;
 
             List<ReleaseProductSkuSpecVo> skuSpecVos = new ArrayList<>();
@@ -105,6 +108,41 @@ public class GoodAddParams {
             vo.setSkuSpecVos(skuSpecVos);
         }
         return vo;
+    }
+
+    /**
+     * 构建规格名称
+     * 不用默认的sku生成方式 自定义
+     * 与 {@link GoodVo#releaseSkuName()} 进行同步
+     *
+     * @return
+     */
+    public String releaseSkuName() {
+
+        StringBuilder skuName = new StringBuilder();
+
+        List<GoodSpecParams> goodSpecParamsList = this.getGoodSpecParamsList();
+        if (Lists.isNotEmpty(goodSpecParamsList)) {
+            for (GoodSpecParams goodSpecVo : goodSpecParamsList) {
+                if (GoodVo.needSpecName) {
+                    skuName.append(goodSpecVo.getSpecName());
+                    if (StringUtils.isNotEmpty(GoodVo.specNameAndValueDelimiter)) {
+                        skuName.append(GoodVo.specNameAndValueDelimiter);
+                    }
+                }
+
+                skuName.append(goodSpecVo.getSpecValue());
+                if (StringUtils.isNotEmpty(GoodVo.specDelimiter)) {
+                    skuName.append(GoodVo.specDelimiter);
+                }
+            }
+
+            //删除最后一个规格分隔符
+            if (StringUtils.isNotEmpty(GoodVo.specDelimiter)) {
+                skuName.delete(skuName.length() - GoodVo.specDelimiter.length(), skuName.length());
+            }
+        }
+        return skuName.toString();
     }
 
 }

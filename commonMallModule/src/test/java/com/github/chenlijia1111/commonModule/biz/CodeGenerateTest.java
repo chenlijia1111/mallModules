@@ -35,7 +35,7 @@ public class CodeGenerateTest {
         mybatisCodeGeneratorUtil.setCommonCode(false);
 
         Map<String, String> tableToDomain = mybatisCodeGeneratorUtil.getTableToDoMain();
-        tableToDomain.put("s_system_config", "SystemConfig");
+        tableToDomain.put("s_good_spec_json", "GoodSpecJson");
 
         List<String> ignoreDoMainToBusiness = mybatisCodeGeneratorUtil.getIgnoreDoMainToBusiness();
     }

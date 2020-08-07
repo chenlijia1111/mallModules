@@ -41,6 +41,7 @@ public class ProductBiz {
      */
     public static Integer UPDATE_PRODUCT_IGNORE_GOOD_NO = BooleanConstant.NO_INTEGER;
 
+
     @Autowired
     private ProductServiceI productService;//产品
     @Autowired
@@ -144,6 +145,8 @@ public class ProductBiz {
                     setStockCount(goodAddParams.getStockCount()).
                     setGoodImage(goodAddParams.getGoodImage());
 
+            //规格名称
+            goods.setDefaultSkuName(goodAddParams.releaseSkuName());
             goodsList.add(goods);
 
             //添加这个商品的规格属性
@@ -291,6 +294,8 @@ public class ProductBiz {
                     goods.setGoodNo(null);
                 }
 
+                //规格名称
+                goods.setDefaultSkuName(goodAddParams.releaseSkuName());
                 goodsService.update(goods);
 
                 updatedGoodIdList.add(goodId);
@@ -310,6 +315,8 @@ public class ProductBiz {
                         setStockCount(goodAddParams.getStockCount()).
                         setGoodImage(goodAddParams.getGoodImage());
 
+                //规格名称
+                goods.setDefaultSkuName(goodAddParams.releaseSkuName());
                 goodsService.add(goods);
             }
 

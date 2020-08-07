@@ -251,8 +251,8 @@ public class ProductServiceImpl implements ProductServiceI {
             List<GoodSpecVo> goodSpecVos = goodSpecMapper.listGoodSpecVoByProductIdSet(productIdSet);
             Map<String, List<GoodSpecVo>> goodSpecVoMap = goodSpecVos.stream().collect(Collectors.groupingBy(e -> e.getGoodId()));
             for (GoodVo goodVo : goodVoList) {
-                List<GoodSpecVo> collect = goodSpecVoMap.get(goodVo.getId());
-                goodVo.setGoodSpecVoList(collect);
+                List<GoodSpecVo> hitGoodSpecVoList = goodSpecVoMap.get(goodVo.getId());
+                goodVo.setGoodSpecVoList(hitGoodSpecVoList);
             }
 
             Map<String, List<ProductSpecVo>> productSpecVoMap = productSpecVos.stream().collect(Collectors.groupingBy(e -> e.getProductId()));
