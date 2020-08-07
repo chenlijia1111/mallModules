@@ -23,6 +23,22 @@
       #{goodId}
     </foreach>
   </select>
+  <select id="listGoodSpecVoByProductIdSet" resultType="com.github.chenlijia1111.commonModule.common.responseVo.product.GoodSpecVo">
+    SELECT
+    s_good_spec.id, s_good_spec.good_id goodId, s_good_spec.spec_value_id specValueId,
+    s_product_spec.spec_name specName,
+    s_product_spec_value.spec_value_image specImageValue,
+    s_product_spec_value.spec_value specValue
+    FROM
+    s_good_spec,s_product_spec,s_product_spec_value,s_goods
+    WHERE s_product_spec.id = s_product_spec_value.product_spec_id
+    AND s_good_spec.spec_value_id = s_product_spec_value.id
+    AND s_good_spec.good_id = s_goods.id
+    AND s_goods.delete_status = 0
+    <foreach collection="productIdSet" item="productId" open="AND s_goods.product_id IN (" close=")" separator=",">
+      #{productId}
+    </foreach>
+  </select>
   <delete id="deleteByProductId">
     DELETE
     FROM

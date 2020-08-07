@@ -24,6 +24,18 @@ public interface GoodSpecMapper extends Mapper<GoodSpec> {
      */
     List<GoodSpecVo> listGoodSpecVoByGoodIdSet(@Param("goodIdSet") Set<String> goodIdSet);
 
+
+    /**
+     * 通过产品id集合查询商品规格集合
+     * 因为如果商品很多的话， In 又不走索引，可能会导致查询时间过长
+     * 所以用 productId 进行关联查询会更快一点
+     * 一般查列表，一次也就10条数据，数据就不会很多
+     * 如果是通过商品id查询，碰到规格多的可能会有上百个 goodId 要通过 in 查询
+     * @param productIdSet
+     * @return
+     */
+    List<GoodSpecVo> listGoodSpecVoByProductIdSet(@Param("productIdSet") Set<String> productIdSet);
+
     /**
      * 删除该产品的所有商品的规格值
      * @since 上午 9:39 2019/11/5 0005

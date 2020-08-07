@@ -8,6 +8,7 @@ import java.util.Set;
 
 import com.github.chenlijia1111.commonModule.entity.ShopCar;
 import org.apache.ibatis.annotations.Param;
+import tk.mybatis.mapper.entity.Example;
 
 /**
  * 购物车
@@ -40,10 +41,19 @@ public interface ShopCarServiceI {
      * 条件查询
      *
      * @param condition      1
-     * @return      * @author chenLiJia
+     * @return
      * @since 2020-02-19 17:37:09
      **/
     List<ShopCar> listByCondition(ShopCar condition);
+
+    /**
+     * 条件查询
+     *
+     * @param condition      1
+     * @return
+     * @since 2020-02-19 17:37:09
+     **/
+    List<ShopCar> listByCondition(Example condition);
 
 
     /**

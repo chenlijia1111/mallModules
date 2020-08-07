@@ -23,6 +23,8 @@ import java.util.stream.Collectors;
 
 /**
  * 产品表
+ * <p>
+ * 2020-08-07 优化根据产品id查询产品信息，通过 groupBy 分组，在进行赋值，利用 map 减少每次查询对应的数据的时间
  *
  * @author chenLiJia
  * @since 2019-11-01 13:46:54
@@ -190,9 +192,10 @@ public class ProductServiceImpl implements ProductServiceI {
                 //查询这些产品规格所对应的值
                 Set<Integer> productSpecIdSet = productSpecVos.stream().map(e -> e.getId()).collect(Collectors.toSet());
                 List<ProductSpecValue> productSpecValueList = productSpecValueMapper.listBySpecIdSet(productSpecIdSet);
+                Map<Integer, List<ProductSpecValue>> productSpecValueMap = productSpecValueList.stream().collect(Collectors.groupingBy(e -> e.getProductSpecId()));
                 //关联规格值数据
                 for (ProductSpecVo specVo : productSpecVos) {
-                    List<ProductSpecValue> collect = productSpecValueList.stream().filter(e -> Objects.equals(e.getProductSpecId(), specVo.getId())).collect(Collectors.toList());
+                    List<ProductSpecValue> collect = productSpecValueMap.get(specVo.getId());
                     specVo.setProductSpecValueList(collect);
                 }
                 //产品的规格值
@@ -200,12 +203,11 @@ public class ProductServiceImpl implements ProductServiceI {
 
                 //商品信息
                 List<GoodVo> goodVoList = goodsMapper.listByProductIdSet(Sets.asSets(productId));
-                //商品id集合
-                Set<String> goodIdSet = goodVoList.stream().map(e -> e.getId()).collect(Collectors.toSet());
                 //关联商品的规格值
-                List<GoodSpecVo> goodSpecVos = goodSpecMapper.listGoodSpecVoByGoodIdSet(goodIdSet);
+                List<GoodSpecVo> goodSpecVos = goodSpecMapper.listGoodSpecVoByProductIdSet(Sets.asSets(productId));
+                Map<String, List<GoodSpecVo>> goodSpecVoMap = goodSpecVos.stream().collect(Collectors.groupingBy(e -> e.getGoodId()));
                 for (GoodVo goodVo : goodVoList) {
-                    List<GoodSpecVo> collect = goodSpecVos.stream().filter(e -> Objects.equals(e.getGoodId(), goodVo.getId())).collect(Collectors.toList());
+                    List<GoodSpecVo> collect = goodSpecVoMap.get(goodVo.getId());
                     goodVo.setGoodSpecVoList(collect);
                 }
                 //产品的商品列表
@@ -236,23 +238,25 @@ public class ProductServiceImpl implements ProductServiceI {
             //查询这些产品规格所对应的值
             Set<Integer> productSpecIdSet = productSpecVos.stream().map(e -> e.getId()).collect(Collectors.toSet());
             List<ProductSpecValue> productSpecValueList = productSpecValueMapper.listBySpecIdSet(productSpecIdSet);
+            Map<Integer, List<ProductSpecValue>> productSpecValueMap = productSpecValueList.stream().collect(Collectors.groupingBy(e -> e.getProductSpecId()));
             //关联规格值数据
             for (ProductSpecVo specVo : productSpecVos) {
-                List<ProductSpecValue> collect = productSpecValueList.stream().filter(e -> Objects.equals(e.getProductSpecId(), specVo.getId())).collect(Collectors.toList());
+                List<ProductSpecValue> collect = productSpecValueMap.get(specVo.getId());
                 specVo.setProductSpecValueList(collect);
             }
 
             //商品信息
             List<GoodVo> goodVoList = goodsMapper.listByProductIdSet(productIdSet);
-            //商品id集合
-            Set<String> goodIdSet = goodVoList.stream().map(e -> e.getId()).collect(Collectors.toSet());
             //关联商品的规格值
-            List<GoodSpecVo> goodSpecVos = goodSpecMapper.listGoodSpecVoByGoodIdSet(goodIdSet);
+            List<GoodSpecVo> goodSpecVos = goodSpecMapper.listGoodSpecVoByProductIdSet(productIdSet);
+            Map<String, List<GoodSpecVo>> goodSpecVoMap = goodSpecVos.stream().collect(Collectors.groupingBy(e -> e.getGoodId()));
             for (GoodVo goodVo : goodVoList) {
-                List<GoodSpecVo> collect = goodSpecVos.stream().filter(e -> Objects.equals(e.getGoodId(), goodVo.getId())).collect(Collectors.toList());
+                List<GoodSpecVo> collect = goodSpecVoMap.get(goodVo.getId());
                 goodVo.setGoodSpecVoList(collect);
             }
 
+            Map<String, List<ProductSpecVo>> productSpecVoMap = productSpecVos.stream().collect(Collectors.groupingBy(e -> e.getProductId()));
+            Map<String, List<GoodVo>> goodVoMap = goodVoList.stream().collect(Collectors.groupingBy(e -> e.getProductId()));
 
             //构建数据
             for (String productId : productIdSet) {
@@ -262,10 +266,10 @@ public class ProductServiceImpl implements ProductServiceI {
                     AdminProductVo productVo = new AdminProductVo();
                     BeanUtils.copyProperties(product, productVo);
                     //产品的规格值
-                    List<ProductSpecVo> currentProductProductSpecVoList = productSpecVos.stream().filter(e -> Objects.equals(e.getProductId(), productId)).collect(Collectors.toList());
+                    List<ProductSpecVo> currentProductProductSpecVoList = productSpecVoMap.get(productId);
                     productVo.setProductSpecVoList(currentProductProductSpecVoList);
                     //产品的商品列表
-                    List<GoodVo> currentProductGoodVoList = goodVoList.stream().filter(e -> Objects.equals(e.getProductId(), productId)).collect(Collectors.toList());
+                    List<GoodVo> currentProductGoodVoList = goodVoMap.get(productId);
                     productVo.setGoodVoList(currentProductGoodVoList);
                     list.add(productVo);
                 }

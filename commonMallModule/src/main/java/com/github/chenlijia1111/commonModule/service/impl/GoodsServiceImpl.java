@@ -17,12 +17,15 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
  * 商品表
+ * <p>
+ * 2020-08-07 优化根据产品id查询产品信息，通过 groupBy 分组，在进行赋值，利用 map 减少每次查询对应的数据的时间
  *
  * @author chenLiJia
  * @since 2019-11-01 13:46:54
@@ -132,14 +135,7 @@ public class GoodsServiceImpl implements GoodsServiceI {
 
         if (Sets.isNotEmpty(productIdSet)) {
             List<GoodVo> goodVoList = goodsMapper.listByProductIdSet(productIdSet);
-            //商品id集合
-            Set<String> goodIdSet = goodVoList.stream().map(e -> e.getId()).collect(Collectors.toSet());
-            //关联商品的规格值
-            List<GoodSpecVo> goodSpecVos = goodSpecMapper.listGoodSpecVoByGoodIdSet(goodIdSet);
-            for (GoodVo goodVo : goodVoList) {
-                List<GoodSpecVo> collect = goodSpecVos.stream().filter(e -> Objects.equals(e.getGoodId(), goodVo.getId())).collect(Collectors.toList());
-                goodVo.setGoodSpecVoList(collect);
-            }
+            getFullInfo(goodVoList);
             return goodVoList;
         }
 
@@ -162,9 +158,7 @@ public class GoodsServiceImpl implements GoodsServiceI {
                 GoodVo goodVo = new GoodVo();
                 BeanUtils.copyProperties(goods, goodVo);
 
-                //关联商品的规格值
-                List<GoodSpecVo> goodSpecVos = goodSpecMapper.listGoodSpecVoByGoodIdSet(Sets.asSets(goodId));
-                goodVo.setGoodSpecVoList(goodSpecVos);
+                getFullInfo(Lists.asList(goodVo));
                 return goodVo;
             }
 
@@ -184,11 +178,7 @@ public class GoodsServiceImpl implements GoodsServiceI {
         if (Sets.isNotEmpty(goodIdSet)) {
             List<GoodVo> goodVoList = goodsMapper.listByGoodIdSet(goodIdSet);
             //关联商品的规格值
-            List<GoodSpecVo> goodSpecVos = goodSpecMapper.listGoodSpecVoByGoodIdSet(goodIdSet);
-            for (GoodVo goodVo : goodVoList) {
-                List<GoodSpecVo> collect = goodSpecVos.stream().filter(e -> Objects.equals(e.getGoodId(), goodVo.getId())).collect(Collectors.toList());
-                goodVo.setGoodSpecVoList(collect);
-            }
+            getFullInfo(goodVoList);
             return goodVoList;
         }
 
@@ -203,9 +193,10 @@ public class GoodsServiceImpl implements GoodsServiceI {
     private void getFullInfo(List<GoodVo> list) {
         if (Lists.isNotEmpty(list)) {
             //商品id集合
-            Set<String> goodIdSet = list.stream().map(e -> e.getId()).collect(Collectors.toSet());
-            List<GoodSpecVo> goodSpecVos = goodSpecMapper.listGoodSpecVoByGoodIdSet(goodIdSet);
-            list.stream().forEach(e -> e.findGoodSpecVo(goodSpecVos));
+            Set<String> productIdSet = list.stream().map(e -> e.getProductId()).collect(Collectors.toSet());
+            List<GoodSpecVo> goodSpecVos = goodSpecMapper.listGoodSpecVoByProductIdSet(productIdSet);
+            Map<String, List<GoodSpecVo>> goodSpecVoMap = goodSpecVos.stream().collect(Collectors.groupingBy(e -> e.getGoodId()));
+            list.stream().forEach(e -> e.setGoodSpecVoList(goodSpecVoMap.get(e.getId())));
         }
     }
 

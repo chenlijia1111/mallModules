@@ -57,10 +57,14 @@ public class GoodVo extends Goods {
 
     /**
      * 查询商品规格值
+     * 2020-08-07---废弃，每个商品都通过这种方式去获取规格数据，消耗时间
+     * 已修改为 group by 的实行获取
+     * ----> GoodServiceImpl -> getFullInfo()
      *
      * @param list
      * @return
      */
+    @Deprecated
     public GoodVo findGoodSpecVo(List<GoodSpecVo> list) {
         if (Lists.isNotEmpty(list)) {
             List<GoodSpecVo> collect = list.stream().filter(e -> Objects.equals(e.getGoodId(), this.getId())).collect(Collectors.toList());

@@ -1,6 +1,5 @@
 package com.github.chenlijia1111.commonModule.service.impl;
 
-import com.github.chenlijia1111.commonModule.common.responseVo.product.GoodSpecVo;
 import com.github.chenlijia1111.commonModule.common.responseVo.product.GoodVo;
 import com.github.chenlijia1111.commonModule.common.responseVo.shopCar.ClientShopCarGroupByShopVo;
 import com.github.chenlijia1111.commonModule.common.responseVo.shopCar.ClientShopCarVo;
@@ -16,6 +15,7 @@ import com.github.chenlijia1111.utils.list.Lists;
 import com.github.chenlijia1111.utils.list.Sets;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import tk.mybatis.mapper.entity.Example;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -199,6 +199,20 @@ public class ShopCarServiceImpl implements ShopCarServiceI {
         return shopCarMapper.select(condition);
     }
 
+    /**
+     * 条件查询
+     *
+     * @param condition 1
+     * @return
+     * @since 2020-02-19 17:37:09
+     **/
+    @Override
+    public List<ShopCar> listByCondition(Example condition) {
+        if (Objects.nonNull(condition)) {
+            return shopCarMapper.selectByExample(condition);
+        }
+        return new ArrayList<>();
+    }
 
     /**
      * 根据购物车id集合查询购物车
