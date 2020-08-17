@@ -5,6 +5,8 @@ import com.github.chenlijia1111.commonModule.dao.ReceivingGoodsOrderMapper;
 import com.github.chenlijia1111.commonModule.dao.ShoppingOrderMapper;
 import com.github.chenlijia1111.commonModule.entity.ImmediatePaymentOrder;
 import com.github.chenlijia1111.commonModule.entity.ReceivingGoodsOrder;
+import com.github.chenlijia1111.commonModule.service.IAutoReceiveOrderHook;
+import com.github.chenlijia1111.commonModule.utils.SpringContextHolder;
 import com.github.chenlijia1111.utils.core.StringUtils;
 import org.joda.time.DateTime;
 
@@ -21,7 +23,7 @@ import java.util.concurrent.TimeUnit;
  * 一般情况都是根据物流情况，物流签收之后，隔一定时间如果还没没有收货就自动收货
  * <p>
  * 如果要使用的话就把他注入到spring中去
- * 在项目启动时，已经进行查询了待支付的订单进延时队列了，调用者不用自己实现，
+ * 在项目启动时，已经进行查询了待收货的订单进延时队列了，调用者不用自己实现，
  * {@link ShoppingOrderMapper#listDelayNotReceiveOrder()} 查询已签收但是没收货的订单，
  * 调用者需要定时查询物流状态，修改发货单的签收状态为已签收，并把数据放到延时队列
  * {@link ImmediatePaymentOrder#getExpressSignStatus()}
@@ -49,6 +51,7 @@ public class OrderAutoReceiveTask {
      * 添加未收货的订单到延时队列去
      * 添加时机 一般为 订单物流签收以后
      * 为了防止之前的队列数据在重启之后丢失，应该在重启的时候从数据库查询哪些是物流已签收的数据，并重新放入队列
+     *
      * @param orderNo
      * @param signTime
      * @param limitMinutes
@@ -63,7 +66,7 @@ public class OrderAutoReceiveTask {
 
             //判断这个orderNo是否已经是待处理了，如果已经存在就不重复处理了
             boolean contains = notReceiveOrderList.contains(delayNotReceiveOrder);
-            if(!contains){
+            if (!contains) {
                 notReceiveOrderList.put(delayNotReceiveOrder);
             }
         }
@@ -164,6 +167,14 @@ public class OrderAutoReceiveTask {
                         receiveOrder.setState(CommonMallConstants.ORDER_COMPLETE);
                         receiveOrder.setReceiveTime(new Date());
                         receivingGoodsOrderMapper.updateByPrimaryKeySelective(receiveOrder);
+
+                        try {
+                            //执行自动收货之后的钩子函数
+                            IAutoReceiveOrderHook autoReceiveOrderHook = SpringContextHolder.getBean(IAutoReceiveOrderHook.class);
+                            autoReceiveOrderHook.receiveHook(delayNotReceiveOrder.orderNo);
+                        } catch (Exception e) {
+                            //没有注入，找不到钩子实现对象
+                        }
                     }
                 } catch (InterruptedException e) {
                     e.printStackTrace();

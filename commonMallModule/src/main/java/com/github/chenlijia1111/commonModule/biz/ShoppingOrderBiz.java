@@ -146,8 +146,11 @@ public class ShoppingOrderBiz {
         for (SingleOrderAddParams addParams : singleOrderList) {
             //商品id
             String goodId = addParams.getGoodId();
-            //商品数量  添加参数允许添加多个相同的商品id->商品数量
-            Integer count = singleOrderList.stream().filter(e -> Objects.equals(e.getGoodId(), goodId)).
+            //商品数量
+            Integer count = addParams.getCount();
+
+            //这个商品所有的下单数量，允许参数中多个相同的 goodId ，但是要判断库存
+            Integer goodTotalCount = singleOrderList.stream().filter(e -> Objects.equals(e.getGoodId(), goodId)).
                     collect(Collectors.summingInt(e -> e.getCount()));
 
             //查询商品信息
@@ -166,7 +169,7 @@ public class ShoppingOrderBiz {
 
             //判断库存是否充足
             if (Objects.equals(BooleanConstant.YES_INTEGER, CHECK_GOOD_STOCK_STATUS) &&
-                    goodVo.getStockCount() < addParams.getCount()) {
+                    goodVo.getStockCount() < goodTotalCount) {
                 return Result.failure("商品库存不足");
             }
 
