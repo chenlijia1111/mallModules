@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -37,7 +38,7 @@ public class FightGroupAdminProductVo extends AdminProductVo {
      */
     @ApiModelProperty("拼团价格")
     @PropertyCheck(name = "拼团价格")
-    private Double fightPrice;
+    private BigDecimal fightPrice;
 
     /**
      * 成团人数

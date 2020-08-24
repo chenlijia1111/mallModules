@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import javax.persistence.*;
 
@@ -69,7 +70,7 @@ public class FightGroupProduct {
     @ApiModelProperty("拼团价格")
     @PropertyCheck(name = "拼团价格")
     @Column(name = "fight_price")
-    private Double fightPrice;
+    private BigDecimal fightPrice;
 
     /**
      * 拼团商品参与总库存

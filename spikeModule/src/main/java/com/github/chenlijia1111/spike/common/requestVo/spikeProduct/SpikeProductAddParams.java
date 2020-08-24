@@ -8,6 +8,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -54,7 +55,7 @@ public class SpikeProductAddParams {
      */
     @ApiModelProperty("秒杀价格")
     @PropertyCheck(name = "秒杀价格", checkFunction = PriceCheck.class)
-    private Double spikePrice;
+    private BigDecimal spikePrice;
 
     /**
      * 参与秒杀的库存数量

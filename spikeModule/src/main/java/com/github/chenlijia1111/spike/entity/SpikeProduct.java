@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import javax.persistence.*;
 
@@ -69,7 +70,7 @@ public class SpikeProduct {
     @ApiModelProperty("秒杀价格")
     @PropertyCheck(name = "秒杀价格")
     @Column(name = "spike_price")
-    private Double spikePrice;
+    private BigDecimal spikePrice;
 
     /**
      * 参与秒杀的库存数量

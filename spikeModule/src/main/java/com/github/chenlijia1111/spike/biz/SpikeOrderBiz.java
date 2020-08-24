@@ -28,6 +28,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -200,6 +201,8 @@ public class SpikeOrderBiz {
         spikeOrderRecodeService.add(spikeOrderRecode);
 
         //构建订单
+        //订单金额
+        BigDecimal productOrderAmountTotal = spikeProduct.getSpikePrice().multiply(new BigDecimal(count));
         ShoppingOrder shoppingOrder = new ShoppingOrder().setOrderNo(orderNo).
                 setCustom(userId).
                 setShops(product.getShops()).
@@ -207,9 +210,9 @@ public class SpikeOrderBiz {
                 setCount(count).
                 setState(CommonMallConstants.ORDER_INIT).
                 setOrderType(OrderTypeEnum.SPIKE_ORDER.getType()).
-                setProductAmountTotal(spikeProduct.getSpikePrice() * count).
+                setProductAmountTotal(productOrderAmountTotal).
                 setGoodPrice(spikeProduct.getSpikePrice()).
-                setOrderAmountTotal(spikeProduct.getSpikePrice() * count).
+                setOrderAmountTotal(productOrderAmountTotal).
                 setShopGroupId(shopGroupId).
                 setGroupId(groupId).
                 setCreateTime(currentTime).setRemarks(params.getRemarks());
@@ -293,9 +296,7 @@ public class SpikeOrderBiz {
 
 
         //总应付金额
-        Double payAble = shoppingOrder.getOrderAmountTotal();
-        //保留两位小数
-        payAble = NumberUtil.doubleToFixLengthDouble(payAble, 2);
+        BigDecimal payAble = shoppingOrder.getOrderAmountTotal();
         //最终的应付金额,待考虑
         shoppingOrder.setPayable(payAble);
 
@@ -388,15 +389,17 @@ public class SpikeOrderBiz {
         String orderNo = String.valueOf(IDGenerateFactory.ORDER_ID_UTIL.nextId());
 
         //构建订单
+        //订单金额
+        BigDecimal productAmountTotal = spikeProduct.getSpikePrice().multiply(new BigDecimal(count));
         ShoppingOrder shoppingOrder = new ShoppingOrder().setOrderNo(orderNo).
                 setCustom(userId).
                 setShops(product.getShops()).
                 setGoodsId(goodId).
                 setCount(count).
                 setState(CommonMallConstants.ORDER_INIT).
-                setProductAmountTotal(spikeProduct.getSpikePrice() * count).
+                setProductAmountTotal(productAmountTotal).
                 setGoodPrice(spikeProduct.getSpikePrice()).
-                setOrderAmountTotal(spikeProduct.getSpikePrice() * count).
+                setOrderAmountTotal(productAmountTotal).
                 setGroupId(groupId).
                 setCreateTime(currentTime).setRemarks(params.getRemarks());
 
@@ -431,9 +434,7 @@ public class SpikeOrderBiz {
 
 
         //总应付金额
-        Double payAble = shoppingOrder.getOrderAmountTotal();
-        //保留两位小数
-        payAble = NumberUtil.doubleToFixLengthDouble(payAble, 2);
+        BigDecimal payAble = shoppingOrder.getOrderAmountTotal();
         //最终的应付金额,待考虑
         shoppingOrder.setPayable(payAble);
 
@@ -450,8 +451,18 @@ public class SpikeOrderBiz {
         }
 
         //费用详情信息map
-        Map<String, Double> feeMap = abstractCouponList.stream().
-                collect(Collectors.groupingBy(AbstractCoupon::getCouponImplClassName, Collectors.summingDouble(e -> e.getEffectiveMoney())));
+        //费用详情信息map
+        Map<String, BigDecimal> feeMap = new HashMap<>();
+        for (AbstractCoupon coupon : abstractCouponList) {
+            String couponImplClassName = coupon.getCouponImplClassName();
+            BigDecimal couponMoney = feeMap.get(couponImplClassName);
+            if(Objects.isNull(couponMoney)){
+                couponMoney = new BigDecimal(0);
+            }
+
+            couponMoney = couponMoney.add(coupon.getEffectiveMoney());
+            feeMap.put(couponImplClassName,couponMoney);
+        }
         vo.setFeeMap(feeMap);
 
         //返回计算结果

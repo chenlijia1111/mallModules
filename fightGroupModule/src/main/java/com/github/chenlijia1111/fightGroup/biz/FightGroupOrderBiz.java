@@ -32,6 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -262,6 +263,8 @@ public class FightGroupOrderBiz {
         fightGroupUserOrderService.add(fightGroupUserOrder);
 
         //构建订单
+        //订单价格
+        BigDecimal productAmountTotal = fightGroupProduct.getFightPrice().multiply(new BigDecimal(count));
         ShoppingOrder shoppingOrder = new ShoppingOrder().setOrderNo(orderNo).
                 setCustom(userId).
                 setShops(product.getShops()).
@@ -269,9 +272,9 @@ public class FightGroupOrderBiz {
                 setCount(count).
                 setState(CommonMallConstants.ORDER_INIT).
                 setOrderType(OrderTypeEnum.FIGHT_GROUP_ORDER.getType()).
-                setProductAmountTotal(fightGroupProduct.getFightPrice() * count).
+                setProductAmountTotal(productAmountTotal).
                 setGoodPrice(fightGroupProduct.getFightPrice()).
-                setOrderAmountTotal(fightGroupProduct.getFightPrice() * count).
+                setOrderAmountTotal(productAmountTotal).
                 setShopGroupId(shopGroupId).
                 setGroupId(groupId).
                 setCreateTime(currentTime).setRemarks(params.getRemarks());
@@ -362,9 +365,7 @@ public class FightGroupOrderBiz {
 
 
         //总应付金额
-        Double payAble = shoppingOrder.getOrderAmountTotal();
-        //保留两位小数
-        payAble = NumberUtil.doubleToFixLengthDouble(payAble, 2);
+        BigDecimal payAble = shoppingOrder.getOrderAmountTotal();
         //最终的应付金额,待考虑
         shoppingOrder.setPayable(payAble);
 
@@ -463,6 +464,8 @@ public class FightGroupOrderBiz {
         //订单编号
         String orderNo = String.valueOf(IDGenerateFactory.ORDER_ID_UTIL.nextId());
         //构建订单
+        //订单商品价格
+        BigDecimal productOrderAmountTotal = fightGroupProduct.getFightPrice().multiply(new BigDecimal(count));
         ShoppingOrder shoppingOrder = new ShoppingOrder().setOrderNo(orderNo).
                 setCustom(userId).
                 setShops(product.getShops()).
@@ -470,9 +473,9 @@ public class FightGroupOrderBiz {
                 setCount(count).
                 setState(CommonMallConstants.ORDER_INIT).
                 setOrderType(OrderTypeEnum.FIGHT_GROUP_ORDER.getType()).
-                setProductAmountTotal(fightGroupProduct.getFightPrice() * count).
+                setProductAmountTotal(productOrderAmountTotal).
                 setGoodPrice(fightGroupProduct.getFightPrice()).
-                setOrderAmountTotal(fightGroupProduct.getFightPrice() * count).
+                setOrderAmountTotal(productOrderAmountTotal).
                 setShopGroupId(shopGroupId).
                 setGroupId(groupId).
                 setCreateTime(currentTime).setRemarks(params.getRemarks());
@@ -542,9 +545,7 @@ public class FightGroupOrderBiz {
 
 
         //总应付金额
-        Double payAble = shoppingOrder.getOrderAmountTotal();
-        //保留两位小数
-        payAble = NumberUtil.doubleToFixLengthDouble(payAble, 2);
+        BigDecimal payAble = shoppingOrder.getOrderAmountTotal();
         //最终的应付金额,待考虑
         shoppingOrder.setPayable(payAble);
 
@@ -563,8 +564,17 @@ public class FightGroupOrderBiz {
         }
 
         //费用详情信息map
-        Map<String, Double> feeMap = abstractCouponList.stream().
-                collect(Collectors.groupingBy(AbstractCoupon::getCouponImplClassName, Collectors.summingDouble(e -> e.getEffectiveMoney())));
+        Map<String, BigDecimal> feeMap = new HashMap<>();
+        for (AbstractCoupon coupon : abstractCouponList) {
+            String couponImplClassName = coupon.getCouponImplClassName();
+            BigDecimal couponMoney = feeMap.get(couponImplClassName);
+            if(Objects.isNull(couponMoney)){
+                couponMoney = new BigDecimal(0);
+            }
+
+            couponMoney = couponMoney.add(coupon.getEffectiveMoney());
+            feeMap.put(couponImplClassName,couponMoney);
+        }
         vo.setFeeMap(feeMap);
 
         //返回计算结果

@@ -16,7 +16,6 @@ import com.github.chenlijia1111.commonModule.utils.SpringContextHolder;
 import com.github.chenlijia1111.utils.common.Result;
 import com.github.chenlijia1111.utils.common.constant.BooleanConstant;
 import com.github.chenlijia1111.utils.core.JSONUtil;
-import com.github.chenlijia1111.utils.core.NumberUtil;
 import com.github.chenlijia1111.utils.core.PropertyCheckUtil;
 import com.github.chenlijia1111.utils.core.StringUtils;
 import com.github.chenlijia1111.utils.list.Lists;
@@ -51,14 +50,7 @@ import java.util.stream.Collectors;
  * @see com.github.chenlijia1111.commonModule.common.schedules.OrderAutoReceiveTask
  * <p>
  * 确认收货后一段时间内自动评价 这里已经实现了，调用者只需要注入即可
- * <p>
- * 1.6 修改 把下单是否需要判断库存 从参数中移除，修改为系统变量。放在参数中还是不太安全，有可能会忘记验证
- * 1.7 TODO 把所有价格修改为 bigdecimal
- * 累计修改项：
- * 商品金额
- * 订单金额
- * 售后订单退款金额
- * 优惠券金额
+ * 
  * @see OrderAutoEvaluateTask
  * @since 2019-11-05 16:39:24
  **/
