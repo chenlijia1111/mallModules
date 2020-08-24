@@ -10,6 +10,7 @@ import lombok.experimental.Accessors;
 import javax.persistence.Column;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -79,7 +80,7 @@ public class ReturnGoodsOrder {
     @ApiModelProperty("退货金额")
     @PropertyCheck(name = "退货金额")
     @Column(name = "re_fund")
-    private Double reFund;
+    private BigDecimal reFund;
 
     /**
      * 商家处理状态 0初始状态 983042成功 983041 失败或者取消

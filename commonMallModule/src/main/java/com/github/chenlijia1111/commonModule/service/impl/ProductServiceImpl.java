@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import tk.mybatis.mapper.entity.Example;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -292,29 +293,29 @@ public class ProductServiceImpl implements ProductServiceI {
             for (AdminProductListVo vo : list) {
                 List<Goods> collect = goods.stream().filter(e -> Objects.equals(e.getProductId(), vo.getId())).collect(Collectors.toList());
                 //查询最小市场价以及最大市场价
-                Optional<Double> minMarketPriceOption = collect.stream().map(e -> e.getMarketPrice()).min(Comparator.comparing(e -> e));
-                Optional<Double> maxMarketPriceOption = collect.stream().map(e -> e.getMarketPrice()).max(Comparator.comparing(e -> e));
+                Optional<BigDecimal> minMarketPriceOption = collect.stream().map(e -> e.getMarketPrice()).min(BigDecimal::compareTo);
+                Optional<BigDecimal> maxMarketPriceOption = collect.stream().map(e -> e.getMarketPrice()).max(BigDecimal::compareTo);
                 if (minMarketPriceOption.isPresent() && maxMarketPriceOption.isPresent()) {
-                    Double minMarketPrice = minMarketPriceOption.get();
-                    Double maxMarketPrice = maxMarketPriceOption.get();
+                    BigDecimal minMarketPrice = minMarketPriceOption.get();
+                    BigDecimal maxMarketPrice = maxMarketPriceOption.get();
                     vo.setMarketPriceRange(Objects.equals(minMarketPrice, maxMarketPrice) ? (minMarketPrice + "") : (minMarketPrice + "-" + maxMarketPrice));
                 }
 
                 //查询最小售价以及最大售价
-                Optional<Double> minPriceOption = collect.stream().map(e -> e.getPrice()).min(Comparator.comparing(e -> e));
-                Optional<Double> maxPriceOption = collect.stream().map(e -> e.getPrice()).max(Comparator.comparing(e -> e));
+                Optional<BigDecimal> minPriceOption = collect.stream().map(e -> e.getPrice()).min(BigDecimal::compareTo);
+                Optional<BigDecimal> maxPriceOption = collect.stream().map(e -> e.getPrice()).max(BigDecimal::compareTo);
                 if (minPriceOption.isPresent() && maxPriceOption.isPresent()) {
-                    Double minPrice = minPriceOption.get();
-                    Double maxPrice = maxPriceOption.get();
+                    BigDecimal minPrice = minPriceOption.get();
+                    BigDecimal maxPrice = maxPriceOption.get();
                     vo.setPriceRange(Objects.equals(minPrice, maxPrice) ? (minPrice + "") : (minPrice + "-" + maxPrice));
                 }
 
                 //查询最小会员价以及最大会员价
-                Optional<Double> minVIPPriceOption = collect.stream().map(e -> e.getVipPrice()).min(Comparator.comparing(e -> e));
-                Optional<Double> maxVIPPriceOption = collect.stream().map(e -> e.getVipPrice()).max(Comparator.comparing(e -> e));
+                Optional<BigDecimal> minVIPPriceOption = collect.stream().map(e -> e.getVipPrice()).min(BigDecimal::compareTo);
+                Optional<BigDecimal> maxVIPPriceOption = collect.stream().map(e -> e.getVipPrice()).max(BigDecimal::compareTo);
                 if (minVIPPriceOption.isPresent() && maxVIPPriceOption.isPresent()) {
-                    Double minVIPPrice = minVIPPriceOption.get();
-                    Double maxVIPPrice = maxVIPPriceOption.get();
+                    BigDecimal minVIPPrice = minVIPPriceOption.get();
+                    BigDecimal maxVIPPrice = maxVIPPriceOption.get();
                     vo.setVipPriceRange(Objects.equals(minVIPPrice, maxVIPPrice) ? (minVIPPrice + "") : (minVIPPrice + "-" + maxVIPPrice));
                 }
             }

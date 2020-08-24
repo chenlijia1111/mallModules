@@ -17,6 +17,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -133,9 +134,9 @@ public class SpiderJDUtil {
                     if (Lists.isNotEmpty(goodAddParams)) {
                         //默认值
                         for (GoodAddParams goodAddParam : goodAddParams) {
-                            goodAddParam.setPrice(2.0);
-                            goodAddParam.setVipPrice(2.0);
-                            goodAddParam.setMarketPrice(2.0);
+                            goodAddParam.setPrice(new BigDecimal("2.0"));
+                            goodAddParam.setVipPrice(new BigDecimal("2.0"));
+                            goodAddParam.setMarketPrice(new BigDecimal("2.0"));
                             goodAddParam.setGoodNo("001");
                             goodAddParam.setStockCount(100);
                         }

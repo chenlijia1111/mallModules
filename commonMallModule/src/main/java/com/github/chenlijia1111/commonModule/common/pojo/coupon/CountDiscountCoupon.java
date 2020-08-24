@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -49,7 +50,7 @@ public class CountDiscountCoupon extends AbstractCoupon {
      *
      * @since 下午 6:07 2019/11/5 0005
      **/
-    private Double discount;
+    private BigDecimal discount;
 
     /**
      * 计算当前优惠券对于目标金额可以抵扣多少金额
@@ -59,8 +60,9 @@ public class CountDiscountCoupon extends AbstractCoupon {
      * @since 上午 11:51 2019/11/22 0022
      **/
     @Override
-    public Double calculatePayable(List<ShoppingOrder> orderList) {
-        Double effectMoney = 0.0;
+    public BigDecimal calculatePayable(List<ShoppingOrder> orderList) {
+        //返回总的优惠金额
+        BigDecimal effectMoney = new BigDecimal("0.0");
         if (Lists.isNotEmpty(orderList)) {
             //订单商品数量
             Integer goodCount = orderList.stream().collect(Collectors.summingInt(ShoppingOrder::getCount));
@@ -68,22 +70,22 @@ public class CountDiscountCoupon extends AbstractCoupon {
                 //满足条件
                 //享受折扣
                 for (ShoppingOrder order : orderList) {
-                    Double orderAmountTotal = order.getOrderAmountTotal();
+                    BigDecimal orderAmountTotal = order.getOrderAmountTotal();
                     //打完折之后的订单金额
-                    double v = orderAmountTotal * this.getDiscount();
-                    //保留两位小数
-                    v = NumberUtil.doubleToFixLengthDouble(v, 2);
-                    order.setOrderAmountTotal(v);
+                    BigDecimal afterDiscountOrderAmountTotal = orderAmountTotal.multiply(this.getDiscount());
+                    order.setOrderAmountTotal(afterDiscountOrderAmountTotal);
 
                     //添加当前的优惠券进去
                     List<AbstractCoupon> couponList = order.getCouponList();
-                    //优惠的金额
-                    effectMoney = orderAmountTotal - v;
-                    //保留两位小数
-                    effectMoney = NumberUtil.doubleToFixLengthDouble(effectMoney, 2);
-                    this.setEffectiveMoney(effectMoney);
+                    //当前订单优惠的金额
+                    BigDecimal subMoney = orderAmountTotal.subtract(afterDiscountOrderAmountTotal);
+                    //设置当前订单优惠的金额
+                    this.setEffectiveMoney(subMoney);
                     couponList.add(this);
                     order.setCouponList(couponList);
+
+                    //更新总的优惠金额
+                    effectMoney = effectMoney.add(subMoney);
                 }
             }
         }

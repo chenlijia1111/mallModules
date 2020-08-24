@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
@@ -54,20 +55,20 @@ public class AppProductVo extends AdminProductVo {
         if (Lists.isNotEmpty(goodVoList)) {
             //查找产品价格区间
             //查询最小市场价以及最大市场价
-            Optional<Double> minMarketPriceOption = goodVoList.stream().map(e -> e.getMarketPrice()).min(Comparator.comparing(e -> e));
-            Optional<Double> maxMarketPriceOption = goodVoList.stream().map(e -> e.getMarketPrice()).max(Comparator.comparing(e -> e));
+            Optional<BigDecimal> minMarketPriceOption = goodVoList.stream().map(e -> e.getMarketPrice()).min(BigDecimal::compareTo);
+            Optional<BigDecimal> maxMarketPriceOption = goodVoList.stream().map(e -> e.getMarketPrice()).max(BigDecimal::compareTo);
             if (minMarketPriceOption.isPresent() && maxMarketPriceOption.isPresent()) {
-                Double minMarketPrice = minMarketPriceOption.get();
-                Double maxMarketPrice = maxMarketPriceOption.get();
+                BigDecimal minMarketPrice = minMarketPriceOption.get();
+                BigDecimal maxMarketPrice = maxMarketPriceOption.get();
                 this.setMarketPriceRange(Objects.equals(minMarketPrice, maxMarketPrice) ? (minMarketPrice + "") : (minMarketPrice + "-" + maxMarketPrice));
             }
 
             //查询最小售价以及最大售价
-            Optional<Double> minPriceOption = goodVoList.stream().map(e -> e.getPrice()).min(Comparator.comparing(e -> e));
-            Optional<Double> maxPriceOption = goodVoList.stream().map(e -> e.getPrice()).max(Comparator.comparing(e -> e));
+            Optional<BigDecimal> minPriceOption = goodVoList.stream().map(e -> e.getPrice()).min(BigDecimal::compareTo);
+            Optional<BigDecimal> maxPriceOption = goodVoList.stream().map(e -> e.getPrice()).max(BigDecimal::compareTo);
             if (minPriceOption.isPresent() && maxPriceOption.isPresent()) {
-                Double minPrice = minPriceOption.get();
-                Double maxPrice = maxPriceOption.get();
+                BigDecimal minPrice = minPriceOption.get();
+                BigDecimal maxPrice = maxPriceOption.get();
                 this.setPriceRange(Objects.equals(minPrice, maxPrice) ? (minPrice + "") : (minPrice + "-" + maxPrice));
             }
 

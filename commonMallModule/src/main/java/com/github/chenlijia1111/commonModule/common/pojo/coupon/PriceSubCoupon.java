@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -42,14 +43,14 @@ public class PriceSubCoupon extends AbstractCoupon {
      *
      * @since 下午 6:07 2019/11/5 0005
      **/
-    private Double conditionMoney;
+    private BigDecimal conditionMoney;
 
     /**
      * 优惠金额
      *
      * @since 下午 6:07 2019/11/5 0005
      **/
-    private Double subMoney;
+    private BigDecimal subMoney;
 
 
     /**
@@ -60,39 +61,45 @@ public class PriceSubCoupon extends AbstractCoupon {
      * @since 下午 3:18 2019/11/22 0022
      **/
     @Override
-    public Double calculatePayable(List<ShoppingOrder> orderList) {
-        Double effectMoney = 0.0;
+    public BigDecimal calculatePayable(List<ShoppingOrder> orderList) {
+        //总共优惠的金额
+        BigDecimal effectMoney = new BigDecimal("0.0");
         if (Lists.isNotEmpty(orderList)) {
             //这些订单的总应付金额
-            Double allOrderAmountTotal = orderList.stream().collect(Collectors.summingDouble(ShoppingOrder::getOrderAmountTotal));
-            if (Objects.nonNull(this.getConditionMoney()) && allOrderAmountTotal >= this.getConditionMoney()) {
+            BigDecimal allOrderAmountTotal = new BigDecimal("0.0");
+            for (ShoppingOrder order : orderList) {
+                allOrderAmountTotal = allOrderAmountTotal.add(order.getOrderAmountTotal());
+            }
+
+            if (Objects.nonNull(this.getConditionMoney()) && allOrderAmountTotal.compareTo(this.getConditionMoney()) >= 0) {
                 //满足条件
                 //享受折扣
                 //这些订单总共优惠的金额
                 effectMoney = this.getSubMoney();
-                //如果总价格小于优惠抵扣价格，赋值为总价格
-                if(allOrderAmountTotal < effectMoney){
+                //如果总价格小于优惠抵扣价格，赋值为总价格 (比如满5减3，但是订单金额为3，那就变成满3减3了)
+                if(allOrderAmountTotal.compareTo(effectMoney) < 0){
                     effectMoney = allOrderAmountTotal;
                 }
                 //按比例计算单个订单优惠了多少钱
                 for (ShoppingOrder order : orderList) {
-                    Double orderAmountTotal = order.getOrderAmountTotal();
+                    BigDecimal orderAmountTotal = order.getOrderAmountTotal();
                     //这个订单优惠的金额
-                    double orderSubMoney = effectMoney * (orderAmountTotal / allOrderAmountTotal);
-                    //保留两位小数
-                    orderSubMoney = NumberUtil.doubleToFixLengthDouble(orderSubMoney, 2);
+                    BigDecimal orderSubMoney = effectMoney.multiply(orderAmountTotal).divide(allOrderAmountTotal);
+                    //用了除法，需要保留两位小数
+                    orderSubMoney.setScale(2,BigDecimal.ROUND_HALF_UP);
 
                     //优惠之后的订单金额
-                    double v = orderAmountTotal - orderSubMoney;
-                    //保留两位小数
-                    v = NumberUtil.doubleToFixLengthDouble(v, 2);
-                    order.setOrderAmountTotal(v);
+                    BigDecimal afterSubOrderMoney = orderAmountTotal.subtract(orderSubMoney);
+                    order.setOrderAmountTotal(afterSubOrderMoney);
 
                     //添加当前的优惠券进去
                     List<AbstractCoupon> couponList = order.getCouponList();
                     this.setEffectiveMoney(orderSubMoney);
                     couponList.add(this);
                     order.setCouponList(couponList);
+
+                    //更新总优惠金额
+                    effectMoney = effectMoney.add(orderSubMoney);
                 }
             }
         }

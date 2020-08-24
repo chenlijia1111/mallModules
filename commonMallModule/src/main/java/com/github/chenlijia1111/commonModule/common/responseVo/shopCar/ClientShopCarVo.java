@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.util.StringUtils;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -48,7 +49,7 @@ public class ClientShopCarVo extends ShopCar {
      * @since 上午 11:22 2019/8/17 0017
      **/
     @ApiModelProperty(value = "商品价格")
-    private Double goodsPrice;
+    private BigDecimal goodsPrice;
 
     /**
      * 商品规格名称

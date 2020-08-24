@@ -11,6 +11,7 @@ import lombok.experimental.Accessors;
 import javax.persistence.Column;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.Objects;
 
@@ -66,7 +67,7 @@ public class Goods {
     @ApiModelProperty("售价")
     @PropertyCheck(name = "售价", checkFunction = PriceCheck.class)
     @Column(name = "price")
-    private Double price;
+    private BigDecimal price;
 
     /**
      * 会员价
@@ -74,7 +75,7 @@ public class Goods {
     @ApiModelProperty("会员价")
     @PropertyCheck(name = "会员价", checkFunction = PriceCheck.class)
     @Column(name = "vip_price")
-    private Double vipPrice;
+    private BigDecimal vipPrice;
 
     /**
      * 市场价
@@ -82,7 +83,7 @@ public class Goods {
     @ApiModelProperty("市场价")
     @PropertyCheck(name = "市场价", checkFunction = PriceCheck.class)
     @Column(name = "market_price")
-    private Double marketPrice;
+    private BigDecimal marketPrice;
 
     /**
      * 商品图片

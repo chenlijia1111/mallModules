@@ -1,11 +1,14 @@
 package com.github.chenlijia1111.commonModule.common.requestVo.coupon;
 
+import com.github.chenlijia1111.commonModule.common.checkFunction.BigDecimalPriceCheck;
 import com.github.chenlijia1111.commonModule.common.checkFunction.PriceCheck;
 import com.github.chenlijia1111.utils.core.annos.PropertyCheck;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.math.BigDecimal;
 
 /**
  * 添加满数量折扣券
@@ -59,8 +62,8 @@ public class AddExpressCouponParams {
      * @since 下午 3:37 2019/11/21 0021
      **/
     @ApiModelProperty(value = "物流费")
-    @PropertyCheck(name = "物流费", checkFunction = PriceCheck.class)
-    private Double expressMoney;
+    @PropertyCheck(name = "物流费", checkFunction = BigDecimalPriceCheck.class)
+    private BigDecimal expressMoney;
 
     /**
      * 条件金额
@@ -68,7 +71,7 @@ public class AddExpressCouponParams {
      * @since 下午 6:07 2019/11/5 0005
      **/
     @ApiModelProperty(value = "条件金额")
-    private Double conditionMoney;
+    private BigDecimal conditionMoney;
 
     /**
      * 条件数量
@@ -86,7 +89,7 @@ public class AddExpressCouponParams {
      * @since 下午 3:39 2019/11/21 0021
      **/
     @ApiModelProperty(value = "优惠金额,与折扣率二者取其一进行计算")
-    private Double subMoney;
+    private BigDecimal subMoney;
 
     /**
      * 折扣率
@@ -94,7 +97,7 @@ public class AddExpressCouponParams {
      * @since 下午 6:07 2019/11/5 0005
      **/
     @ApiModelProperty(value = "折扣率")
-    private Double discount;
+    private BigDecimal discount;
 
 
 }

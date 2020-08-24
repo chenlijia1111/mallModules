@@ -13,6 +13,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,19 +43,19 @@ public class GoodAddParams {
      */
     @ApiModelProperty("售价")
     @PropertyCheck(name = "售价", checkFunction = PriceCheck.class)
-    private Double price;
+    private BigDecimal price;
 
     /**
      * 会员价
      */
     @ApiModelProperty("会员价")
-    private Double vipPrice;
+    private BigDecimal vipPrice;
 
     /**
      * 市场价
      */
     @ApiModelProperty("市场价")
-    private Double marketPrice;
+    private BigDecimal marketPrice;
 
     /**
      * 商品编号

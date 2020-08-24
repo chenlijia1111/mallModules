@@ -1,5 +1,6 @@
 package com.github.chenlijia1111.commonModule.common.requestVo.coupon;
 
+import com.github.chenlijia1111.commonModule.common.checkFunction.BigDecimalPriceCheck;
 import com.github.chenlijia1111.commonModule.common.checkFunction.PositiveNumberCheck;
 import com.github.chenlijia1111.commonModule.common.checkFunction.PriceCheck;
 import com.github.chenlijia1111.utils.core.annos.PropertyCheck;
@@ -7,6 +8,8 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.math.BigDecimal;
 
 /**
  * 添加满数量折扣券
@@ -61,8 +64,8 @@ public class AddPriceSubCouponParams {
      * @since 下午 6:07 2019/11/5 0005
      **/
     @ApiModelProperty(value = "条件金额")
-    @PropertyCheck(name = "条件金额", checkFunction = PriceCheck.class)
-    private Double conditionMoney;
+    @PropertyCheck(name = "条件金额", checkFunction = BigDecimalPriceCheck.class)
+    private BigDecimal conditionMoney;
 
     /**
      * 优惠金额
@@ -70,7 +73,7 @@ public class AddPriceSubCouponParams {
      * @since 下午 6:07 2019/11/5 0005
      **/
     @ApiModelProperty(value = "优惠金额")
-    @PropertyCheck(name = "优惠金额", checkFunction = PriceCheck.class)
-    private Double subMoney;
+    @PropertyCheck(name = "优惠金额", checkFunction = BigDecimalPriceCheck.class)
+    private BigDecimal subMoney;
 
 }

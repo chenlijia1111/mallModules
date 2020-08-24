@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -22,19 +23,19 @@ public class ReleaseProductSkuVo {
      * 价格
      */
     @ApiModelProperty(value = "价格")
-    private Double price;
+    private BigDecimal price;
 
     /**
      * 市场价格
      */
     @ApiModelProperty(value = "市场价格")
-    private Double marketPrice;
+    private BigDecimal marketPrice;
 
     /**
      * vip价格
      */
     @ApiModelProperty(value = "vip价格")
-    private Double vipPrice;
+    private BigDecimal vipPrice;
 
     /**
      * 库存

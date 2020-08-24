@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -45,7 +46,7 @@ public class ScoreCoupon extends AbstractCoupon {
      *
      * @since 下午 6:07 2019/11/5 0005
      **/
-    private Double score;
+    private BigDecimal score;
 
     /**
      * 兑换比率 不可以为空,没有这个无法换算出对应可以抵扣的金额
@@ -53,14 +54,14 @@ public class ScoreCoupon extends AbstractCoupon {
      *
      * @since 下午 4:07 2019/11/21 0021
      **/
-    private Double ratio;
+    private BigDecimal ratio;
 
     /**
      * 最多可以抵扣的积分
      *
      * @since 下午 6:07 2019/11/5 0005
      **/
-    private Double maxScore;
+    private BigDecimal maxScore;
 
     /**
      * 最多可以抵扣的金额比率
@@ -68,7 +69,7 @@ public class ScoreCoupon extends AbstractCoupon {
      *
      * @since 下午 6:07 2019/11/5 0005
      **/
-    private Double maxMoneyRatio;
+    private BigDecimal maxMoneyRatio;
 
 
     /**
@@ -79,48 +80,50 @@ public class ScoreCoupon extends AbstractCoupon {
      * @since 下午 3:26 2019/11/22 0022
      **/
     @Override
-    public Double calculatePayable(List<ShoppingOrder> orderList) {
-        Double effectMoney = 0.0;
+    public BigDecimal calculatePayable(List<ShoppingOrder> orderList) {
+        //总的优惠金额
+        BigDecimal effectMoney = new BigDecimal("0.0");
         if (Lists.isNotEmpty(orderList)) {
             //这些订单的总应付金额
-            Double allOrderAmountTotal = orderList.stream().collect(Collectors.summingDouble(ShoppingOrder::getOrderAmountTotal));
+            BigDecimal allOrderAmountTotal = new BigDecimal("0.0");
+            for (ShoppingOrder order : orderList) {
+                allOrderAmountTotal = allOrderAmountTotal.add(order.getOrderAmountTotal());
+            }
 
             if (Objects.nonNull(this.getScore()) && Objects.nonNull(this.getRatio())) {
 
                 //判断是否超过了最多可以转换的积分
-                if (Objects.nonNull(this.getMaxScore()) && this.getScore() > this.getMaxScore()) {
+                if (Objects.nonNull(this.getMaxScore()) && this.getScore().compareTo(this.getMaxScore()) > 0) {
                     this.setScore(this.getMaxScore());
                 }
 
                 //积分转化的金额
-                effectMoney = this.score * this.getRatio();
+                effectMoney = this.score.multiply(this.getRatio());
                 //判断最多可以转换的金额
                 if (Objects.nonNull(this.getMaxMoneyRatio())) {
-                    double v = allOrderAmountTotal * this.getMaxMoneyRatio();
-                    v = NumberUtil.doubleToFixLengthDouble(v, 2);
-                    if (effectMoney > v) {
+                    BigDecimal maxTransferMoney = allOrderAmountTotal.multiply(this.getMaxMoneyRatio());
+                    if (effectMoney.compareTo(maxTransferMoney) > 0) {
                         //最多可以转化的积分
-                        double maxTransferScore = v / this.getRatio();
-                        maxTransferScore = NumberUtil.doubleToFixLengthDouble(maxTransferScore, 2);
+                        BigDecimal maxTransferScore = maxTransferMoney.divide(this.getRatio());
+                        //因为用了除法，所有保留两位小数
+                        maxTransferScore.setScale(2,BigDecimal.ROUND_HALF_UP);
                         this.setScore(maxTransferScore);
                         //积分转化的金额
-                        effectMoney = this.score * this.getRatio();
+                        effectMoney = this.score.multiply(this.getRatio());
                     }
                 }
 
                 //按比例计算单个订单优惠了多少钱
                 for (ShoppingOrder order : orderList) {
-                    Double orderAmountTotal = order.getOrderAmountTotal();
+                    BigDecimal orderAmountTotal = order.getOrderAmountTotal();
                     //这个订单优惠的金额
-                    double orderSubMoney = effectMoney * (orderAmountTotal / allOrderAmountTotal);
-                    //保留两位小数
-                    orderSubMoney = NumberUtil.doubleToFixLengthDouble(orderSubMoney, 2);
+                    BigDecimal orderSubMoney = effectMoney.multiply(orderAmountTotal).divide(allOrderAmountTotal);
+                    //因为用了除法，保留两位小数
+                    orderSubMoney.setScale(2,BigDecimal.ROUND_HALF_UP);
 
                     //优惠之后的订单金额
-                    double v = orderAmountTotal - orderSubMoney;
-                    //保留两位小数
-                    v = NumberUtil.doubleToFixLengthDouble(v, 2);
-                    order.setOrderAmountTotal(v);
+                    BigDecimal afterSubOrderMoney = orderAmountTotal.subtract(orderSubMoney);
+                    order.setOrderAmountTotal(afterSubOrderMoney);
 
                     //添加当前的优惠券进去
                     List<AbstractCoupon> couponList = order.getCouponList();

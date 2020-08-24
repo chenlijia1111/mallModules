@@ -13,6 +13,7 @@ import lombok.experimental.Accessors;
 import javax.persistence.Column;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
@@ -106,7 +107,7 @@ public class ShoppingOrder {
     @ApiModelProperty("商品支付时单价")
     @PropertyCheck(name = "商品支付时单价")
     @Column(name = "good_price")
-    private Double goodPrice;
+    private BigDecimal goodPrice;
 
     /**
      * 商品金额
@@ -114,7 +115,7 @@ public class ShoppingOrder {
     @ApiModelProperty("商品金额")
     @PropertyCheck(name = "商品金额")
     @Column(name = "product_amount_total")
-    private Double productAmountTotal;
+    private BigDecimal productAmountTotal;
 
     /**
      * 支付渠道
@@ -146,7 +147,7 @@ public class ShoppingOrder {
     @ApiModelProperty("订单金额")
     @PropertyCheck(name = "订单金额")
     @Column(name = "order_amount_total")
-    private Double orderAmountTotal;
+    private BigDecimal orderAmountTotal;
 
     /**
      * 支付时间
@@ -178,7 +179,7 @@ public class ShoppingOrder {
     @ApiModelProperty("应付金额")
     @PropertyCheck(name = "应付金额")
     @Column(name = "payable")
-    private Double payable;
+    private BigDecimal payable;
 
     /**
      * 创建时间

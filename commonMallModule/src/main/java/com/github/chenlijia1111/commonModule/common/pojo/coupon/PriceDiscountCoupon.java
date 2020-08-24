@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -41,7 +42,7 @@ public class PriceDiscountCoupon extends AbstractCoupon{
      *
      * @since 下午 6:07 2019/11/5 0005
      **/
-    private Double conditionMoney;
+    private BigDecimal conditionMoney;
 
 
     /**
@@ -49,7 +50,7 @@ public class PriceDiscountCoupon extends AbstractCoupon{
      *
      * @since 下午 6:07 2019/11/5 0005
      **/
-    private Double discount;
+    private BigDecimal discount;
 
 
     /**
@@ -59,24 +60,26 @@ public class PriceDiscountCoupon extends AbstractCoupon{
      * @return java.lang.Double 返回具体优惠的金额
      **/
     @Override
-    public Double calculatePayable(List<ShoppingOrder> orderList) {
-        Double effectMoney = 0.0;
+    public BigDecimal calculatePayable(List<ShoppingOrder> orderList) {
+        //总的优惠的金额
+        BigDecimal effectMoney = new BigDecimal("0.0");
         if (Lists.isNotEmpty(orderList)) {
             //这些订单的总应付金额
-            Double allOrderAmountTotal = orderList.stream().collect(Collectors.summingDouble(ShoppingOrder::getOrderAmountTotal));
-            if (Objects.nonNull(this.getConditionMoney()) && allOrderAmountTotal >= this.getConditionMoney()) {
+            BigDecimal allOrderAmountTotal = new BigDecimal("0.0");
+            for (ShoppingOrder order : orderList) {
+                allOrderAmountTotal = allOrderAmountTotal.add(order.getOrderAmountTotal());
+            }
+
+            if (Objects.nonNull(this.getConditionMoney()) && allOrderAmountTotal.compareTo(this.getConditionMoney()) >= 0) {
                 //满足条件
                 //享受折扣
                 for (ShoppingOrder order : orderList) {
-                    Double orderAmountTotal = order.getOrderAmountTotal();
+                    BigDecimal orderAmountTotal = order.getOrderAmountTotal();
                     //优惠之后的订单金额
-                    double subAfterOrderAmount = orderAmountTotal * this.getDiscount();
-                    subAfterOrderAmount = NumberUtil.doubleToFixLengthDouble(subAfterOrderAmount, 2);
-                    //优惠的金额
-                    double subMoney = orderAmountTotal - subAfterOrderAmount;
-                    //保留两位小数
-                    subMoney = NumberUtil.doubleToFixLengthDouble(subMoney, 2);
-                    //保留两位小数
+                    BigDecimal subAfterOrderAmount = orderAmountTotal.multiply(this.getDiscount());
+                    //单个订单优惠的金额
+                    BigDecimal subMoney = orderAmountTotal.subtract(subAfterOrderAmount);
+                    //设置 优惠之后的订单金额
                     order.setOrderAmountTotal(subAfterOrderAmount);
 
                     //添加当前的优惠券进去
@@ -84,6 +87,9 @@ public class PriceDiscountCoupon extends AbstractCoupon{
                     this.setEffectiveMoney(subMoney);
                     couponList.add(this);
                     order.setCouponList(couponList);
+
+                    //更新总的优惠金额
+                    effectMoney = effectMoney.add(subMoney);
                 }
             }
         }

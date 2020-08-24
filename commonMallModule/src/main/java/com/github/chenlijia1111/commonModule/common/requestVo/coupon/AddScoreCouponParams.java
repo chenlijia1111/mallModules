@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.Column;
+import java.math.BigDecimal;
 
 /**
  * 添加满数量折扣券
@@ -63,7 +64,7 @@ public class AddScoreCouponParams {
      **/
     @ApiModelProperty(value = "抵扣的积分")
     @PropertyCheck(name = "抵扣的积分")
-    private Double score;
+    private BigDecimal score;
 
     /**
      * 兑换比率 不可以为空,没有这个无法换算出对应可以抵扣的金额
@@ -73,7 +74,7 @@ public class AddScoreCouponParams {
      **/
     @ApiModelProperty(value = "兑换比率")
     @PropertyCheck(name = "兑换比率")
-    private Double ratio;
+    private BigDecimal ratio;
 
     /**
      * 最多可以抵扣的积分
@@ -81,7 +82,7 @@ public class AddScoreCouponParams {
      * @since 下午 6:07 2019/11/5 0005
      **/
     @ApiModelProperty(value = "最多可以抵扣的积分")
-    private Double maxScore;
+    private BigDecimal maxScore;
 
     /**
      * 最多可以抵扣的金额比率
@@ -90,6 +91,6 @@ public class AddScoreCouponParams {
      * @since 下午 6:07 2019/11/5 0005
      **/
     @ApiModelProperty(value = "最多可以抵扣的金额比率")
-    private Double maxMoneyRatio;
+    private BigDecimal maxMoneyRatio;
 
 }

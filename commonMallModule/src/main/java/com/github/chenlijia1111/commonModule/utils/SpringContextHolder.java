@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 import java.util.Map;
 
 /**
- * 以静态变量保存Spring ApplicationContext, 可在任何代码任何地方任何时候取出ApplicaitonContext.
+ * 以静态变量保存Spring ApplicationContext, 可在任何代码任何地方任何时候取出 ApplicationContext.
  *
  * @author 陈礼佳
  * @date 2018-5-29 下午1:25:40
@@ -23,7 +23,7 @@ public class SpringContextHolder implements ApplicationContextAware {
     private static Logger logger = new LogUtil(SpringContextHolder.class);
 
     /**
-     * 取得存储在静态变量中的ApplicationContext.
+     * 取得存储在静态变量中的 ApplicationContext.
      */
     public static ApplicationContext getApplicationContext() {
         assertContextInjected();

@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.util.Map;
 
 /**
@@ -25,12 +26,12 @@ public class CalculateOrderPriceVo {
      * @since 下午 4:05 2019/11/22 0022
      **/
     @ApiModelProperty(value = "总应付金额")
-    private Double payAble;
+    private BigDecimal payAble;
 
     /**
      * 费用详情信息
      */
     @ApiModelProperty(value = "费用详情信息")
-    private Map<String, Double> feeMap;
+    private Map<String, BigDecimal> feeMap;
 
 }

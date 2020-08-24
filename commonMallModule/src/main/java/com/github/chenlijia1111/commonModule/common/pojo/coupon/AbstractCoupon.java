@@ -7,6 +7,7 @@ import com.github.chenlijia1111.utils.core.JSONUtil;
 import com.github.chenlijia1111.utils.core.StringUtils;
 import com.github.chenlijia1111.utils.list.Lists;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -50,7 +51,7 @@ public abstract class AbstractCoupon {
     /**
      * 生效金额
      **/
-    private Double effectiveMoney = 0.0;
+    private BigDecimal effectiveMoney = new BigDecimal("0.0");
 
     /**
      * 优惠券具体的实现类名称
@@ -65,18 +66,18 @@ public abstract class AbstractCoupon {
      * @param orderList 目标订单
      * @return java.lang.Double 返回具体可以抵扣的金额
      **/
-    public abstract Double calculatePayable(List<ShoppingOrder> orderList);
+    public abstract BigDecimal calculatePayable(List<ShoppingOrder> orderList);
 
     /**
      * 获取抵扣金额
      *
      * @return java.lang.Double 返回具体抵扣的金额
      **/
-    public Double getEffectiveMoney() {
+    public BigDecimal getEffectiveMoney() {
         return effectiveMoney;
     }
 
-    public void setEffectiveMoney(Double effectiveMoney) {
+    public void setEffectiveMoney(BigDecimal effectiveMoney) {
         this.effectiveMoney = effectiveMoney;
     }
 

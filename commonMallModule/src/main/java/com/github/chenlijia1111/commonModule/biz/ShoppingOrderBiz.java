@@ -28,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -52,6 +53,12 @@ import java.util.stream.Collectors;
  * 确认收货后一段时间内自动评价 这里已经实现了，调用者只需要注入即可
  * <p>
  * 1.6 修改 把下单是否需要判断库存 从参数中移除，修改为系统变量。放在参数中还是不太安全，有可能会忘记验证
+ * 1.7 TODO 把所有价格修改为 bigdecimal
+ * 累计修改项：
+ * 商品金额
+ * 订单金额
+ * 售后订单退款金额
+ * 优惠券金额
  * @see OrderAutoEvaluateTask
  * @since 2019-11-05 16:39:24
  **/
@@ -182,6 +189,9 @@ public class ShoppingOrderBiz {
                 shopGroupIdMap.put(product.getShops(), shopGroupId);
             }
 
+            //商品金额
+            BigDecimal productAmountTotal = goodVo.getPrice().multiply(new BigDecimal(String.valueOf(count)));
+
             ShoppingOrder shoppingOrder = new ShoppingOrder().setOrderNo(orderNo).
                     setCustom(userId).
                     setShops(product.getShops()).
@@ -189,9 +199,9 @@ public class ShoppingOrderBiz {
                     setCount(count).
                     setState(CommonMallConstants.ORDER_INIT).
                     setOrderType(OrderTypeEnum.ORDINARY_ORDER.getType()).
-                    setProductAmountTotal(goodVo.getPrice() * count).
+                    setProductAmountTotal(productAmountTotal).
                     setGoodPrice(goodVo.getPrice()).
-                    setOrderAmountTotal(goodVo.getPrice() * count).
+                    setOrderAmountTotal(productAmountTotal).
                     setShopGroupId(shopGroupId).
                     setGroupId(groupId).
                     setCreateTime(currentTime).setRemarks(params.getRemarks()).
@@ -279,9 +289,10 @@ public class ShoppingOrderBiz {
 
 
         //总应付金额
-        Double payAble = orderList.stream().collect(Collectors.summingDouble(ShoppingOrder::getOrderAmountTotal));
-        //保留两位小数
-        payAble = NumberUtil.doubleToFixLengthDouble(payAble, 2);
+        BigDecimal payAble = new BigDecimal(0.0);
+        for (ShoppingOrder order : orderList) {
+            payAble = payAble.add(order.getOrderAmountTotal());
+        }
         for (ShoppingOrder order : orderList) {
             //最终的应付金额,待考虑
             order.setPayable(payAble);
@@ -384,6 +395,9 @@ public class ShoppingOrderBiz {
             //订单编号 只做计算，不消耗实际id
             String orderNo = String.valueOf(IDGenerateFactory.ORDER_ID_UTIL.nextId());
 
+            //商品金额
+            BigDecimal productAmountTotal = goodVo.getPrice().multiply(new BigDecimal(String.valueOf(count)));
+
             ShoppingOrder shoppingOrder = new ShoppingOrder().setOrderNo(orderNo).
                     setCustom(userId).
                     setShops(product.getShops()).
@@ -391,9 +405,9 @@ public class ShoppingOrderBiz {
                     setCount(count).
                     setState(CommonMallConstants.ORDER_INIT).
                     setOrderType(OrderTypeEnum.ORDINARY_ORDER.getType()).
-                    setProductAmountTotal(goodVo.getPrice() * count).
+                    setProductAmountTotal(productAmountTotal).
                     setGoodPrice(goodVo.getPrice()).
-                    setOrderAmountTotal(goodVo.getPrice() * count).
+                    setOrderAmountTotal(productAmountTotal).
                     setGroupId(groupId).
                     setCreateTime(currentTime).setRemarks(params.getRemarks()).
                     setDeleteStatus(BooleanConstant.NO_INTEGER).
@@ -447,9 +461,10 @@ public class ShoppingOrderBiz {
 
 
         //总应付金额
-        Double payAble = orderList.stream().collect(Collectors.summingDouble(ShoppingOrder::getOrderAmountTotal));
-        //保留两位小数
-        payAble = NumberUtil.doubleToFixLengthDouble(payAble, 2);
+        BigDecimal payAble = new BigDecimal(0.0);
+        for (ShoppingOrder order : orderList) {
+            payAble = payAble.add(order.getOrderAmountTotal());
+        }
 
         CalculateOrderPriceVo vo = new CalculateOrderPriceVo();
         vo.setPayAble(payAble);
@@ -464,8 +479,17 @@ public class ShoppingOrderBiz {
         }
 
         //费用详情信息map
-        Map<String, Double> feeMap = abstractCouponList.stream().
-                collect(Collectors.groupingBy(AbstractCoupon::getCouponImplClassName, Collectors.summingDouble(e -> e.getEffectiveMoney())));
+        Map<String, BigDecimal> feeMap = new HashMap<>();
+        for (AbstractCoupon coupon : abstractCouponList) {
+            String couponImplClassName = coupon.getCouponImplClassName();
+            BigDecimal couponMoney = feeMap.get(couponImplClassName);
+            if(Objects.isNull(couponMoney)){
+                couponMoney = new BigDecimal(0);
+            }
+
+            couponMoney = couponMoney.add(coupon.getEffectiveMoney());
+            feeMap.put(couponImplClassName,couponMoney);
+        }
         vo.setFeeMap(feeMap);
 
 

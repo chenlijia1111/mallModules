@@ -1,15 +1,14 @@
 package com.github.chenlijia1111.commonModule.common.requestVo.product;
 
-import com.github.chenlijia1111.utils.core.annos.PropertyCheck;
 import com.github.chenlijia1111.commonModule.common.checkFunction.StateCheck;
+import com.github.chenlijia1111.utils.core.annos.PropertyCheck;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Comparator;
+import java.math.BigDecimal;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * 产品添加参数
@@ -32,6 +31,7 @@ public class ProductAddParams {
 
     /**
      * 商品类别
+     *
      * @since 下午 2:44 2019/11/21 0021
      **/
     @ApiModelProperty(value = "商品类别")
@@ -39,6 +39,7 @@ public class ProductAddParams {
 
     /**
      * 商品品牌
+     *
      * @since 下午 2:44 2019/11/21 0021
      **/
     @ApiModelProperty(value = "商品品牌")
@@ -46,6 +47,7 @@ public class ProductAddParams {
 
     /**
      * 产品编号
+     *
      * @since 下午 2:47 2019/11/21 0021
      **/
     @ApiModelProperty(value = "产品编号")
@@ -53,6 +55,7 @@ public class ProductAddParams {
 
     /**
      * 单位
+     *
      * @since 下午 2:48 2019/11/21 0021
      **/
     @ApiModelProperty(value = "单位")
@@ -60,6 +63,7 @@ public class ProductAddParams {
 
     /**
      * 排序值
+     *
      * @since 下午 2:48 2019/11/21 0021
      **/
     @ApiModelProperty(value = "排序值")
@@ -117,19 +121,21 @@ public class ProductAddParams {
 
     /**
      * 获取最大价格
+     *
      * @return
      */
-    public Double getMaxPrice(){
-        Double maxPrice = goodList.stream().map(e -> e.getPrice()).max(Comparator.comparingDouble(o -> o)).orElse(0.0);
+    public BigDecimal getMaxPrice() {
+        BigDecimal maxPrice = goodList.stream().map(e -> e.getPrice()).max(BigDecimal::compareTo).orElse(new BigDecimal("0.0"));
         return maxPrice;
     }
 
     /**
      * 获取最小价格
+     *
      * @return
      */
-    public Double getMinPrice(){
-        Double minPrice = goodList.stream().map(e -> e.getPrice()).min(Comparator.comparingDouble(o -> o)).orElse(0.0);
+    public BigDecimal getMinPrice() {
+        BigDecimal minPrice = goodList.stream().map(e -> e.getPrice()).min(BigDecimal::compareTo).orElse(new BigDecimal("0.0"));
         return minPrice;
     }
 }
