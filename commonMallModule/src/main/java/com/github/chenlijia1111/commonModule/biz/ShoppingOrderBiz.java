@@ -50,7 +50,7 @@ import java.util.stream.Collectors;
  * @see com.github.chenlijia1111.commonModule.common.schedules.OrderAutoReceiveTask
  * <p>
  * 确认收货后一段时间内自动评价 这里已经实现了，调用者只需要注入即可
- * 
+ *
  * @see OrderAutoEvaluateTask
  * @since 2019-11-05 16:39:24
  **/
