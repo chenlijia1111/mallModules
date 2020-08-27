@@ -3,7 +3,6 @@ package com.github.chenlijia1111.commonModule.common.schedules;
 import com.github.chenlijia1111.commonModule.common.pojo.CommonMallConstants;
 import com.github.chenlijia1111.commonModule.dao.GoodsMapper;
 import com.github.chenlijia1111.commonModule.dao.ShoppingOrderMapper;
-import com.github.chenlijia1111.commonModule.entity.Goods;
 import com.github.chenlijia1111.commonModule.entity.ShoppingOrder;
 import com.github.chenlijia1111.commonModule.service.ICancelOrderHook;
 import com.github.chenlijia1111.commonModule.utils.SpringContextHolder;
@@ -24,16 +23,16 @@ import java.util.concurrent.TimeUnit;
  * 任务
  * 订单定时取消策略
  * 延时队列
- *
+ * <p>
  * 如果要使用的话就把他注入到spring中去
  * 在项目启动时，没有进行查询了待支付的订单进延时队列，因为设涉及到物流数据的查询,调用者需要自己实现，
  * 我会判断项目是否注入了这个实例，如果注入了才会去查询
- *
+ * <p>
  * 取消订单之后会调用取消订单的钩子函数
- * @see com.github.chenlijia1111.commonModule.service.ICancelOrderHook
- * 方便调用者处理其他自定义逻辑
  *
  * @author Chen LiJia
+ * @see com.github.chenlijia1111.commonModule.service.ICancelOrderHook
+ * 方便调用者处理其他自定义逻辑
  * @since 2020/4/8
  */
 public class OrderCancelTimeLimitTask {
@@ -64,9 +63,25 @@ public class OrderCancelTimeLimitTask {
      * @param limitMinutes
      */
     public void addNotPayOrder(String groupId, Date createTime, Integer limitMinutes) {
+        //默认 groupIdType 为商家组订单
+        addNotPayOrder(groupId, 1, createTime, limitMinutes);
+    }
+
+    /**
+     * 添加未支付订单到延时队列
+     * 调用场景：下单
+     * 调用场景：项目启动，防止项目重启之前的队列数据丢失
+     *
+     * @param groupId
+     * @param groupIdType  groupId 类型
+     * @param createTime
+     * @param limitMinutes
+     */
+    public void addNotPayOrder(String groupId, Integer groupIdType, Date createTime, Integer limitMinutes) {
         if (StringUtils.isNotEmpty(groupId) && Objects.nonNull(createTime) && Objects.nonNull(limitMinutes)) {
             DelayNotPayOrder delayNotPayOrder = new DelayNotPayOrder();
             delayNotPayOrder.groupId = groupId;
+            delayNotPayOrder.groupIdType = groupIdType;
             delayNotPayOrder.createTime = createTime;
             delayNotPayOrder.limitTime = new DateTime(createTime.getTime()).plusMinutes(limitMinutes).toDate();
             notPayGroupIdList.put(delayNotPayOrder);
@@ -83,6 +98,16 @@ public class OrderCancelTimeLimitTask {
          * 订单组id
          */
         private String groupId;
+
+        /**
+         * 2020-08-27 新增
+         * groupId 类型
+         * 1 组订单编号
+         * 2 商家组订单编号
+         * 3 订单编号
+         * 用于允许 取消单个订单或者商家组订单
+         */
+        private Integer groupIdType;
 
         /**
          * 订单创建时间
@@ -164,7 +189,16 @@ public class OrderCancelTimeLimitTask {
                             //如果是待支付，取消就不需要回补库存了
                             try {
                                 ICancelOrderHook cancelOrderHook = SpringContextHolder.getBean(ICancelOrderHook.class);
-                                cancelOrderHook.cancelOrderByGroupId(delayNotPayOrder.groupId);
+                                if (Objects.equals(delayNotPayOrder.groupIdType, 1)) {
+                                    //组订单编号
+                                    cancelOrderHook.cancelOrderByGroupId(delayNotPayOrder.groupId);
+                                } else if (Objects.equals(delayNotPayOrder.groupIdType, 2)) {
+                                    //商家组订单编号
+                                    cancelOrderHook.cancelOrderByShopGroupId(delayNotPayOrder.groupId);
+                                } else if (Objects.equals(delayNotPayOrder.groupIdType, 3)) {
+                                    //订单编号
+                                    cancelOrderHook.cancelOrderByOrderNo(delayNotPayOrder.groupId);
+                                }
                             } catch (Exception e) {
                                 //e.printStackTrace();
                             }

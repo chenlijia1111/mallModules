@@ -83,6 +83,12 @@ public class ShoppingOrderBiz {
      */
     public static Integer CHECK_GOOD_STOCK_STATUS = BooleanConstant.YES_INTEGER;
 
+    /**
+     * 下单之后是否需要加入到待支付处理队列中去
+     * 因为有些特殊的系统可能有些特别，需要自己单独处理
+     */
+    public static Integer ADD_DELAY_NOT_PAY_AFTER_ADD_ORDER_STATUS = BooleanConstant.YES_INTEGER;
+
 
     /**
      * 添加订单
@@ -311,13 +317,15 @@ public class ShoppingOrderBiz {
 
 
         //操作成功，添加订单到延时队列，超时未支付取消订单
-        try {
-            OrderCancelTimeLimitTask task = SpringContextHolder.getBean(OrderCancelTimeLimitTask.class);
-            if (Objects.nonNull(task)) {
-                task.addNotPayOrder(groupId, currentTime, CommonMallConstants.CANCEL_NOT_PAY_ORDER_LIMIT_MINUTES);
+        if (Objects.equals(ADD_DELAY_NOT_PAY_AFTER_ADD_ORDER_STATUS, BooleanConstant.YES_INTEGER)) {
+            try {
+                OrderCancelTimeLimitTask task = SpringContextHolder.getBean(OrderCancelTimeLimitTask.class);
+                if (Objects.nonNull(task)) {
+                    task.addNotPayOrder(groupId, currentTime, CommonMallConstants.CANCEL_NOT_PAY_ORDER_LIMIT_MINUTES);
+                }
+            } catch (Exception e) {
+                //没有获取到bean，说明没有注入
             }
-        } catch (Exception e) {
-            //没有获取到bean，说明没有注入
         }
 
         //返回groupId

@@ -142,9 +142,29 @@
       s_shopping_order.group_id groupId,max(s_shopping_order.create_time) createTime
     FROM
       s_shopping_order
-    WHERE s_shopping_order.delete_status != 1
+    WHERE s_shopping_order.delete_status = 0
       AND s_shopping_order.state = 0
+      AND s_shopping_order.pay_time IS NULL
     GROUP BY s_shopping_order.group_id
+  </select>
+  <select id="listDelayNotPayOrderWithShopGroupNo" resultType="com.github.chenlijia1111.commonModule.common.responseVo.order.DelayNotPayOrder">
+    SELECT
+      s_shopping_order.shop_group_id groupId,max(s_shopping_order.create_time) createTime
+    FROM
+      s_shopping_order
+    WHERE s_shopping_order.delete_status = 0
+      AND s_shopping_order.state = 0
+      AND s_shopping_order.pay_time IS NULL
+    GROUP BY s_shopping_order.shop_group_id
+  </select>
+  <select id="listDelayNotPayOrderWithOrderNo" resultType="com.github.chenlijia1111.commonModule.common.responseVo.order.DelayNotPayOrder">
+    SELECT
+      s_shopping_order.order_no groupId,s_shopping_order.create_time createTime
+    FROM
+      s_shopping_order
+    WHERE s_shopping_order.delete_status = 0
+      AND s_shopping_order.state = 0
+      AND s_shopping_order.pay_time IS NULL
   </select>
   <select id="findOrderState" resultType="java.lang.Integer">
     SELECT s_shopping_order.state

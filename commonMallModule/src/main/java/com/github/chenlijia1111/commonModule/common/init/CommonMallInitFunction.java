@@ -9,6 +9,7 @@ import com.github.chenlijia1111.commonModule.common.schedules.OrderAutoEvaluateT
 import com.github.chenlijia1111.commonModule.common.schedules.OrderAutoReceiveTask;
 import com.github.chenlijia1111.commonModule.common.schedules.OrderCancelTimeLimitTask;
 import com.github.chenlijia1111.commonModule.dao.*;
+import com.github.chenlijia1111.commonModule.service.IDelayNotPayOrder;
 import com.github.chenlijia1111.commonModule.service.impl.*;
 import com.github.chenlijia1111.commonModule.utils.SpringContextHolder;
 import com.github.chenlijia1111.utils.core.StringUtils;
@@ -22,6 +23,7 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -203,12 +205,26 @@ public class CommonMallInitFunction implements ApplicationListener<ContextRefres
         try {
             OrderCancelTimeLimitTask task = SpringContextHolder.getBean(OrderCancelTimeLimitTask.class);
             if (Objects.nonNull(task)) {
-                ShoppingOrderMapper shoppingOrderMapper = SpringContextHolder.getBean(ShoppingOrderMapper.class);
-                List<DelayNotPayOrder> delayNotPayOrders = shoppingOrderMapper.listDelayNotPayOrder();
+                Map<String, IDelayNotPayOrder> delayNotPayOrderMap = SpringContextHolder.getBeansOfType(IDelayNotPayOrder.class);
+                IDelayNotPayOrder delayNotPayOrderImpl = null;
+                String defaultDelayNotPayOrderImplName = "mallDelayNotPayOrderImpl";
+                if(delayNotPayOrderMap.size() == 1){
+                    delayNotPayOrderImpl = delayNotPayOrderMap.get(defaultDelayNotPayOrderImplName);
+                }else{
+                    //调用者自己实现了查询待支付订单
+                    for (String name : delayNotPayOrderMap.keySet()) {
+                        if(!Objects.equals(name,defaultDelayNotPayOrderImplName)){
+                            delayNotPayOrderImpl = delayNotPayOrderMap.get(name);
+                            break;
+                        }
+                    }
+                }
+                List<DelayNotPayOrder> delayNotPayOrders = delayNotPayOrderImpl.listDelayNotPayOrder();
                 if (Lists.isNotEmpty(delayNotPayOrders)) {
                     for (int i = 0; i < delayNotPayOrders.size(); i++) {
                         DelayNotPayOrder delayNotPayOrder = delayNotPayOrders.get(i);
-                        task.addNotPayOrder(delayNotPayOrder.getGroupId(), delayNotPayOrder.getCreateTime(),
+                        task.addNotPayOrder(delayNotPayOrder.getGroupId(),
+                                CommonMallConstants.DELAY_NOT_PAY_ORDER_GROUP_ID_TYPE, delayNotPayOrder.getCreateTime(),
                                 CommonMallConstants.CANCEL_NOT_PAY_ORDER_LIMIT_MINUTES);
                     }
                 }
