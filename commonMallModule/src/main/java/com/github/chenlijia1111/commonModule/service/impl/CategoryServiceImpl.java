@@ -184,16 +184,16 @@ public class CategoryServiceImpl implements CategoryServiceI {
      * @return
      */
     @Override
-    public Map<Integer, String> spliceCategoryName(List<? extends Category> categoryList) {
+    public Map<Integer, String> spliceCategoryName(List<CategoryVo> categoryList) {
         //转为 map 映射
         Map<Integer, String> map = new HashMap<>();
         if (Lists.isNotEmpty(categoryList)) {
-            for (Category vo : categoryList) {
+            for (CategoryVo vo : categoryList) {
                 map.put(vo.getId(), vo.getCategoryName());
             }
 
             //进行处理
-            for (Category vo : categoryList) {
+            for (CategoryVo vo : categoryList) {
                 //判断有没有父类，有父类就把父类的名称拼接在前面
                 Integer parentId = vo.getParentId();
                 if (Objects.nonNull(parentId)) {

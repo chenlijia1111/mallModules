@@ -103,6 +103,6 @@ public interface CategoryServiceI {
      * @param categoryList
      * @return
      */
-    Map<Integer, String> spliceCategoryName(List<? extends Category> categoryList);
+    Map<Integer, String> spliceCategoryName(List<CategoryVo> categoryList);
 
 }
