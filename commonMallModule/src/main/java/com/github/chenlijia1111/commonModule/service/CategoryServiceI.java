@@ -3,6 +3,7 @@ package com.github.chenlijia1111.commonModule.service;
 import com.github.chenlijia1111.commonModule.common.responseVo.category.CategoryVo;
 import com.github.chenlijia1111.utils.common.Result;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import com.github.chenlijia1111.commonModule.entity.Category;
@@ -96,5 +97,12 @@ public interface CategoryServiceI {
      * @return
      */
     List<Category> listByCondition(Example condition);
+
+    /**
+     * 拼接类别名称  上级/下级
+     * @param categoryList
+     * @return
+     */
+    Map<Integer, String> spliceCategoryName(List<? extends Category> categoryList);
 
 }

@@ -6,6 +6,7 @@ import com.github.chenlijia1111.commonModule.entity.Category;
 import com.github.chenlijia1111.commonModule.service.CategoryServiceI;
 import com.github.chenlijia1111.utils.common.Result;
 import com.github.chenlijia1111.utils.core.PropertyCheckUtil;
+import com.github.chenlijia1111.utils.core.StringUtils;
 import com.github.chenlijia1111.utils.list.Lists;
 import com.github.chenlijia1111.utils.list.Sets;
 import org.springframework.stereotype.Service;
@@ -13,7 +14,6 @@ import tk.mybatis.mapper.entity.Example;
 
 import javax.annotation.Resource;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * 商品分类
@@ -77,7 +77,7 @@ public class CategoryServiceImpl implements CategoryServiceI {
     /**
      * 递归查询这些类别所有的下级类别
      * 这里不将子类整理好，如有需要，可以用树节点工具进行整理返回前端
-     *
+     * <p>
      * 传递的数据如果为空 就查询所有分类
      *
      * @param idSet
@@ -92,12 +92,13 @@ public class CategoryServiceImpl implements CategoryServiceI {
 
     /**
      * 查询所有的上级类别，包含自己
+     *
      * @param idSet
      * @return
      */
     @Override
     public List<CategoryVo> listAllParentCategory(Set<Integer> idSet) {
-        if(Sets.isEmpty(idSet)){
+        if (Sets.isEmpty(idSet)) {
             return new ArrayList<>();
         }
         return categoryMapper.listAllParentCategory(idSet);
@@ -164,14 +165,46 @@ public class CategoryServiceImpl implements CategoryServiceI {
 
     /**
      * 条件查询
+     *
      * @param condition
      * @return
      */
     @Override
     public List<Category> listByCondition(Example condition) {
-        if(Objects.nonNull(condition)){
+        if (Objects.nonNull(condition)) {
             return categoryMapper.selectByExample(condition);
         }
         return new ArrayList<>();
+    }
+
+    /**
+     * 拼接类别名称  上级/下级
+     *
+     * @param categoryList
+     * @return
+     */
+    @Override
+    public Map<Integer, String> spliceCategoryName(List<? extends Category> categoryList) {
+        //转为 map 映射
+        Map<Integer, String> map = new HashMap<>();
+        if (Lists.isNotEmpty(categoryList)) {
+            for (Category vo : categoryList) {
+                map.put(vo.getId(), vo.getCategoryName());
+            }
+
+            //进行处理
+            for (Category vo : categoryList) {
+                //判断有没有父类，有父类就把父类的名称拼接在前面
+                Integer parentId = vo.getParentId();
+                if (Objects.nonNull(parentId)) {
+                    String parentCategoryName = map.get(parentId);
+                    if (StringUtils.isNotEmpty(parentCategoryName)) {
+                        //修改类别名称为拼接
+                        map.put(vo.getId(), parentCategoryName + "/" + vo.getCategoryName());
+                    }
+                }
+            }
+        }
+        return map;
     }
 }
