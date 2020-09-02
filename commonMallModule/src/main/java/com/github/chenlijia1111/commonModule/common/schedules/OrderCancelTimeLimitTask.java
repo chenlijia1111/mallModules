@@ -15,6 +15,7 @@ import javax.annotation.Resource;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.DelayQueue;
 import java.util.concurrent.Delayed;
 import java.util.concurrent.TimeUnit;
@@ -86,6 +87,15 @@ public class OrderCancelTimeLimitTask {
             delayNotPayOrder.limitTime = new DateTime(createTime.getTime()).plusMinutes(limitMinutes).toDate();
             notPayGroupIdList.put(delayNotPayOrder);
         }
+    }
+
+    /**
+     * 返回当前延时队列数量
+     *
+     * @return
+     */
+    public int queueCount() {
+        return notPayGroupIdList.size();
     }
 
 
@@ -171,11 +181,25 @@ public class OrderCancelTimeLimitTask {
             while (true) {
                 try {
                     DelayNotPayOrder delayNotPayOrder = notPayGroupIdList.take();
-                    //查询是否已支付
-                    Integer orderState = shoppingOrderMapper.findOrderState(delayNotPayOrder.groupId);
-                    if (Objects.equals(orderState, CommonMallConstants.ORDER_INIT)) {
-                        List<ShoppingOrder> shoppingOrders = shoppingOrderMapper.listByGroupIdSet(Sets.asSets(delayNotPayOrder.groupId));
-                        if (Lists.isNotEmpty(shoppingOrders)) {
+                    List<ShoppingOrder> shoppingOrders = null;
+                    if (Objects.equals(delayNotPayOrder.groupIdType, 1)) {
+                        //组订单编号
+                        shoppingOrders = shoppingOrderMapper.listByGroupIdSetFilterLongField(Sets.asSets(delayNotPayOrder.groupId));
+                    } else if (Objects.equals(delayNotPayOrder.groupIdType, 2)) {
+                        //商家组订单编号
+                        shoppingOrders = shoppingOrderMapper.listByShopGroupIdSetFilterLongField(Sets.asSets(delayNotPayOrder.groupId));
+                    } else if (Objects.equals(delayNotPayOrder.groupIdType, 3)) {
+                        //订单编号
+                        shoppingOrders = shoppingOrderMapper.listByOrderNoSetFilterLongField(Sets.asSets(delayNotPayOrder.groupId));
+                    }
+
+                    if (Lists.isNotEmpty(shoppingOrders)) {
+
+                        //判断状态，支付了就不需要取消了 只有初始状态才需要取消 即 0
+                        Optional<ShoppingOrder> initOrderAny = shoppingOrders.stream().filter(e -> Objects.equals(CommonMallConstants.ORDER_INIT, e.getState())).findAny();
+                        if(initOrderAny.isPresent()){
+                            //存在未支付的订单
+                            //可以取消
                             for (int i = 0; i < shoppingOrders.size(); i++) {
                                 ShoppingOrder shoppingOrder = shoppingOrders.get(i);
                                 //修改为取消
