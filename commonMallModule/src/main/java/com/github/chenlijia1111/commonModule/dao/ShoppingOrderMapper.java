@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * 
+ *
  * @author chenLiJia
  * @since 2019-11-05 16:39:11
  * @version 1.0
@@ -98,9 +98,26 @@ public interface ShoppingOrderMapper extends Mapper<ShoppingOrder> {
     /**
      * 列出未支付的订单
      * 用处：在系统启动的时候获取未支付的订单放入延时队列中去，等待处理
+     * 根据组订单进行聚合
      * @return
      */
     List<DelayNotPayOrder> listDelayNotPayOrder();
+
+    /**
+     * 列出未支付的订单
+     * 用处：在系统启动的时候获取未支付的订单放入延时队列中去，等待处理
+     * 根据商家组订单进行聚合
+     * @return
+     */
+    List<DelayNotPayOrder> listDelayNotPayOrderWithShopGroupNo();
+
+    /**
+     * 列出未支付的订单
+     * 用处：在系统启动的时候获取未支付的订单放入延时队列中去，等待处理
+     * 以单个订单为一个数据
+     * @return
+     */
+    List<DelayNotPayOrder> listDelayNotPayOrderWithOrderNo();
 
 
     /**

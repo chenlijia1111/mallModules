@@ -33,5 +33,16 @@ public class CommonMallConstants {
     //购物车 计算数量 是否需要过滤未上架的商品 默认否
     public static boolean SHOP_CAR_FILTER_NOT_SHELF_PRODUCT = false;
 
+    /**
+     * 查询未支付订单聚合方式，默认以组订单进行聚合
+     * 1以组订单聚合 2以商家组订单聚合 3以订单为单个数据
+     * 用于取消的时候决定取消订单的单位
+     * 是直接将整个组订单取消，还是取消一个商家组订单，还是取消单个订单
+     * {@link com.github.chenlijia1111.commonModule.service.ICancelOrderHook}
+     * {@link com.github.chenlijia1111.commonModule.common.schedules.OrderCancelTimeLimitTask}
+     * {@link com.github.chenlijia1111.commonModule.service.IDelayNotPayOrder}
+     */
+    public static Integer DELAY_NOT_PAY_ORDER_GROUP_ID_TYPE = 1;
+
 
 }
