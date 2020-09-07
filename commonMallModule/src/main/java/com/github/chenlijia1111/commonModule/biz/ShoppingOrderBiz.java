@@ -9,6 +9,7 @@ import com.github.chenlijia1111.commonModule.common.responseVo.order.CalculateOr
 import com.github.chenlijia1111.commonModule.common.responseVo.product.AdminProductVo;
 import com.github.chenlijia1111.commonModule.common.responseVo.product.GoodVo;
 import com.github.chenlijia1111.commonModule.common.schedules.OrderAutoEvaluateTask;
+import com.github.chenlijia1111.commonModule.common.schedules.OrderAutoTasks;
 import com.github.chenlijia1111.commonModule.common.schedules.OrderCancelTimeLimitTask;
 import com.github.chenlijia1111.commonModule.entity.*;
 import com.github.chenlijia1111.commonModule.service.*;
@@ -50,7 +51,6 @@ import java.util.stream.Collectors;
  * @see com.github.chenlijia1111.commonModule.common.schedules.OrderAutoReceiveTask
  * <p>
  * 确认收货后一段时间内自动评价 这里已经实现了，调用者只需要注入即可
- *
  * @see OrderAutoEvaluateTask
  * @since 2019-11-05 16:39:24
  **/
@@ -321,14 +321,7 @@ public class ShoppingOrderBiz {
 
         //操作成功，添加订单到延时队列，超时未支付取消订单
         if (Objects.equals(ADD_DELAY_NOT_PAY_AFTER_ADD_ORDER_STATUS, BooleanConstant.YES_INTEGER)) {
-            try {
-                OrderCancelTimeLimitTask task = SpringContextHolder.getBean(OrderCancelTimeLimitTask.class);
-                if (Objects.nonNull(task)) {
-                    task.addNotPayOrder(groupId, currentTime, CommonMallConstants.CANCEL_NOT_PAY_ORDER_LIMIT_MINUTES);
-                }
-            } catch (Exception e) {
-                //没有获取到bean，说明没有注入
-            }
+            OrderAutoTasks.addOrderDelay(groupId, currentTime, CommonMallConstants.CANCEL_NOT_PAY_ORDER_LIMIT_MINUTES, OrderCancelTimeLimitTask.class);
         }
 
         //返回groupId
@@ -483,12 +476,12 @@ public class ShoppingOrderBiz {
         for (AbstractCoupon coupon : abstractCouponList) {
             String couponImplClassName = coupon.getCouponImplClassName();
             BigDecimal couponMoney = feeMap.get(couponImplClassName);
-            if(Objects.isNull(couponMoney)){
+            if (Objects.isNull(couponMoney)) {
                 couponMoney = new BigDecimal(0);
             }
 
             couponMoney = couponMoney.add(coupon.getEffectiveMoney());
-            feeMap.put(couponImplClassName,couponMoney);
+            feeMap.put(couponImplClassName, couponMoney);
         }
         vo.setFeeMap(feeMap);
 
@@ -690,14 +683,7 @@ public class ShoppingOrderBiz {
 
         if (update.getSuccess()) {
             //收货之后，添加到自动评价延时队列
-            try {
-                OrderAutoEvaluateTask orderAutoEvaluateTask = SpringContextHolder.getBean(OrderAutoEvaluateTask.class);
-                if (Objects.nonNull(orderAutoEvaluateTask)) {
-                    orderAutoEvaluateTask.addNotReceiveOrder(orderNo, currentTime, CommonMallConstants.NOT_EVALUATE_ORDER_LIMIT_MINUTES);
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            OrderAutoTasks.addOrderDelay(orderNo, currentTime, CommonMallConstants.NOT_EVALUATE_ORDER_LIMIT_MINUTES, OrderAutoEvaluateTask.class);
         }
         return update;
     }
