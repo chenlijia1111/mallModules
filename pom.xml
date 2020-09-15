@@ -32,7 +32,7 @@
         <mybatis.version>3.5.3</mybatis.version>
         <javax.servlet-api.version>4.0.1</javax.servlet-api.version>
         <quartz.version>2.3.1</quartz.version>
-        <utils.version>1.1.9-SNAPSHOT</utils.version>
+        <utils.version>1.2.0-RELEASE</utils.version>
         <jackson-databind.version>2.9.10.3</jackson-databind.version>
         <mybatis-generator-core.version>1.4.0</mybatis-generator-core.version>
         <jjwt.version>0.9.1</jjwt.version>
