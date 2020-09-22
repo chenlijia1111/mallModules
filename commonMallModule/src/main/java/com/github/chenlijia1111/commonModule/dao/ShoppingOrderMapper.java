@@ -3,6 +3,7 @@ package com.github.chenlijia1111.commonModule.dao;
 import com.github.chenlijia1111.commonModule.common.responseVo.order.DelayNotEvaluateOrder;
 import com.github.chenlijia1111.commonModule.common.responseVo.order.DelayNotPayOrder;
 import com.github.chenlijia1111.commonModule.common.responseVo.order.DelayNotReceiveOrder;
+import com.github.chenlijia1111.commonModule.common.responseVo.order.OrderStatusFieldVo;
 import com.github.chenlijia1111.commonModule.entity.ShoppingOrder;
 import com.github.chenlijia1111.utils.common.Result;
 import org.apache.ibatis.annotations.Param;
@@ -142,6 +143,15 @@ public interface ShoppingOrderMapper extends Mapper<ShoppingOrder> {
      * @return
      */
     List<DelayNotReceiveOrder> listDelayNotReceiveOrder();
+
+
+    /**
+     * 查询订单的各个状态
+     * 2020-09-22
+     * @param orderNoSet
+     * @return
+     */
+    List<OrderStatusFieldVo> listOrderStatusFieldVoByOrderNoSet(@Param("orderNoSet") Set<String> orderNoSet);
 
 
 }

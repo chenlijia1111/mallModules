@@ -1,27 +1,53 @@
 # mallModules
-模块化商城
 
-### 1.7
+>商城模块化开发项目，方便后端快速开发
+>
+>将商城中通用模块抽出进行复用
 
-把所有价格修改为 bigdecimal
+### 模块
 
-累计修改项：
+#### commonMallModule 
 
-商品金额
+> 通用模块，包含商品，普通订单，用户地址，优惠券，评价，购物车，售后等通用模块
 
-订单金额
+#### fightGroupModule
 
-售后订单退款金额
+> 拼团模块
 
-优惠券金额
+#### spikeModule
 
-拼团价格
+> 秒杀模块
 
-秒杀价格
+### 分支计划
 
-### 1.6
+#### master
 
-修改 把下单是否需要判断库存 从参数中移除，修改为系统变量。放在参数中还是不太安全，有可能会忘记验证
+>  主分支更新维护 1.6-SNAPSHOT
+>
+
+#### dev
+
+> dev 分支开发 1.7-SNAPSHOT
+
+#### 稳定版已发布分支
+
+```xml
+<dependency>
+  <groupId>com.github.chenlijia1111</groupId>
+  <artifactId>commonMallModule</artifactId>
+  <version>1.6-RELEASE</version>
+</dependency>
+```
+
+#### 快照版已发布分支
+
+```xml
+<dependency>
+  <groupId>com.github.chenlijia1111</groupId>
+  <artifactId>commonMallModule</artifactId>
+  <version>1.7-SNAPSHOT</version>
+</dependency>
+```
 
 
 
