@@ -2,9 +2,10 @@ package com.github.chenlijia1111.commonModule.service.impl;
 
 import com.github.chenlijia1111.commonModule.common.enums.OrderStatusEnum;
 import com.github.chenlijia1111.commonModule.common.pojo.CommonMallConstants;
-import com.github.chenlijia1111.commonModule.common.responseVo.order.DelayNotPayOrder;
+import com.github.chenlijia1111.commonModule.common.responseVo.order.OrderStatusFieldVo;
 import com.github.chenlijia1111.commonModule.dao.*;
-import com.github.chenlijia1111.commonModule.entity.*;
+import com.github.chenlijia1111.commonModule.entity.Goods;
+import com.github.chenlijia1111.commonModule.entity.ShoppingOrder;
 import com.github.chenlijia1111.commonModule.service.IFindOrderStateHook;
 import com.github.chenlijia1111.commonModule.service.ShoppingOrderServiceI;
 import com.github.chenlijia1111.commonModule.utils.SpringContextHolder;
@@ -134,70 +135,43 @@ public class ShoppingOrderServiceImpl implements ShoppingOrderServiceI {
         Map<String, Integer> map = new HashMap<>();
 
         if (Sets.isNotEmpty(orderNoSet)) {
-            //查询这些订单的订单信息、发货单、收货单
-            //所有购物单
-            List<ShoppingOrder> shoppingOrders = shoppingOrderMapper.listByOrderNoSet(orderNoSet);
-            //所有发货单
-            List<ImmediatePaymentOrder> immediatePaymentOrders = immediatePaymentOrderMapper.listByFrontOrderNoSet(orderNoSet);
-            //所有发货单单号集合
-            Set<String> sendOrderNoSet = immediatePaymentOrders.stream().map(e -> e.getOrderNo()).collect(Collectors.toSet());
-            //所有收货单
-            List<ReceivingGoodsOrder> receivingGoodsOrders = receivingGoodsOrderMapper.listByFrontOrderNoSet(sendOrderNoSet);
-            //查询所有评价
-            List<Evaluation> evaluations = evaluationMapper.listByOrderNoSet(orderNoSet);
-
+            //查询订单状态
+            List<OrderStatusFieldVo> orderStatusFieldVos = shoppingOrderMapper.listOrderStatusFieldVoByOrderNoSet(orderNoSet);
+            //开始处理
             for (String orderNo : orderNoSet) {
                 //查询这个订单的信息
-                Optional<ShoppingOrder> any = shoppingOrders.stream().filter(e -> Objects.equals(orderNo, e.getOrderNo())).findAny();
-                if (any.isPresent()) {
-                    ShoppingOrder shoppingOrder = any.get();
-                    //订单状态
-                    Integer state = shoppingOrder.getState();
-                    //完成状态
-                    Integer completeStatus = shoppingOrder.getCompleteStatus();
-                    if (Objects.equals(state, CommonMallConstants.ORDER_INIT)) {
+                OrderStatusFieldVo orderStatusFieldVo = orderStatusFieldVos.stream().filter(e -> Objects.equals(e.getOrderNo(), orderNo)).findAny().orElse(null);
+                if (Objects.nonNull(orderStatusFieldVo)) {
+                    if (Objects.equals(orderStatusFieldVo.getOrderState(), CommonMallConstants.ORDER_INIT)) {
                         //初始状态
                         map.put(orderNo, OrderStatusEnum.INIT.getOrderStatus());
-                    } else if (Objects.equals(state, CommonMallConstants.ORDER_CANCEL)) {
+                    } else if (Objects.equals(orderStatusFieldVo.getOrderState(), CommonMallConstants.ORDER_CANCEL)) {
                         //取消
                         map.put(orderNo, OrderStatusEnum.CANCEL.getOrderStatus());
-                    } else if (Objects.equals(state, CommonMallConstants.ORDER_COMPLETE)) {
+                    } else if (Objects.equals(orderStatusFieldVo.getOrderState(), CommonMallConstants.ORDER_COMPLETE)) {
                         //已支付
                         //判断有没有发货
-                        Optional<ImmediatePaymentOrder> any1 = immediatePaymentOrders.stream().filter(e -> Objects.equals(orderNo, e.getFrontOrder())).findAny();
-                        if (any1.isPresent()) {
-                            ImmediatePaymentOrder immediatePaymentOrder = any1.get();
-                            Integer sendState = immediatePaymentOrder.getState();
-                            if (Objects.equals(CommonMallConstants.ORDER_INIT, sendState)) {
-                                //未发货
-                                map.put(orderNo, OrderStatusEnum.PAYED.getOrderStatus());
-                            } else if (Objects.equals(CommonMallConstants.ORDER_COMPLETE, sendState)) {
-                                //已发货
-                                map.put(orderNo, OrderStatusEnum.SEND.getOrderStatus());
-                            }
+                        if (Objects.equals(CommonMallConstants.ORDER_INIT, orderStatusFieldVo.getSendStatus())) {
+                            //未发货
+                            map.put(orderNo, OrderStatusEnum.PAYED.getOrderStatus());
+                        } else if (Objects.equals(CommonMallConstants.ORDER_COMPLETE, orderStatusFieldVo.getSendStatus())) {
+                            //已发货
+                            map.put(orderNo, OrderStatusEnum.SEND.getOrderStatus());
+                        }
 
-                            //判断是否已收货
-                            Optional<ReceivingGoodsOrder> any2 = receivingGoodsOrders.stream().filter(e -> Objects.equals(immediatePaymentOrder.getOrderNo(), e.getFrontOrder())).findAny();
-                            if (any2.isPresent()) {
-                                ReceivingGoodsOrder receivingGoodsOrder = any2.get();
-                                Integer receiveState = receivingGoodsOrder.getState();
-                                if (Objects.equals(CommonMallConstants.ORDER_COMPLETE, receiveState)) {
-                                    //已收货
-                                    map.put(orderNo, OrderStatusEnum.RECEIVED.getOrderStatus());
+                        //判断是否已收货
+                        if (Objects.equals(CommonMallConstants.ORDER_COMPLETE, orderStatusFieldVo.getReceiveStatus())) {
+                            //已收货
+                            map.put(orderNo, OrderStatusEnum.RECEIVED.getOrderStatus());
 
-                                    //判断是否已评价
-                                    if (Lists.isNotEmpty(evaluations)) {
-                                        Optional<Evaluation> any3 = evaluations.stream().filter(e -> Objects.equals(e.getOrderNo(), orderNo)).findAny();
-                                        if (any3.isPresent()) {
-                                            //已评价
-                                            map.put(orderNo, OrderStatusEnum.EVALUAED.getOrderStatus());
-                                        }
-                                    }
-                                }
+                            //判断是否已评价
+                            if (Objects.equals(BooleanConstant.YES_INTEGER, orderStatusFieldVo.getEvaluateStatus())) {
+                                //已评价
+                                map.put(orderNo, OrderStatusEnum.EVALUAED.getOrderStatus());
                             }
                         }
                     }
-                    if (Objects.equals(BooleanConstant.YES_INTEGER, completeStatus)) {
+                    if (Objects.equals(BooleanConstant.YES_INTEGER, orderStatusFieldVo.getCompleteStatus())) {
                         //已完成
                         map.put(orderNo, OrderStatusEnum.COMPLETED.getOrderStatus());
                     }
@@ -385,8 +359,6 @@ public class ShoppingOrderServiceImpl implements ShoppingOrderServiceI {
     }
 
 
-
-
     /**
      * 条件查询
      *
@@ -403,12 +375,13 @@ public class ShoppingOrderServiceImpl implements ShoppingOrderServiceI {
 
     /**
      * 根据组订单编号查询
+     *
      * @param groupIdSet 1
      * @return
      */
     @Override
     public List<ShoppingOrder> listByGroupIdSet(Set<String> groupIdSet) {
-        if(Sets.isNotEmpty(groupIdSet)){
+        if (Sets.isNotEmpty(groupIdSet)) {
             return shoppingOrderMapper.listByGroupIdSet(groupIdSet);
         }
         return new ArrayList<>();
@@ -416,12 +389,13 @@ public class ShoppingOrderServiceImpl implements ShoppingOrderServiceI {
 
     /**
      * 根据组订单编号查询-忽略长字段，加快查询速度
+     *
      * @param groupIdSet 1
      * @return
      */
     @Override
     public List<ShoppingOrder> listByGroupIdSetFilterLongField(Set<String> groupIdSet) {
-        if(Sets.isNotEmpty(groupIdSet)){
+        if (Sets.isNotEmpty(groupIdSet)) {
             return shoppingOrderMapper.listByGroupIdSetFilterLongField(groupIdSet);
         }
         return new ArrayList<>();
@@ -443,12 +417,13 @@ public class ShoppingOrderServiceImpl implements ShoppingOrderServiceI {
 
     /**
      * 根据订单编号查询-忽略长字段，加快查询速度
+     *
      * @param orderNoSet 1
      * @return
      */
     @Override
     public List<ShoppingOrder> listByOrderNoSetFilterLongField(Set<String> orderNoSet) {
-        if(Sets.isNotEmpty(orderNoSet)){
+        if (Sets.isNotEmpty(orderNoSet)) {
             return shoppingOrderMapper.listByOrderNoSetFilterLongField(orderNoSet);
         }
         return new ArrayList<>();
@@ -456,12 +431,13 @@ public class ShoppingOrderServiceImpl implements ShoppingOrderServiceI {
 
     /**
      * 根据商家组订单编号查询
+     *
      * @param shopGroupIdSet
      * @return
      */
     @Override
     public List<ShoppingOrder> listByShopGroupIdSet(Set<String> shopGroupIdSet) {
-        if(Sets.isNotEmpty(shopGroupIdSet)){
+        if (Sets.isNotEmpty(shopGroupIdSet)) {
             return shoppingOrderMapper.listByShopGroupIdSet(shopGroupIdSet);
         }
         return new ArrayList<>();
@@ -469,12 +445,13 @@ public class ShoppingOrderServiceImpl implements ShoppingOrderServiceI {
 
     /**
      * 根据商家组订单编号查询
+     *
      * @param shopGroupIdSet
      * @return
      */
     @Override
     public List<ShoppingOrder> listByShopGroupIdSetFilterLongField(Set<String> shopGroupIdSet) {
-        if(Sets.isNotEmpty(shopGroupIdSet)){
+        if (Sets.isNotEmpty(shopGroupIdSet)) {
             return shoppingOrderMapper.listByShopGroupIdSetFilterLongField(shopGroupIdSet);
         }
         return new ArrayList<>();

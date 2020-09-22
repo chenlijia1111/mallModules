@@ -198,4 +198,38 @@
       AND s_immediate_payment_order.express_sign_status = 1
       AND s_receiving_goods_order.state = 0
   </select>
+
+  <select id="listOrderStatusFieldVoByOrderNoSet"
+            resultType="com.github.chenlijia1111.commonModule.common.responseVo.order.OrderStatusFieldVo">
+    SELECT tempOrder.orderNo,
+            shopGroupNo,
+            groupNo,
+            orderState,
+            payStatus,
+            completeStatus,
+            sendStatus,
+            receiveStatus,
+            if(s_evaluation.order_no IS NULL, 0, 1) evaluateStatus
+    FROM (SELECT s_shopping_order.order_no                         orderNo,
+                  s_shopping_order.shop_group_id                    shopGroupNo,
+                  s_shopping_order.group_id                         groupNo,
+                  s_shopping_order.state                            orderState,
+                  if(s_shopping_order.transaction_id IS NULL, 0, 1) payStatus,
+                  s_shopping_order.complete_status                  completeStatus,
+                  s_immediate_payment_order.state                   sendStatus,
+                  s_receiving_goods_order.state                     receiveStatus
+          FROM s_shopping_order,
+          s_immediate_payment_order,
+          s_receiving_goods_order
+          WHERE s_shopping_order.delete_status = 0
+          AND s_shopping_order.order_no = s_immediate_payment_order.front_order
+          AND s_immediate_payment_order.order_no = s_receiving_goods_order.front_order
+          <foreach collection="orderNoSet" item="orderNo" open="AND s_shopping_order.order_no IN (" close=")" separator=",">
+            #{orderNo}
+          </foreach>
+
+        ) tempOrder
+    LEFT JOIN s_evaluation
+    ON tempOrder.orderNo = s_evaluation.order_no
+  </select>
 </mapper>
