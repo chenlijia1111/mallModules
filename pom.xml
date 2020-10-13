@@ -23,7 +23,7 @@
         <skipTests>true</skipTests>
         <mysql-connector-java.version>8.0.17</mysql-connector-java.version>
         <lombok.version>1.18.10</lombok.version>
-        <junit.version>4.12</junit.version>
+        <junit.version>4.13.1</junit.version>
         <pagehelper.version>3.7.4</pagehelper.version>
         <springfox-swagger2.version>2.7.0</springfox-swagger2.version>
         <swagger-bootstrap-ui.version>1.9.5</swagger-bootstrap-ui.version>
