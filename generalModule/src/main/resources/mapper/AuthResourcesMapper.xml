@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.github.chenlijia1111.generalModule.dao.AuthResourcesMapper">
+  <resultMap id="BaseResultMap" type="com.github.chenlijia1111.generalModule.entity.AuthResources">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="parent_id" jdbcType="INTEGER" property="parentId" />
+    <result column="auth_name" jdbcType="VARCHAR" property="authName" />
+    <result column="page_url" jdbcType="VARCHAR" property="pageUrl" />
+    <result column="page_icon" jdbcType="VARCHAR" property="pageIcon" />
+    <result column="request_url" jdbcType="VARCHAR" property="requestUrl" />
+    <result column="button_status" jdbcType="INTEGER" property="buttonStatus" />
+    <result column="page_status" jdbcType="INTEGER" property="pageStatus" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="delete_status" jdbcType="INTEGER" property="deleteStatus" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, parent_id, auth_name, page_url, page_icon, request_url, button_status, page_status, create_time,
+    update_time, delete_status
+  </sql>
+  <select id="listRoleAllAuth" resultType="com.github.chenlijia1111.generalModule.common.responseVo.auth.AuthVo">
+    SELECT
+    s_auth_resources.id, s_auth_resources.parent_id parentId, s_auth_resources.auth_name authName,
+    s_auth_resources.page_url pageUrl,s_auth_resources.page_icon pageIcon, s_auth_resources.request_url requestUrl,
+    s_auth_resources.button_status buttonStatus, s_auth_resources.page_status pageStatus
+    FROM s_auth_resources,s_role_auth
+    WHERE s_auth_resources.id = s_role_auth.auth_id
+    AND s_auth_resources.delete_status = 0
+    <foreach collection="roleIdSet" item="roleId" open="AND s_role_auth.role_id IN (" close=")" separator=",">
+      #{roleId}
+    </foreach>
+  </select>
+  <select id="listRolePageAuth" resultType="com.github.chenlijia1111.generalModule.common.responseVo.auth.AuthVo">
+    SELECT
+    s_auth_resources.id, s_auth_resources.parent_id parentId, s_auth_resources.auth_name authName,
+    s_auth_resources.page_url pageUrl,s_auth_resources.page_icon pageIcon, s_auth_resources.request_url requestUrl,
+    s_auth_resources.button_status buttonStatus, s_auth_resources.page_status pageStatus
+    FROM s_auth_resources,s_role_auth
+    WHERE s_auth_resources.id = s_role_auth.auth_id
+    AND s_auth_resources.delete_status = 0
+    AND s_auth_resources.button_status = 0
+    <foreach collection="roleIdSet" item="roleId" open="AND s_role_auth.role_id IN (" close=")" separator=",">
+      #{roleId}
+    </foreach>
+  </select>
+</mapper>

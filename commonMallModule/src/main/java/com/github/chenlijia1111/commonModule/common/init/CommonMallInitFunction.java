@@ -4,17 +4,17 @@ import com.github.chenlijia1111.commonModule.common.pojo.CommonMallConstants;
 import com.github.chenlijia1111.commonModule.common.responseVo.order.DelayNotEvaluateOrder;
 import com.github.chenlijia1111.commonModule.common.responseVo.order.DelayNotPayOrder;
 import com.github.chenlijia1111.commonModule.common.responseVo.order.DelayNotReceiveOrder;
-import com.github.chenlijia1111.commonModule.common.schedules.*;
+import com.github.chenlijia1111.commonModule.common.schedules.OrderAutoEvaluateTask;
+import com.github.chenlijia1111.commonModule.common.schedules.OrderAutoReceiveTask;
+import com.github.chenlijia1111.commonModule.common.schedules.OrderAutoTasks;
+import com.github.chenlijia1111.commonModule.common.schedules.OrderCancelTimeLimitTask;
 import com.github.chenlijia1111.commonModule.dao.*;
 import com.github.chenlijia1111.commonModule.service.IDelayNotPayOrder;
 import com.github.chenlijia1111.commonModule.service.impl.*;
 import com.github.chenlijia1111.commonModule.utils.SpringContextHolder;
 import com.github.chenlijia1111.utils.core.StringUtils;
 import com.github.chenlijia1111.utils.list.Lists;
-import com.github.chenlijia1111.utils.timer.TimerTaskUtil;
-import com.github.chenlijia1111.utils.timer.TriggerUtil;
 import org.joda.time.LocalDate;
-import org.quartz.Trigger;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Service;
@@ -26,8 +26,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * 初始化方法
- * 定时监听拼团-团解散
- * 查询到达时间限制且还没有拼团成功的拼团,将拼团的状态修改为拼团失败
  *
  * @author chenlijia
  * @version 1.0
@@ -42,8 +40,6 @@ public class CommonMallInitFunction implements ApplicationListener<ContextRefres
         if (contextRefreshedEvent.getApplicationContext().getParent() == null) {
             //执行方法
             initMaxOrderNo();
-            //添加定时清理验证码
-            addClearVerifyCodeTask();
             //初始化未支付的订单到延时队列进行处理
             initNotPayOrderList();
             //初始化未评价的订单到延时队列进行处理
@@ -156,19 +152,6 @@ public class CommonMallInitFunction implements ApplicationListener<ContextRefres
             }
         }
         return new AtomicInteger(0);
-    }
-
-
-    /**
-     * 添加定时清理验证码定时任务
-     */
-    private void addClearVerifyCodeTask() {
-        String groupName = "autoClearCode";
-
-        //每天3点运行
-        Trigger autoClearTrigger = TriggerUtil.createCronTrigger("0 0 3 * * ?", "autoClearCodeTrigger", groupName);
-
-        TimerTaskUtil.doTask(autoClearTrigger, AutoClearLimitVerifyCode.class, AutoClearLimitVerifyCode.class.getSimpleName(), groupName);
     }
 
     /**

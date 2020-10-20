@@ -14,6 +14,7 @@
         <module>commonMallModule</module>
         <module>fightGroupModule</module>
         <module>spikeModule</module>
+        <module>generalModule</module>
     </modules>
 
     <properties>
