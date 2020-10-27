@@ -5,7 +5,7 @@
     <id column="id" jdbcType="VARCHAR" property="id" />
     <result column="product_id" jdbcType="VARCHAR" property="productId" />
     <result column="good_no" jdbcType="VARCHAR" property="goodNo" />
-    <result column="stock_count" jdbcType="INTEGER" property="stockCount" />
+    <result column="stock_count" jdbcType="DECIMAL" property="stockCount" />
     <result column="price" jdbcType="DOUBLE" property="price" />
     <result column="vip_price" jdbcType="DOUBLE" property="vipPrice" />
     <result column="market_price" jdbcType="DOUBLE" property="marketPrice" />

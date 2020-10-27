@@ -1,12 +1,14 @@
 package com.github.chenlijia1111.commonModule.common.pojo.coupon;
 
 import com.github.chenlijia1111.commonModule.entity.ShoppingOrder;
+import com.github.chenlijia1111.commonModule.utils.BigDecimalUtil;
 import com.github.chenlijia1111.utils.core.NumberUtil;
 import com.github.chenlijia1111.utils.list.Lists;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -94,11 +96,14 @@ public class ExpressCoupon extends AbstractCoupon {
         Double effectMoney = this.getExpressMoney();
         if (Lists.isNotEmpty(orderList)) {
             //订单商品数量
-            Integer goodCount = orderList.stream().collect(Collectors.summingInt(ShoppingOrder::getCount));
+            BigDecimal goodCount = new BigDecimal("0.0");
+            for (ShoppingOrder order : orderList) {
+                goodCount = BigDecimalUtil.add(goodCount, order.getCount());
+            }
             //这些订单的总应付金额
             Double allOrderAmountTotal = orderList.stream().collect(Collectors.summingDouble(ShoppingOrder::getOrderAmountTotal));
             if ((Objects.nonNull(this.getConditionMoney()) && allOrderAmountTotal >= this.getConditionMoney())
-                    || (Objects.nonNull(this.getConditionCount()) && goodCount >= this.conditionCount)) {
+                    || (Objects.nonNull(this.getConditionCount()) && goodCount.compareTo(new BigDecimal(this.conditionCount)) >= 0)) {
                 //两个条件满足一个即满足条件
                 //享受折扣
                 //计算总的物流费用

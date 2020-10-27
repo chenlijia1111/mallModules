@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -40,7 +41,7 @@ public class ReleaseProductSkuVo {
      * 库存
      */
     @ApiModelProperty(value = "库存")
-    private Integer stockCount;
+    private BigDecimal stockCount;
 
     /**
      * 产品根据产品规格构架产品sku的属性属性值对象列表

@@ -1,13 +1,14 @@
 package com.github.chenlijia1111.commonModule.common.pojo.coupon;
 
 import com.github.chenlijia1111.commonModule.entity.ShoppingOrder;
-import com.github.chenlijia1111.utils.core.JSONUtil;
+import com.github.chenlijia1111.commonModule.utils.BigDecimalUtil;
 import com.github.chenlijia1111.utils.core.NumberUtil;
 import com.github.chenlijia1111.utils.list.Lists;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -22,7 +23,7 @@ import java.util.stream.Collectors;
 @Setter
 @Getter
 @Accessors(chain = true)
-public class CountSubCoupon extends AbstractCoupon{
+public class CountSubCoupon extends AbstractCoupon {
 
     /**
      * 优惠券代号
@@ -33,6 +34,7 @@ public class CountSubCoupon extends AbstractCoupon{
 
     /**
      * 优惠券id
+     *
      * @since 上午 10:13 2019/11/22 0022
      **/
     private String id;
@@ -66,16 +68,19 @@ public class CountSubCoupon extends AbstractCoupon{
         Double effectMoney = 0.0;
         if (Lists.isNotEmpty(orderList)) {
             //订单商品数量
-            Integer goodCount = orderList.stream().collect(Collectors.summingInt(ShoppingOrder::getCount));
+            BigDecimal goodCount = new BigDecimal("0.0");
+            for (ShoppingOrder order : orderList) {
+                goodCount = BigDecimalUtil.add(goodCount, order.getCount());
+            }
             //这些订单的总应付金额
             Double allOrderAmountTotal = orderList.stream().collect(Collectors.summingDouble(ShoppingOrder::getOrderAmountTotal));
-            if (Objects.nonNull(this.getConditionCount()) && goodCount >= this.conditionCount) {
+            if (Objects.nonNull(this.getConditionCount()) && goodCount.compareTo(new BigDecimal(this.conditionCount)) >= 0) {
                 //满足条件
                 //享受折扣
                 //这些订单总共优惠的金额
                 effectMoney = this.getSubMoney();
                 //如果总价格小于优惠抵扣价格，赋值为总价格
-                if(allOrderAmountTotal < effectMoney){
+                if (allOrderAmountTotal < effectMoney) {
                     effectMoney = allOrderAmountTotal;
                 }
                 //按比例计算单个订单优惠了多少钱

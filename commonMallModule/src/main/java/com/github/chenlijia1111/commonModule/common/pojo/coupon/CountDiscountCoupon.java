@@ -1,15 +1,16 @@
 package com.github.chenlijia1111.commonModule.common.pojo.coupon;
 
 import com.github.chenlijia1111.commonModule.entity.ShoppingOrder;
+import com.github.chenlijia1111.commonModule.utils.BigDecimalUtil;
 import com.github.chenlijia1111.utils.core.NumberUtil;
 import com.github.chenlijia1111.utils.list.Lists;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 /**
  * 满数量折扣券
@@ -63,8 +64,11 @@ public class CountDiscountCoupon extends AbstractCoupon {
         Double effectMoney = 0.0;
         if (Lists.isNotEmpty(orderList)) {
             //订单商品数量
-            Integer goodCount = orderList.stream().collect(Collectors.summingInt(ShoppingOrder::getCount));
-            if (Objects.nonNull(this.getConditionCount()) && goodCount >= this.conditionCount) {
+            BigDecimal goodCount = new BigDecimal("0.0");
+            for (ShoppingOrder order : orderList) {
+                goodCount = BigDecimalUtil.add(goodCount, order.getCount());
+            }
+            if (Objects.nonNull(this.getConditionCount()) && goodCount.compareTo(new BigDecimal(this.conditionCount)) >= 0) {
                 //满足条件
                 //享受折扣
                 for (ShoppingOrder order : orderList) {

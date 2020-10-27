@@ -12,6 +12,7 @@ import com.github.chenlijia1111.commonModule.common.schedules.OrderAutoEvaluateT
 import com.github.chenlijia1111.commonModule.common.schedules.OrderCancelTimeLimitTask;
 import com.github.chenlijia1111.commonModule.entity.*;
 import com.github.chenlijia1111.commonModule.service.*;
+import com.github.chenlijia1111.commonModule.utils.BigDecimalUtil;
 import com.github.chenlijia1111.commonModule.utils.SpringContextHolder;
 import com.github.chenlijia1111.utils.common.Result;
 import com.github.chenlijia1111.utils.common.constant.BooleanConstant;
@@ -28,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -153,11 +155,13 @@ public class ShoppingOrderBiz {
             //商品id
             String goodId = addParams.getGoodId();
             //商品数量
-            Integer count = addParams.getCount();
+            BigDecimal count = addParams.getCount();
 
             //这个商品所有的下单数量，允许参数中多个相同的 goodId ，但是要判断库存
-            Integer goodTotalCount = singleOrderList.stream().filter(e -> Objects.equals(e.getGoodId(), goodId)).
-                    collect(Collectors.summingInt(e -> e.getCount()));
+            BigDecimal goodTotalCount = new BigDecimal("0.0");
+            for (SingleOrderAddParams singleOrderAddParams : singleOrderList) {
+                goodTotalCount = BigDecimalUtil.add(goodTotalCount, singleOrderAddParams.getCount());
+            }
 
             //查询商品信息
             GoodVo goodVo = goodsService.findByGoodId(goodId);
@@ -175,7 +179,7 @@ public class ShoppingOrderBiz {
 
             //判断库存是否充足
             if (Objects.equals(BooleanConstant.YES_INTEGER, CHECK_GOOD_STOCK_STATUS) &&
-                    goodVo.getStockCount() < goodTotalCount) {
+                    goodVo.getStockCount().compareTo(goodTotalCount) < 0) {
                 return Result.failure("商品库存不足");
             }
 
@@ -188,6 +192,14 @@ public class ShoppingOrderBiz {
                 shopGroupIdMap.put(product.getShops(), shopGroupId);
             }
 
+            //订单价格
+            //先用 double 用着，1.7的时候会全部替换成 decimal
+            Double orderAmountTotal = goodVo.getPrice() * count.doubleValue();
+            orderAmountTotal = NumberUtil.doubleToFixLengthDouble(orderAmountTotal, 2);
+            Double productAmountTotal = goodVo.getPrice() * count.doubleValue();
+            productAmountTotal = NumberUtil.doubleToFixLengthDouble(productAmountTotal, 2);
+
+            //构造订单对象
             ShoppingOrder shoppingOrder = new ShoppingOrder().setOrderNo(orderNo).
                     setCustom(userId).
                     setShops(product.getShops()).
@@ -195,9 +207,9 @@ public class ShoppingOrderBiz {
                     setCount(count).
                     setState(CommonMallConstants.ORDER_INIT).
                     setOrderType(OrderTypeEnum.ORDINARY_ORDER.getType()).
-                    setProductAmountTotal(goodVo.getPrice() * count).
+                    setProductAmountTotal(productAmountTotal).
                     setGoodPrice(goodVo.getPrice()).
-                    setOrderAmountTotal(goodVo.getPrice() * count).
+                    setOrderAmountTotal(orderAmountTotal).
                     setShopGroupId(shopGroupId).
                     setGroupId(groupId).
                     setCreateTime(currentTime).setRemarks(params.getRemarks()).
@@ -310,8 +322,10 @@ public class ShoppingOrderBiz {
 
             //下单成功之后,减库存
             GoodVo goodsVO = order.getGoodsVO();
+            BigDecimal stockCount = goodsVO.getStockCount();
+            stockCount = BigDecimalUtil.divide(stockCount,order.getCount());
             Goods goods = new Goods().setId(goodsVO.getId()).
-                    setStockCount(goodsVO.getStockCount() - order.getCount());
+                    setStockCount(stockCount);
             goodsService.update(goods);
         }
 
@@ -373,7 +387,7 @@ public class ShoppingOrderBiz {
             //商品id
             String goodId = addParams.getGoodId();
             //商品数量
-            Integer count = addParams.getCount();
+            BigDecimal count = addParams.getCount();
 
             //查询商品信息
             GoodVo goodVo = goodsService.findByGoodId(goodId);
@@ -392,6 +406,13 @@ public class ShoppingOrderBiz {
             //订单编号 只做计算，不消耗实际id
             String orderNo = String.valueOf(IDGenerateFactory.ORDER_ID_UTIL.nextId());
 
+            //订单价格
+            //先用 double 用着，1.7的时候会全部替换成 decimal
+            Double orderAmountTotal = goodVo.getPrice() * count.doubleValue();
+            orderAmountTotal = NumberUtil.doubleToFixLengthDouble(orderAmountTotal, 2);
+            Double productAmountTotal = goodVo.getPrice() * count.doubleValue();
+            productAmountTotal = NumberUtil.doubleToFixLengthDouble(productAmountTotal, 2);
+
             ShoppingOrder shoppingOrder = new ShoppingOrder().setOrderNo(orderNo).
                     setCustom(userId).
                     setShops(product.getShops()).
@@ -399,9 +420,9 @@ public class ShoppingOrderBiz {
                     setCount(count).
                     setState(CommonMallConstants.ORDER_INIT).
                     setOrderType(OrderTypeEnum.ORDINARY_ORDER.getType()).
-                    setProductAmountTotal(goodVo.getPrice() * count).
+                    setProductAmountTotal(productAmountTotal).
                     setGoodPrice(goodVo.getPrice()).
-                    setOrderAmountTotal(goodVo.getPrice() * count).
+                    setOrderAmountTotal(orderAmountTotal).
                     setGroupId(groupId).
                     setCreateTime(currentTime).setRemarks(params.getRemarks()).
                     setDeleteStatus(BooleanConstant.NO_INTEGER).

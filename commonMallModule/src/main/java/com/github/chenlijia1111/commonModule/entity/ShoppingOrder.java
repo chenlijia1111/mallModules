@@ -13,6 +13,7 @@ import lombok.experimental.Accessors;
 import javax.persistence.Column;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
@@ -73,11 +74,12 @@ public class ShoppingOrder {
 
     /**
      * 商品数量
+     * 2020-10-27 修改，支持小数，适配特殊情景，如买菜之类
      */
     @ApiModelProperty("商品数量")
     @PropertyCheck(name = "商品数量")
     @Column(name = "count")
-    private Integer count;
+    private BigDecimal count;
 
     /**
      * 状态 0初始状态 983042成功 983041 失败或者取消

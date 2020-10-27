@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -53,11 +54,12 @@ public class ShopCar {
 
     /**
      * 产品数量
+     * 2020-10-27 修改，支持小数，适配特殊情景，如买菜之类
      */
     @ApiModelProperty("产品数量")
     @PropertyCheck(name = "产品数量")
     @Column(name = "good_count")
-    private Integer goodCount;
+    private BigDecimal goodCount;
 
     /**
      * 修改时间 以此字段倒序排序
@@ -107,11 +109,11 @@ public class ShopCar {
         this.goodId = goodId;
     }
 
-    public Integer getGoodCount() {
+    public BigDecimal getGoodCount() {
         return goodCount;
     }
 
-    public void setGoodCount(Integer goodCount) {
+    public void setGoodCount(BigDecimal goodCount) {
         this.goodCount = goodCount;
     }
 

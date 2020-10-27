@@ -17,6 +17,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -137,7 +138,7 @@ public class SpiderJDUtil {
                             goodAddParam.setVipPrice(2.0);
                             goodAddParam.setMarketPrice(2.0);
                             goodAddParam.setGoodNo("001");
-                            goodAddParam.setStockCount(100);
+                            goodAddParam.setStockCount(new BigDecimal("100"));
                         }
                     }
 

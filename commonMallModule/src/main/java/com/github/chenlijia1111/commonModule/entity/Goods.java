@@ -11,6 +11,7 @@ import lombok.experimental.Accessors;
 import javax.persistence.Column;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.Objects;
 
@@ -58,7 +59,7 @@ public class Goods {
     @ApiModelProperty("库存数量")
     @PropertyCheck(name = "库存数量")
     @Column(name = "stock_count")
-    private Integer stockCount;
+    private BigDecimal stockCount;
 
     /**
      * 售价
@@ -127,8 +128,11 @@ public class Goods {
     private String defaultSkuName;
 
 
-    public Goods setStockCount(Integer stockCount) {
-        this.stockCount = (Objects.isNull(stockCount) || stockCount < 0) ? 0 : stockCount;
+    public Goods setStockCount(BigDecimal stockCount) {
+        //库存不允许是负数
+        BigDecimal zeroBigDecimal = new BigDecimal("0.0");
+        this.stockCount = (Objects.isNull(stockCount) || stockCount.compareTo(zeroBigDecimal) < 0) ?
+                zeroBigDecimal : stockCount;
         return this;
     }
 }
