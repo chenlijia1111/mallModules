@@ -6,6 +6,8 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
+
 /**
  * 修改购物车商品id参数
  * @author Chen LiJia
@@ -32,9 +34,10 @@ public class UpdateShopCarGoodIdParams {
 
     /**
      * 商品数量
+     * 2020-10-27 修改 支持小数
      */
     @ApiModelProperty(value = "商品数量")
     @PropertyCheck(name = "商品数量")
-    private Integer goodCount;
+    private BigDecimal goodCount;
 
 }

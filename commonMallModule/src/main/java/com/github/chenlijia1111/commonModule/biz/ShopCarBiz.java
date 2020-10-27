@@ -11,6 +11,7 @@ import com.github.chenlijia1111.commonModule.common.responseVo.shopCar.ClientSho
 import com.github.chenlijia1111.commonModule.entity.Product;
 import com.github.chenlijia1111.commonModule.entity.ShopCar;
 import com.github.chenlijia1111.commonModule.service.*;
+import com.github.chenlijia1111.commonModule.utils.BigDecimalUtil;
 import com.github.chenlijia1111.utils.common.Result;
 import com.github.chenlijia1111.utils.core.PropertyCheckUtil;
 import com.github.chenlijia1111.utils.core.StringUtils;
@@ -118,7 +119,7 @@ public class ShopCarBiz {
         } else {
             //加入过  在原来的基础上增加数量
             ShopCar shopCar = shopCars.get(0);
-            shopCar.setGoodCount(shopCar.getGoodCount() + params.getGoodsCount());
+            shopCar.setGoodCount(BigDecimalUtil.add(shopCar.getGoodCount(),params.getGoodsCount()));
             Result update = shopCarService.update(shopCar);
             //返回购物车中当前商品种类的数量
             Integer shopCarAllGoodsKindCount = findShopCarAllGoodsKindCount(currentUserId);

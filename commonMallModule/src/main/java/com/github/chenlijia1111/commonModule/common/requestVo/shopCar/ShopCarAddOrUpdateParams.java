@@ -7,6 +7,8 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
+
 /**
  * 购物车添加参数
  * 添加的时候，如果元购物车已经有这个商品了，就直接在原有的基础上加上添加的数量
@@ -39,7 +41,7 @@ public class ShopCarAddOrUpdateParams {
      **/
     @ApiModelProperty(value = "商品数量")
     @PropertyCheck(name = "商品数量", checkFunction = PositiveNumberCheck.class)
-    private Integer goodsCount;
+    private BigDecimal goodsCount;
 
 
 }

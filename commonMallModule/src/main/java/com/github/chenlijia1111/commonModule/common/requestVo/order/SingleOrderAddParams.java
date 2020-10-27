@@ -7,6 +7,8 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
+
 /**
  * 单个订单添加参数
  *
@@ -30,12 +32,13 @@ public class SingleOrderAddParams {
 
     /**
      * 商品数量
+     * 2020-10-27 修改 支持小数
      *
      * @since 下午 4:48 2019/11/5 0005
      **/
     @ApiModelProperty(value = "商品数量")
     @PropertyCheck(name = "商品数量", checkFunction = PositiveNumberCheck.class)
-    private Integer count;
+    private BigDecimal count;
 
     /**
      * 单个订单补充参数

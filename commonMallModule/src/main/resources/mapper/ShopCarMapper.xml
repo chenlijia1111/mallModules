@@ -6,7 +6,7 @@
     <result column="client_id" jdbcType="VARCHAR" property="clientId" />
     <result column="product_id" jdbcType="VARCHAR" property="productId" />
     <result column="good_id" jdbcType="VARCHAR" property="goodId" />
-    <result column="good_count" jdbcType="INTEGER" property="goodCount" />
+    <result column="good_count" jdbcType="DECIMAL" property="goodCount" />
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
   </resultMap>
   <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.github.chenlijia1111.commonModule.entity.ShopCar">

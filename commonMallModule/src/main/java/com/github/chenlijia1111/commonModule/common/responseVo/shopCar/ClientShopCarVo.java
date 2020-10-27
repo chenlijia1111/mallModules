@@ -74,11 +74,12 @@ public class ClientShopCarVo extends ShopCar {
 
     /**
      * 库存数量
+     * 2020-10-27 修改 支持小数
      *
      * @since 下午 9:18 2019/9/24 0024
      **/
     @ApiModelProperty("库存数量")
-    private Integer count;
+    private BigDecimal count;
 
     /**
      * 是否上架 0否 1是

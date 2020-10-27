@@ -65,12 +65,13 @@ public class GoodAddParams {
 
     /**
      * 库存
+     * 2020-10-27 修改，支持小数
      *
      * @since 下午 2:50 2019/11/21 0021
      **/
     @ApiModelProperty(value = "库存")
-    @PropertyCheck(name = "库存", checkFunction = NaturalNumberCheck.class)
-    private Integer stockCount;
+    @PropertyCheck(name = "库存")
+    private BigDecimal stockCount;
 
     /**
      * 商品图片

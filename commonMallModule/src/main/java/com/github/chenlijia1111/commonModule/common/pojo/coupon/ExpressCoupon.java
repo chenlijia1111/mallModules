@@ -96,7 +96,10 @@ public class ExpressCoupon extends AbstractCoupon {
         BigDecimal effectMoney = this.getExpressMoney();
         if (Lists.isNotEmpty(orderList)) {
             //订单商品数量
-            Integer goodCount = orderList.stream().collect(Collectors.summingInt(ShoppingOrder::getCount));
+            BigDecimal goodCount = new BigDecimal("0.0");
+            for (ShoppingOrder order : orderList) {
+                goodCount = BigDecimalUtil.add(goodCount, order.getCount());
+            }
             //这些订单的总应付金额
             BigDecimal allOrderAmountTotal = new BigDecimal("0.0");
             for (ShoppingOrder order : orderList) {

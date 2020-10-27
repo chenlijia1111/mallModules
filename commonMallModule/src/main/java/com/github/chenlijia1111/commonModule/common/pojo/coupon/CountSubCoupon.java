@@ -1,7 +1,7 @@
 package com.github.chenlijia1111.commonModule.common.pojo.coupon;
 
 import com.github.chenlijia1111.commonModule.entity.ShoppingOrder;
-import com.github.chenlijia1111.utils.core.JSONUtil;
+import com.github.chenlijia1111.commonModule.utils.BigDecimalUtil;
 import com.github.chenlijia1111.utils.core.NumberUtil;
 import com.github.chenlijia1111.utils.list.Lists;
 import lombok.Getter;
@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 @Setter
 @Getter
 @Accessors(chain = true)
-public class CountSubCoupon extends AbstractCoupon{
+public class CountSubCoupon extends AbstractCoupon {
 
     /**
      * 优惠券代号
@@ -34,6 +34,7 @@ public class CountSubCoupon extends AbstractCoupon{
 
     /**
      * 优惠券id
+     *
      * @since 上午 10:13 2019/11/22 0022
      **/
     private String id;
@@ -68,7 +69,10 @@ public class CountSubCoupon extends AbstractCoupon{
         BigDecimal effectMoney = new BigDecimal("0.0");
         if (Lists.isNotEmpty(orderList)) {
             //订单商品数量
-            Integer goodCount = orderList.stream().collect(Collectors.summingInt(ShoppingOrder::getCount));
+            BigDecimal goodCount = new BigDecimal("0.0");
+            for (ShoppingOrder order : orderList) {
+                goodCount = BigDecimalUtil.add(goodCount, order.getCount());
+            }
             //这些订单的总应付金额
             BigDecimal allOrderAmountTotal = new BigDecimal("0.0");
             for (ShoppingOrder order : orderList) {

@@ -3,11 +3,13 @@ package com.github.chenlijia1111.commonModule.service.impl;
 import com.github.chenlijia1111.commonModule.common.enums.OrderStatusEnum;
 import com.github.chenlijia1111.commonModule.common.pojo.CommonMallConstants;
 import com.github.chenlijia1111.commonModule.common.responseVo.order.OrderStatusFieldVo;
-import com.github.chenlijia1111.commonModule.dao.*;
+import com.github.chenlijia1111.commonModule.dao.GoodsMapper;
+import com.github.chenlijia1111.commonModule.dao.ShoppingOrderMapper;
 import com.github.chenlijia1111.commonModule.entity.Goods;
 import com.github.chenlijia1111.commonModule.entity.ShoppingOrder;
 import com.github.chenlijia1111.commonModule.service.IFindOrderStateHook;
 import com.github.chenlijia1111.commonModule.service.ShoppingOrderServiceI;
+import com.github.chenlijia1111.commonModule.utils.BigDecimalUtil;
 import com.github.chenlijia1111.commonModule.utils.SpringContextHolder;
 import com.github.chenlijia1111.utils.common.Result;
 import com.github.chenlijia1111.utils.common.constant.BooleanConstant;
@@ -19,6 +21,7 @@ import org.springframework.stereotype.Service;
 import tk.mybatis.mapper.entity.Example;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -35,17 +38,7 @@ public class ShoppingOrderServiceImpl implements ShoppingOrderServiceI {
     @Resource
     private ShoppingOrderMapper shoppingOrderMapper;//购物单
     @Resource
-    private ImmediatePaymentOrderMapper immediatePaymentOrderMapper;//发货单
-    @Resource
-    private ReceivingGoodsOrderMapper receivingGoodsOrderMapper;//收货单
-    @Resource
     private GoodsMapper goodsMapper;//商品
-    @Resource
-    private ProductMapper productMapper;///产品
-    @Resource
-    private GoodSpecMapper goodSpecMapper;//商品规格
-    @Resource
-    private EvaluationMapper evaluationMapper;//评价
 
 
     /**
@@ -308,7 +301,8 @@ public class ShoppingOrderServiceImpl implements ShoppingOrderServiceI {
             //回补库存
             Goods goodVo = goodsMapper.selectByPrimaryKey(order.getGoodsId());
             if (Objects.nonNull(goodVo)) {
-                goodVo.setStockCount(goodVo.getStockCount() + order.getCount());
+                BigDecimal stackCount = BigDecimalUtil.add(goodVo.getStockCount(), order.getCount());
+                goodVo.setStockCount(stackCount);
                 goodsMapper.updateByPrimaryKeySelective(goodVo);
             }
         }
@@ -352,7 +346,8 @@ public class ShoppingOrderServiceImpl implements ShoppingOrderServiceI {
         //回补库存
         Goods goodVo = goodsMapper.selectByPrimaryKey(shoppingOrder.getGoodsId());
         if (Objects.nonNull(goodVo)) {
-            goodVo.setStockCount(goodVo.getStockCount() + shoppingOrder.getCount());
+            BigDecimal stackCount = BigDecimalUtil.add(goodVo.getStockCount(), shoppingOrder.getCount());
+            goodVo.setStockCount(stackCount);
             goodsMapper.updateByPrimaryKeySelective(goodVo);
         }
         return Result.success("操作成功");

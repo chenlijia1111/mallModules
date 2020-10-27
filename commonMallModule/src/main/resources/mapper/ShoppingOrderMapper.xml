@@ -6,7 +6,7 @@
     <result column="custom" jdbcType="VARCHAR" property="custom" />
     <result column="shops" jdbcType="VARCHAR" property="shops" />
     <result column="goods_id" jdbcType="VARCHAR" property="goodsId" />
-    <result column="count" jdbcType="INTEGER" property="count" />
+    <result column="count" jdbcType="DECIMAL" property="count" />
     <result column="state" jdbcType="INTEGER" property="state" />
     <result column="order_type" jdbcType="INTEGER" property="orderType" />
     <result column="product_amount_total" jdbcType="DOUBLE" property="productAmountTotal" />
