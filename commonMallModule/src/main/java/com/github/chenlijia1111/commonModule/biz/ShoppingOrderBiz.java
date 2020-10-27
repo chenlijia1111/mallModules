@@ -190,8 +190,8 @@ public class ShoppingOrderBiz {
                 shopGroupIdMap.put(product.getShops(), shopGroupId);
             }
 
-            //商品金额 TODO
-            BigDecimal productAmountTotal = goodVo.getPrice().multiply(new BigDecimal(String.valueOf(count)));
+            //商品金额
+            BigDecimal productAmountTotal = BigDecimalUtil.mul(goodVo.getPrice(), count);
 
             ShoppingOrder shoppingOrder = new ShoppingOrder().setOrderNo(orderNo).
                     setCustom(userId).
@@ -317,7 +317,7 @@ public class ShoppingOrderBiz {
             //下单成功之后,减库存
             GoodVo goodsVO = order.getGoodsVO();
             BigDecimal stockCount = goodsVO.getStockCount();
-            stockCount = BigDecimalUtil.divide(stockCount,order.getCount());
+            stockCount = BigDecimalUtil.divide(stockCount, order.getCount());
             Goods goods = new Goods().setId(goodsVO.getId()).
                     setStockCount(stockCount);
             goodsService.update(goods);
@@ -393,8 +393,8 @@ public class ShoppingOrderBiz {
             //订单编号 只做计算，不消耗实际id
             String orderNo = String.valueOf(IDGenerateFactory.ORDER_ID_UTIL.nextId());
 
-            //商品金额 TODO
-            BigDecimal productAmountTotal = goodVo.getPrice().multiply(new BigDecimal(String.valueOf(count)));
+            //商品金额
+            BigDecimal productAmountTotal = BigDecimalUtil.mul(goodVo.getPrice(), count);
 
             ShoppingOrder shoppingOrder = new ShoppingOrder().setOrderNo(orderNo).
                     setCustom(userId).

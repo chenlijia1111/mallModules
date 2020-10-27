@@ -1,7 +1,7 @@
 package com.github.chenlijia1111.commonModule.common.pojo.coupon;
 
 import com.github.chenlijia1111.commonModule.entity.ShoppingOrder;
-import com.github.chenlijia1111.utils.core.NumberUtil;
+import com.github.chenlijia1111.commonModule.utils.BigDecimalUtil;
 import com.github.chenlijia1111.utils.list.Lists;
 import lombok.Getter;
 import lombok.Setter;
@@ -10,7 +10,6 @@ import lombok.experimental.Accessors;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 /**
  * 物流券
@@ -107,7 +106,7 @@ public class ExpressCoupon extends AbstractCoupon {
             }
 
             if ((Objects.nonNull(this.getConditionMoney()) && allOrderAmountTotal.compareTo(this.getConditionMoney()) >= 0)
-                    || (Objects.nonNull(this.getConditionCount()) && goodCount >= this.conditionCount)) {
+                    || (Objects.nonNull(this.getConditionCount()) && goodCount.compareTo(new BigDecimal(this.conditionCount)) >= 0)) {
                 //两个条件满足一个即满足条件
                 //享受折扣
                 //计算总的物流费用
@@ -137,7 +136,7 @@ public class ExpressCoupon extends AbstractCoupon {
                 }
 
                 //因为用了除法，所有取2位小数
-                orderExpressMoney.setScale(2,BigDecimal.ROUND_HALF_UP);
+                orderExpressMoney.setScale(2, BigDecimal.ROUND_HALF_UP);
 
                 sumExpressMoney = sumExpressMoney.add(orderExpressMoney);
                 if (i == orderList.size() - 1) {

@@ -2,7 +2,6 @@ package com.github.chenlijia1111.commonModule.common.pojo.coupon;
 
 import com.github.chenlijia1111.commonModule.entity.ShoppingOrder;
 import com.github.chenlijia1111.commonModule.utils.BigDecimalUtil;
-import com.github.chenlijia1111.utils.core.NumberUtil;
 import com.github.chenlijia1111.utils.list.Lists;
 import lombok.Getter;
 import lombok.Setter;
@@ -11,7 +10,6 @@ import lombok.experimental.Accessors;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 /**
  * 满数量减券
@@ -79,13 +77,13 @@ public class CountSubCoupon extends AbstractCoupon {
                 allOrderAmountTotal = allOrderAmountTotal.add(order.getOrderAmountTotal());
             }
 
-            if (Objects.nonNull(this.getConditionCount()) && goodCount >= this.conditionCount) {
+            if (Objects.nonNull(this.getConditionCount()) && goodCount.compareTo(new BigDecimal(this.conditionCount)) >= 0) {
                 //满足条件
                 //享受折扣
                 //这些订单总共优惠的金额
                 effectMoney = this.getSubMoney();
                 //如果总价格小于优惠抵扣价格，赋值为总价格(比如满5减3，但是订单金额为3，那就变成满3减3了)
-                if(allOrderAmountTotal.compareTo(effectMoney) < 0){
+                if (allOrderAmountTotal.compareTo(effectMoney) < 0) {
                     effectMoney = allOrderAmountTotal;
                 }
                 //按比例计算单个订单优惠了多少钱，按订单金额进行平分
@@ -94,7 +92,7 @@ public class CountSubCoupon extends AbstractCoupon {
                     //这个订单优惠的金额
                     BigDecimal orderSubMoney = effectMoney.multiply(orderAmountTotal).divide(allOrderAmountTotal);
                     //有除法 保留两位小数就行了
-                    orderSubMoney.setScale(2,BigDecimal.ROUND_HALF_UP);
+                    orderSubMoney.setScale(2, BigDecimal.ROUND_HALF_UP);
 
                     //优惠之后的订单金额
                     BigDecimal v = orderAmountTotal.subtract(orderSubMoney);
