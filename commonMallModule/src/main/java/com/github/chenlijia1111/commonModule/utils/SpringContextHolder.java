@@ -2,12 +2,13 @@ package com.github.chenlijia1111.commonModule.utils;
 
 import com.github.chenlijia1111.utils.core.LogUtil;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * 以静态变量保存Spring ApplicationContext, 可在任何代码任何地方任何时候取出 ApplicationContext.
@@ -62,7 +63,7 @@ public class SpringContextHolder implements ApplicationContextAware {
      * 实现ApplicationContextAware接口, 注入Context到静态变量中.
      */
     public void setApplicationContext(ApplicationContext applicationContext) {
-		logger.info("注入ApplicationContext到SpringContextHolder:{}", applicationContext);
+        logger.info("注入ApplicationContext到SpringContextHolder:{}", applicationContext);
 
         if (SpringContextHolder.applicationContext != null) {
             logger.info("SpringContextHolder中的ApplicationContext被覆盖, 原有ApplicationContext为:" + SpringContextHolder.applicationContext);
@@ -82,6 +83,7 @@ public class SpringContextHolder implements ApplicationContextAware {
 
     /**
      * 根据类型获取所有实现
+     *
      * @param requiredType
      * @param <T>
      * @return
@@ -90,4 +92,20 @@ public class SpringContextHolder implements ApplicationContextAware {
         Map<String, T> beansOfType = applicationContext.getBeansOfType(requiredType);
         return beansOfType;
     }
+
+
+    /**
+     * 获取配置信息
+     *
+     * @param key 如：server.port
+     * @return
+     */
+    public static String getProperties(String key) {
+        Environment environment = applicationContext.getBean(Environment.class);
+        if (Objects.nonNull(environment)) {
+            return environment.getProperty(key);
+        }
+        return null;
+    }
+
 }
