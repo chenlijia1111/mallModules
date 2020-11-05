@@ -1,6 +1,5 @@
 package com.github.chenlijia1111.fightGroup.biz;
 
-import com.github.chenlijia1111.commonModule.common.enums.CouponTypeEnum;
 import com.github.chenlijia1111.commonModule.common.enums.OrderTypeEnum;
 import com.github.chenlijia1111.commonModule.common.pojo.CommonMallConstants;
 import com.github.chenlijia1111.commonModule.common.pojo.IDGenerateFactory;
@@ -11,6 +10,7 @@ import com.github.chenlijia1111.commonModule.common.responseVo.product.AdminProd
 import com.github.chenlijia1111.commonModule.common.responseVo.product.GoodVo;
 import com.github.chenlijia1111.commonModule.entity.*;
 import com.github.chenlijia1111.commonModule.service.*;
+import com.github.chenlijia1111.commonModule.utils.BigDecimalUtil;
 import com.github.chenlijia1111.fightGroup.common.enums.FightGroupStstusEnum;
 import com.github.chenlijia1111.fightGroup.common.requestVo.fightGroupOrder.FightGroupOrderAddParams;
 import com.github.chenlijia1111.fightGroup.common.response.product.FightGroupAdminProductVo;
@@ -32,6 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -139,10 +140,11 @@ public class FightGroupOrderBiz {
             return Result.failure("拼团已结束");
         }
         //判断库存
-        if (fightGroupProduct.getStockCount() == 0) {
+
+        if (Objects.equals(fightGroupProduct.getStockCount(), new BigDecimal("0.0"))) {
             return Result.failure("商品已被拼完");
         }
-        if (fightGroupProduct.getStockCount() < params.getCount()) {
+        if (fightGroupProduct.getStockCount().compareTo(params.getCount()) < 0) {
             return Result.failure("商品库存不足");
         }
 
@@ -157,7 +159,7 @@ public class FightGroupOrderBiz {
         //商品id
         String goodId = params.getGoodId();
         //商品数量
-        Integer count = params.getCount();
+        BigDecimal count = params.getCount();
 
         //查询商品信息
         GoodVo goodVo = goodsService.findByGoodId(goodId);
@@ -180,7 +182,7 @@ public class FightGroupOrderBiz {
         //新版本号
         String newUpdateVersion = RandomUtil.createUUID();
         //减去之后的库存
-        int newStockCount = fightGroupProduct.getStockCount() - params.getCount();
+        BigDecimal newStockCount = BigDecimalUtil.sub(fightGroupProduct.getStockCount(), params.getCount());
         fightGroupProduct.setUpdateVersion(newUpdateVersion);
         Result updateStockByVersion = fightGroupProductService.updateStockByVersion(fightGroupProduct.getId(), newStockCount,
                 fightGroupProduct.getUpdateVersion(), newUpdateVersion);
@@ -189,9 +191,9 @@ public class FightGroupOrderBiz {
             while (retryLength > 0) {
                 //进行重试
                 fightGroupProduct = fightGroupProductService.findById(params.getFightGroupProductId());
-                newStockCount = fightGroupProduct.getStockCount() - params.getCount();
+                newStockCount = BigDecimalUtil.sub(fightGroupProduct.getStockCount(), params.getCount());
                 //判断库存
-                if (fightGroupProduct.getStockCount() < params.getCount()) {
+                if (fightGroupProduct.getStockCount().compareTo(params.getCount()) < 0) {
                     //回滚
                     TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                     return Result.failure("商品已被拼完");
@@ -269,9 +271,9 @@ public class FightGroupOrderBiz {
                 setCount(count).
                 setState(CommonMallConstants.ORDER_INIT).
                 setOrderType(OrderTypeEnum.FIGHT_GROUP_ORDER.getType()).
-                setProductAmountTotal(fightGroupProduct.getFightPrice() * count).
+                setProductAmountTotal(fightGroupProduct.getFightPrice() * count.doubleValue()).
                 setGoodPrice(fightGroupProduct.getFightPrice()).
-                setOrderAmountTotal(fightGroupProduct.getFightPrice() * count).
+                setOrderAmountTotal(fightGroupProduct.getFightPrice() * count.doubleValue()).
                 setShopGroupId(shopGroupId).
                 setGroupId(groupId).
                 setCreateTime(currentTime).setRemarks(params.getRemarks());
@@ -385,7 +387,7 @@ public class FightGroupOrderBiz {
     /**
      * 计算拼团订单金额
      *
-     * @param params                   下单参数
+     * @param params 下单参数
      * @return com.github.chenlijia1111.utils.common.Result
      * @since 下午 2:49 2019/11/26 0026
      **/
@@ -426,10 +428,10 @@ public class FightGroupOrderBiz {
             return Result.failure("拼团已结束");
         }
         //判断库存
-        if (fightGroupProduct.getStockCount() == 0) {
+        if (Objects.equals(fightGroupProduct.getStockCount(), new BigDecimal("0.0"))) {
             return Result.failure("商品已被拼完");
         }
-        if (fightGroupProduct.getStockCount() < params.getCount()) {
+        if (fightGroupProduct.getStockCount().compareTo(params.getCount()) < 0) {
             return Result.failure("商品库存不足");
         }
 
@@ -444,7 +446,7 @@ public class FightGroupOrderBiz {
         //商品id
         String goodId = params.getGoodId();
         //商品数量
-        Integer count = params.getCount();
+        BigDecimal count = params.getCount();
 
         //查询商品信息
         GoodVo goodVo = goodsService.findByGoodId(goodId);
@@ -470,9 +472,9 @@ public class FightGroupOrderBiz {
                 setCount(count).
                 setState(CommonMallConstants.ORDER_INIT).
                 setOrderType(OrderTypeEnum.FIGHT_GROUP_ORDER.getType()).
-                setProductAmountTotal(fightGroupProduct.getFightPrice() * count).
+                setProductAmountTotal(fightGroupProduct.getFightPrice() * count.doubleValue()).
                 setGoodPrice(fightGroupProduct.getFightPrice()).
-                setOrderAmountTotal(fightGroupProduct.getFightPrice() * count).
+                setOrderAmountTotal(fightGroupProduct.getFightPrice() * count.doubleValue()).
                 setShopGroupId(shopGroupId).
                 setGroupId(groupId).
                 setCreateTime(currentTime).setRemarks(params.getRemarks());

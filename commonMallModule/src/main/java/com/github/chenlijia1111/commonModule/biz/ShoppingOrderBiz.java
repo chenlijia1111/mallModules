@@ -323,7 +323,7 @@ public class ShoppingOrderBiz {
             //下单成功之后,减库存
             GoodVo goodsVO = order.getGoodsVO();
             BigDecimal stockCount = goodsVO.getStockCount();
-            stockCount = BigDecimalUtil.divide(stockCount,order.getCount());
+            stockCount = BigDecimalUtil.sub(stockCount,order.getCount());
             Goods goods = new Goods().setId(goodsVO.getId()).
                     setStockCount(stockCount);
             goodsService.update(goods);

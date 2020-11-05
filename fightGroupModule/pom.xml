@@ -5,12 +5,12 @@
     <parent>
         <artifactId>mallModules</artifactId>
         <groupId>com.github.chenlijia1111</groupId>
-        <version>1.6-SNAPSHOT</version>
+        <version>1.6.2-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>fightGroupModule</artifactId>
-    <version>1.6-SNAPSHOT</version>
+    <version>1.6.2-SNAPSHOT</version>
     <description>拼团模块</description>
 
     <build>
@@ -30,7 +30,7 @@
         <dependency>
             <groupId>com.github.chenlijia1111</groupId>
             <artifactId>commonMallModule</artifactId>
-            <version>1.6-SNAPSHOT</version>
+            <version>1.6.2-SNAPSHOT</version>
         </dependency>
         <!--工具类-->
         <dependency>

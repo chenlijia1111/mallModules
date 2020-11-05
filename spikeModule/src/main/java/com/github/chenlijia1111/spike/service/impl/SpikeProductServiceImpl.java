@@ -8,6 +8,7 @@ import com.github.chenlijia1111.utils.core.StringUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 
 /**
  * 产品参与秒杀表
@@ -78,7 +79,7 @@ public class SpikeProductServiceImpl implements SpikeProductServiceI {
      * @since 下午 3:44 2019/11/25 0025
      **/
     @Override
-    public Result updateStockByVersion(String id, Integer stockCount, String oldVersionNo, String newVersionNo) {
+    public Result updateStockByVersion(String id, BigDecimal stockCount, String oldVersionNo, String newVersionNo) {
         Integer i = spikeProductMapper.updateStockByVersion(id, stockCount, oldVersionNo, newVersionNo);
         return i > 0 ? Result.success("操作成功") : Result.failure("操作失败");
     }

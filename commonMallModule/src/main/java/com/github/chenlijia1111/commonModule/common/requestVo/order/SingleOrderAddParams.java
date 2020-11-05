@@ -1,5 +1,6 @@
 package com.github.chenlijia1111.commonModule.common.requestVo.order;
 
+import com.github.chenlijia1111.commonModule.common.checkFunction.PositiveBigDecimalCheck;
 import com.github.chenlijia1111.commonModule.common.checkFunction.PositiveNumberCheck;
 import com.github.chenlijia1111.utils.core.annos.PropertyCheck;
 import io.swagger.annotations.ApiModel;
@@ -37,7 +38,7 @@ public class SingleOrderAddParams {
      * @since 下午 4:48 2019/11/5 0005
      **/
     @ApiModelProperty(value = "商品数量")
-    @PropertyCheck(name = "商品数量", checkFunction = PositiveNumberCheck.class)
+    @PropertyCheck(name = "商品数量", checkFunction = PositiveBigDecimalCheck.class)
     private BigDecimal count;
 
     /**

@@ -1,6 +1,5 @@
 package com.github.chenlijia1111.spike.biz;
 
-import com.github.chenlijia1111.commonModule.common.enums.CouponTypeEnum;
 import com.github.chenlijia1111.commonModule.common.enums.OrderTypeEnum;
 import com.github.chenlijia1111.commonModule.common.pojo.CommonMallConstants;
 import com.github.chenlijia1111.commonModule.common.pojo.IDGenerateFactory;
@@ -11,6 +10,7 @@ import com.github.chenlijia1111.commonModule.common.responseVo.product.AdminProd
 import com.github.chenlijia1111.commonModule.common.responseVo.product.GoodVo;
 import com.github.chenlijia1111.commonModule.entity.*;
 import com.github.chenlijia1111.commonModule.service.*;
+import com.github.chenlijia1111.commonModule.utils.BigDecimalUtil;
 import com.github.chenlijia1111.spike.common.requestVo.spikeOrder.SpikeOrderAddParams;
 import com.github.chenlijia1111.spike.common.response.product.SpikeAdminProductVo;
 import com.github.chenlijia1111.spike.entity.SpikeOrderRecode;
@@ -28,6 +28,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -125,10 +126,10 @@ public class SpikeOrderBiz {
             return Result.failure("秒杀已结束");
         }
         //判断库存
-        if (spikeProduct.getStockCount() == 0) {
+        if (Objects.equals(spikeProduct.getStockCount(), new BigDecimal("0.0"))) {
             return Result.failure("商品已被秒杀完");
         }
-        if (spikeProduct.getStockCount() < params.getCount()) {
+        if (spikeProduct.getStockCount().compareTo(params.getCount()) < 0) {
             return Result.failure("商品库存不足");
         }
 
@@ -143,7 +144,7 @@ public class SpikeOrderBiz {
         //商品id
         String goodId = params.getGoodId();
         //商品数量
-        Integer count = params.getCount();
+        BigDecimal count = params.getCount();
 
         //查询商品信息
         GoodVo goodVo = goodsService.findByGoodId(goodId);
@@ -166,7 +167,7 @@ public class SpikeOrderBiz {
         //新版本号
         String newUpdateVersion = RandomUtil.createUUID();
         //减去之后的库存
-        int newStockCount = spikeProduct.getStockCount() - params.getCount();
+        BigDecimal newStockCount = BigDecimalUtil.sub(spikeProduct.getStockCount(), params.getCount());
         spikeProduct.setUpdateVersion(newUpdateVersion);
         Result updateStockByVersion = spikeProductService.updateStockByVersion(spikeProduct.getId(), newStockCount, spikeProduct.getUpdateVersion(), newUpdateVersion);
         if (!updateStockByVersion.getSuccess()) {
@@ -174,9 +175,9 @@ public class SpikeOrderBiz {
             while (retryLength > 0) {
                 //进行重试
                 spikeProduct = spikeProductService.findById(params.getSpikeProductId());
-                newStockCount = spikeProduct.getStockCount() - params.getCount();
+                newStockCount = BigDecimalUtil.sub(spikeProduct.getStockCount(), params.getCount());
                 //判断库存
-                if (spikeProduct.getStockCount() < params.getCount()) {
+                if (spikeProduct.getStockCount().compareTo(params.getCount()) < 0) {
                     return Result.failure("商品已被秒杀完");
                 }
                 updateStockByVersion = spikeProductService.updateStockByVersion(spikeProduct.getId(), newStockCount, spikeProduct.getUpdateVersion(), newUpdateVersion);
@@ -207,9 +208,9 @@ public class SpikeOrderBiz {
                 setCount(count).
                 setState(CommonMallConstants.ORDER_INIT).
                 setOrderType(OrderTypeEnum.SPIKE_ORDER.getType()).
-                setProductAmountTotal(spikeProduct.getSpikePrice() * count).
+                setProductAmountTotal(spikeProduct.getSpikePrice() * count.doubleValue()).
                 setGoodPrice(spikeProduct.getSpikePrice()).
-                setOrderAmountTotal(spikeProduct.getSpikePrice() * count).
+                setOrderAmountTotal(spikeProduct.getSpikePrice() * count.doubleValue()).
                 setShopGroupId(shopGroupId).
                 setGroupId(groupId).
                 setCreateTime(currentTime).setRemarks(params.getRemarks());
@@ -356,7 +357,7 @@ public class SpikeOrderBiz {
             return Result.failure("秒杀以结束");
         }
         //判断库存
-        if (spikeProduct.getStockCount() < params.getCount()) {
+        if (spikeProduct.getStockCount().compareTo(params.getCount()) < 0) {
             return Result.failure("商品已被秒杀完");
         }
 
@@ -368,7 +369,7 @@ public class SpikeOrderBiz {
         //商品id
         String goodId = params.getGoodId();
         //商品数量
-        Integer count = params.getCount();
+        BigDecimal count = params.getCount();
 
         //查询商品信息
         GoodVo goodVo = goodsService.findByGoodId(goodId);
@@ -394,9 +395,9 @@ public class SpikeOrderBiz {
                 setGoodsId(goodId).
                 setCount(count).
                 setState(CommonMallConstants.ORDER_INIT).
-                setProductAmountTotal(spikeProduct.getSpikePrice() * count).
+                setProductAmountTotal(spikeProduct.getSpikePrice() * count.doubleValue()).
                 setGoodPrice(spikeProduct.getSpikePrice()).
-                setOrderAmountTotal(spikeProduct.getSpikePrice() * count).
+                setOrderAmountTotal(spikeProduct.getSpikePrice() * count.doubleValue()).
                 setGroupId(groupId).
                 setCreateTime(currentTime).setRemarks(params.getRemarks());
 

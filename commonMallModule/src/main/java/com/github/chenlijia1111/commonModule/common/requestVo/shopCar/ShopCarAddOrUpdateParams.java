@@ -1,5 +1,6 @@
 package com.github.chenlijia1111.commonModule.common.requestVo.shopCar;
 
+import com.github.chenlijia1111.commonModule.common.checkFunction.PositiveBigDecimalCheck;
 import com.github.chenlijia1111.commonModule.common.checkFunction.PositiveNumberCheck;
 import com.github.chenlijia1111.utils.core.annos.PropertyCheck;
 import io.swagger.annotations.ApiModel;
@@ -40,7 +41,7 @@ public class ShopCarAddOrUpdateParams {
      * @since 上午 11:13 2019/8/17 0017
      **/
     @ApiModelProperty(value = "商品数量")
-    @PropertyCheck(name = "商品数量", checkFunction = PositiveNumberCheck.class)
+    @PropertyCheck(name = "商品数量", checkFunction = PositiveBigDecimalCheck.class)
     private BigDecimal goodsCount;
 
 
