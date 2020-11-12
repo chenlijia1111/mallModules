@@ -1,10 +1,12 @@
 package com.github.chenlijia1111.commonModule.utils;
 
 import java.math.BigDecimal;
+import java.util.Objects;
 
 /**
  * bigDecimal 工具类
  * double 转 bigDecimal 最好先将 double 转为 字符串
+ *
  * @author Chen LiJia
  * @since 2020/9/30
  */
@@ -17,6 +19,7 @@ public class BigDecimalUtil {
 
     /**
      * 加法
+     *
      * @param v1
      * @param v2
      * @return
@@ -29,16 +32,18 @@ public class BigDecimalUtil {
 
     /**
      * 加法
+     *
      * @param v1
      * @param v2
      * @return
      */
     public static BigDecimal add(BigDecimal v1, BigDecimal v2) {
-        return v1.add(v1);
+        return v1.add(v2);
     }
 
     /**
      * 减法
+     *
      * @param v1
      * @param v2
      * @return
@@ -51,16 +56,18 @@ public class BigDecimalUtil {
 
     /**
      * 减法
+     *
      * @param v1
      * @param v2
      * @return
      */
     public static BigDecimal sub(BigDecimal v1, BigDecimal v2) {
-        return v1.subtract(v1);
+        return v1.subtract(v2);
     }
 
     /**
      * 乘法
+     *
      * @param v1
      * @param v2
      * @return
@@ -73,6 +80,7 @@ public class BigDecimalUtil {
 
     /**
      * 乘法
+     *
      * @param v1
      * @param v2
      * @return
@@ -87,6 +95,7 @@ public class BigDecimalUtil {
 
     /**
      * 除法
+     *
      * @param v1
      * @param v2
      * @return
@@ -99,6 +108,7 @@ public class BigDecimalUtil {
 
     /**
      * 除法
+     *
      * @param v1
      * @param v2
      * @return
@@ -106,9 +116,24 @@ public class BigDecimalUtil {
     public static BigDecimal divide(BigDecimal v1, BigDecimal v2) {
         v1 = v1.setScale(SCALE, ROUNDING_MODE);
         v2 = v2.setScale(SCALE, ROUNDING_MODE);
-        BigDecimal multiply = v1.divide(v2);
+        BigDecimal multiply = v1.divide(v2, 2, ROUNDING_MODE);
         multiply = multiply.setScale(SCALE, ROUNDING_MODE);
         return multiply;
     }
 
+    /**
+     * 判断 bigDecimal 是否是整数
+     * true 表示是整数
+     * false 表示不是整数
+     *
+     * @param bigDecimal
+     * @return
+     */
+    public static boolean intStatus(BigDecimal bigDecimal) {
+        if (Objects.nonNull(bigDecimal)) {
+            return new BigDecimal(bigDecimal.intValue()).compareTo(bigDecimal) == 0;
+        }
+        return false;
+    }
+    
 }

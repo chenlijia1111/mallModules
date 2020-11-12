@@ -78,7 +78,7 @@ public class SpikeProduct {
     @ApiModelProperty("参与秒杀的库存数量")
     @PropertyCheck(name = "参与秒杀的库存数量")
     @Column(name = "total_stock_count")
-    private Integer totalStockCount;
+    private BigDecimal totalStockCount;
 
     /**
      * 当前库存数量
@@ -86,7 +86,7 @@ public class SpikeProduct {
     @ApiModelProperty("当前库存数量")
     @PropertyCheck(name = "当前库存数量")
     @Column(name = "stock_count")
-    private Integer stockCount;
+    private BigDecimal stockCount;
 
     /**
      * 创建时间

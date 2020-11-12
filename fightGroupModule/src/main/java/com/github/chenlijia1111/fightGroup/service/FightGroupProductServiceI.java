@@ -3,6 +3,8 @@ package com.github.chenlijia1111.fightGroup.service;
 import com.github.chenlijia1111.fightGroup.entity.FightGroupProduct;
 import com.github.chenlijia1111.utils.common.Result;
 
+import java.math.BigDecimal;
+
 /**
  * 商品参加拼团活动
  *
@@ -62,7 +64,7 @@ public interface FightGroupProductServiceI {
      * @return com.github.chenlijia1111.utils.common.Result
      * @since 下午 3:44 2019/11/25 0025
      **/
-    Result updateStockByVersion(String id, Integer stockCount, String oldVersionNo, String newVersionNo);
+    Result updateStockByVersion(String id, BigDecimal stockCount, String oldVersionNo, String newVersionNo);
 
 
 }

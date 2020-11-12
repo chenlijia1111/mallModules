@@ -62,7 +62,7 @@ public class FightGroupProductAddParams {
      */
     @ApiModelProperty("拼团商品参与总库存")
     @PropertyCheck(name = "拼团商品参与总库存", checkFunction = PositiveNumberCheck.class)
-    private Integer totalStockCount;
+    private BigDecimal totalStockCount;
 
     /**
      * 成团人数

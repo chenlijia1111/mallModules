@@ -10,6 +10,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.Column;
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -49,7 +50,7 @@ public class SpikeOrderAddParams {
      **/
     @ApiModelProperty(value = "商品数量")
     @PropertyCheck(name = "商品数量", checkFunction = PositiveNumberCheck.class)
-    private Integer count;
+    private BigDecimal count;
 
     /**
      * 收货人姓名

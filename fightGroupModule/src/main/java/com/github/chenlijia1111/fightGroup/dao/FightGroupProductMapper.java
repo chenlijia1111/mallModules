@@ -5,6 +5,8 @@ import com.github.chenlijia1111.utils.common.Result;
 import org.apache.ibatis.annotations.Param;
 import tk.mybatis.mapper.common.Mapper;
 
+import java.math.BigDecimal;
+
 /**
  * 商品参加拼团活动
  * @author chenLiJia
@@ -38,7 +40,7 @@ public interface FightGroupProductMapper extends Mapper<FightGroupProduct> {
      * @return com.github.chenlijia1111.utils.common.Result
      * @since 下午 3:44 2019/11/25 0025
      **/
-    Integer updateStockByVersion(@Param("id") String id, @Param("stockCount") Integer stockCount,
+    Integer updateStockByVersion(@Param("id") String id, @Param("stockCount") BigDecimal stockCount,
                                 @Param("oldVersionNo") String oldVersionNo, @Param("newVersionNo") String newVersionNo);
 
 }

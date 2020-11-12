@@ -78,7 +78,7 @@ public class FightGroupProduct {
     @ApiModelProperty("拼团商品参与总库存")
     @PropertyCheck(name = "拼团商品参与总库存")
     @Column(name = "total_stock_count")
-    private Integer totalStockCount;
+    private BigDecimal totalStockCount;
 
     /**
      * 拼团商品当前库存
@@ -86,7 +86,7 @@ public class FightGroupProduct {
     @ApiModelProperty("拼团商品当前库存")
     @PropertyCheck(name = "拼团商品当前库存")
     @Column(name = "stock_count")
-    private Integer stockCount;
+    private BigDecimal stockCount;
 
     /**
      * 成团人数

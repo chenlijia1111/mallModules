@@ -5,6 +5,8 @@ import com.github.chenlijia1111.utils.common.Result;
 import org.apache.ibatis.annotations.Param;
 import tk.mybatis.mapper.common.Mapper;
 
+import java.math.BigDecimal;
+
 /**
  * 产品参与秒杀表
  * @author chenLiJia
@@ -23,7 +25,7 @@ public interface SpikeProductMapper extends Mapper<SpikeProduct> {
      * @return java.lang.Integer
      * @since 下午 3:44 2019/11/25 0025
      **/
-    Integer updateStockByVersion(@Param("id") String id, @Param("stockCount") Integer stockCount,
+    Integer updateStockByVersion(@Param("id") String id, @Param("stockCount") BigDecimal stockCount,
                                 @Param("oldVersionNo") String oldVersionNo, @Param("newVersionNo") String newVersionNo);
 
 

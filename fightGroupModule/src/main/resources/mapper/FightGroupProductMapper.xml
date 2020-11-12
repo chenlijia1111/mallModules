@@ -8,8 +8,8 @@
     <result column="start_time" jdbcType="TIMESTAMP" property="startTime" />
     <result column="end_time" jdbcType="TIMESTAMP" property="endTime" />
     <result column="fight_price" jdbcType="DOUBLE" property="fightPrice" />
-    <result column="total_stock_count" jdbcType="INTEGER" property="totalStockCount" />
-    <result column="stock_count" jdbcType="INTEGER" property="stockCount" />
+    <result column="total_stock_count" jdbcType="DECIMAL" property="totalStockCount" />
+    <result column="stock_count" jdbcType="DECIMAL" property="stockCount" />
     <result column="group_person_count" jdbcType="INTEGER" property="groupPersonCount" />
     <result column="person_limit_count" jdbcType="INTEGER" property="personLimitCount" />
     <result column="max_fight_time" jdbcType="INTEGER" property="maxFightTime" />
@@ -20,8 +20,8 @@
     <result column="delete_status" jdbcType="INTEGER" property="deleteStatus" />
   </resultMap>
   <sql id="Base_Column_List">
-    id, product_id, good_id, start_time, end_time, fight_price, total_stock_count, stock_count, 
-    group_person_count, person_limit_count, max_fight_time, sort_number, create_time, 
+    id, product_id, good_id, start_time, end_time, fight_price, total_stock_count, stock_count,
+    group_person_count, person_limit_count, max_fight_time, sort_number, create_time,
     update_time, update_version, delete_status
   </sql>
   <select id="findByTimeRange" resultMap="BaseResultMap">

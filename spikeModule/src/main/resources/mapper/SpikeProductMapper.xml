@@ -8,8 +8,8 @@
     <result column="start_time" jdbcType="TIMESTAMP" property="startTime" />
     <result column="end_time" jdbcType="TIMESTAMP" property="endTime" />
     <result column="spike_price" jdbcType="DOUBLE" property="spikePrice" />
-    <result column="total_stock_count" jdbcType="INTEGER" property="totalStockCount" />
-    <result column="stock_count" jdbcType="INTEGER" property="stockCount" />
+    <result column="total_stock_count" jdbcType="DECIMAL" property="totalStockCount" />
+    <result column="stock_count" jdbcType="DECIMAL" property="stockCount" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
     <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
     <result column="update_version" jdbcType="VARCHAR" property="updateVersion" />

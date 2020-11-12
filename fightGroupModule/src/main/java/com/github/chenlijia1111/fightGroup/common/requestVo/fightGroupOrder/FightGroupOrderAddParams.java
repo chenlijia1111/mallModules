@@ -10,6 +10,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -59,7 +60,7 @@ public class FightGroupOrderAddParams {
      **/
     @ApiModelProperty(value = "商品数量")
     @PropertyCheck(name = "商品数量", checkFunction = PositiveNumberCheck.class)
-    private Integer count;
+    private BigDecimal count;
 
     /**
      * 收货人姓名

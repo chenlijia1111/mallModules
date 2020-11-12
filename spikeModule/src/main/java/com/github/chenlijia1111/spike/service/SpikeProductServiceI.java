@@ -3,6 +3,8 @@ package com.github.chenlijia1111.spike.service;
 import com.github.chenlijia1111.spike.entity.SpikeProduct;
 import com.github.chenlijia1111.utils.common.Result;
 
+import java.math.BigDecimal;
+
 /**
  * 产品参与秒杀表
  *
@@ -50,7 +52,7 @@ public interface SpikeProductServiceI {
      * @return com.github.chenlijia1111.utils.common.Result
      * @since 下午 3:44 2019/11/25 0025
      **/
-    Result updateStockByVersion(String id, Integer stockCount, String oldVersionNo, String newVersionNo);
+    Result updateStockByVersion(String id, BigDecimal stockCount, String oldVersionNo, String newVersionNo);
 
     /**
      * 根据时间区间查询商品是否参与了秒杀

@@ -1,6 +1,5 @@
 package com.github.chenlijia1111.spike.biz;
 
-import com.github.chenlijia1111.commonModule.common.enums.CouponTypeEnum;
 import com.github.chenlijia1111.commonModule.common.enums.OrderTypeEnum;
 import com.github.chenlijia1111.commonModule.common.pojo.CommonMallConstants;
 import com.github.chenlijia1111.commonModule.common.pojo.IDGenerateFactory;
@@ -11,6 +10,7 @@ import com.github.chenlijia1111.commonModule.common.responseVo.product.AdminProd
 import com.github.chenlijia1111.commonModule.common.responseVo.product.GoodVo;
 import com.github.chenlijia1111.commonModule.entity.*;
 import com.github.chenlijia1111.commonModule.service.*;
+import com.github.chenlijia1111.commonModule.utils.BigDecimalUtil;
 import com.github.chenlijia1111.spike.common.requestVo.spikeOrder.SpikeOrderAddParams;
 import com.github.chenlijia1111.spike.common.response.product.SpikeAdminProductVo;
 import com.github.chenlijia1111.spike.entity.SpikeOrderRecode;
@@ -20,7 +20,10 @@ import com.github.chenlijia1111.spike.service.SpikeProductServiceI;
 import com.github.chenlijia1111.spike.service.impl.SpikeNoGeneratorServiceImpl;
 import com.github.chenlijia1111.utils.common.Result;
 import com.github.chenlijia1111.utils.common.constant.BooleanConstant;
-import com.github.chenlijia1111.utils.core.*;
+import com.github.chenlijia1111.utils.core.JSONUtil;
+import com.github.chenlijia1111.utils.core.PropertyCheckUtil;
+import com.github.chenlijia1111.utils.core.RandomUtil;
+import com.github.chenlijia1111.utils.core.StringUtils;
 import com.github.chenlijia1111.utils.list.Lists;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -126,10 +129,12 @@ public class SpikeOrderBiz {
             return Result.failure("秒杀已结束");
         }
         //判断库存
-        if (spikeProduct.getStockCount() == 0) {
+        BigDecimal stockCount = spikeProduct.getStockCount();
+        if (Objects.equals(stockCount, new BigDecimal("0.0"))) {
             return Result.failure("商品已被秒杀完");
         }
-        if (spikeProduct.getStockCount() < params.getCount()) {
+
+        if (spikeProduct.getStockCount().compareTo(params.getCount()) < 0) {
             return Result.failure("商品库存不足");
         }
 
@@ -144,7 +149,7 @@ public class SpikeOrderBiz {
         //商品id
         String goodId = params.getGoodId();
         //商品数量
-        Integer count = params.getCount();
+        BigDecimal count = params.getCount();
 
         //查询商品信息
         GoodVo goodVo = goodsService.findByGoodId(goodId);
@@ -167,7 +172,7 @@ public class SpikeOrderBiz {
         //新版本号
         String newUpdateVersion = RandomUtil.createUUID();
         //减去之后的库存
-        int newStockCount = spikeProduct.getStockCount() - params.getCount();
+        BigDecimal newStockCount = BigDecimalUtil.sub(spikeProduct.getStockCount(),params.getCount());
         spikeProduct.setUpdateVersion(newUpdateVersion);
         Result updateStockByVersion = spikeProductService.updateStockByVersion(spikeProduct.getId(), newStockCount, spikeProduct.getUpdateVersion(), newUpdateVersion);
         if (!updateStockByVersion.getSuccess()) {
@@ -175,9 +180,9 @@ public class SpikeOrderBiz {
             while (retryLength > 0) {
                 //进行重试
                 spikeProduct = spikeProductService.findById(params.getSpikeProductId());
-                newStockCount = spikeProduct.getStockCount() - params.getCount();
+                newStockCount = BigDecimalUtil.sub(spikeProduct.getStockCount(),params.getCount());
                 //判断库存
-                if (spikeProduct.getStockCount() < params.getCount()) {
+                if (spikeProduct.getStockCount().compareTo(params.getCount()) < 0) {
                     return Result.failure("商品已被秒杀完");
                 }
                 updateStockByVersion = spikeProductService.updateStockByVersion(spikeProduct.getId(), newStockCount, spikeProduct.getUpdateVersion(), newUpdateVersion);
@@ -202,7 +207,7 @@ public class SpikeOrderBiz {
 
         //构建订单
         //订单金额
-        BigDecimal productOrderAmountTotal = spikeProduct.getSpikePrice().multiply(new BigDecimal(count));
+        BigDecimal productOrderAmountTotal = BigDecimalUtil.mul(spikeProduct.getSpikePrice(),count);
         ShoppingOrder shoppingOrder = new ShoppingOrder().setOrderNo(orderNo).
                 setCustom(userId).
                 setShops(product.getShops()).
@@ -357,7 +362,7 @@ public class SpikeOrderBiz {
             return Result.failure("秒杀以结束");
         }
         //判断库存
-        if (spikeProduct.getStockCount() < params.getCount()) {
+        if (spikeProduct.getStockCount().compareTo(params.getCount()) < 0) {
             return Result.failure("商品已被秒杀完");
         }
 
@@ -369,7 +374,7 @@ public class SpikeOrderBiz {
         //商品id
         String goodId = params.getGoodId();
         //商品数量
-        Integer count = params.getCount();
+        BigDecimal count = params.getCount();
 
         //查询商品信息
         GoodVo goodVo = goodsService.findByGoodId(goodId);
@@ -390,7 +395,7 @@ public class SpikeOrderBiz {
 
         //构建订单
         //订单金额
-        BigDecimal productAmountTotal = spikeProduct.getSpikePrice().multiply(new BigDecimal(count));
+        BigDecimal productAmountTotal = BigDecimalUtil.mul(spikeProduct.getSpikePrice(),count);
         ShoppingOrder shoppingOrder = new ShoppingOrder().setOrderNo(orderNo).
                 setCustom(userId).
                 setShops(product.getShops()).
@@ -456,12 +461,12 @@ public class SpikeOrderBiz {
         for (AbstractCoupon coupon : abstractCouponList) {
             String couponImplClassName = coupon.getCouponImplClassName();
             BigDecimal couponMoney = feeMap.get(couponImplClassName);
-            if(Objects.isNull(couponMoney)){
+            if (Objects.isNull(couponMoney)) {
                 couponMoney = new BigDecimal(0);
             }
 
             couponMoney = couponMoney.add(coupon.getEffectiveMoney());
-            feeMap.put(couponImplClassName,couponMoney);
+            feeMap.put(couponImplClassName, couponMoney);
         }
         vo.setFeeMap(feeMap);
 

@@ -1,5 +1,6 @@
 package com.github.chenlijia1111.spike.common.requestVo.spikeProduct;
 
+import com.github.chenlijia1111.commonModule.common.checkFunction.PositiveBigDecimalCheck;
 import com.github.chenlijia1111.commonModule.common.checkFunction.PositiveNumberCheck;
 import com.github.chenlijia1111.commonModule.common.checkFunction.PriceCheck;
 import com.github.chenlijia1111.utils.core.annos.PropertyCheck;
@@ -61,8 +62,8 @@ public class SpikeProductAddParams {
      * 参与秒杀的库存数量
      */
     @ApiModelProperty("参与秒杀的库存数量")
-    @PropertyCheck(name = "参与秒杀的库存数量", checkFunction = PositiveNumberCheck.class)
-    private Integer stockCount;
+    @PropertyCheck(name = "参与秒杀的库存数量", checkFunction = PositiveBigDecimalCheck.class)
+    private BigDecimal stockCount;
 
     /**
      * 排序值,用于秒杀列表排序
