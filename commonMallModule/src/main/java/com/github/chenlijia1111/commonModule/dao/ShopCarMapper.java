@@ -5,6 +5,7 @@ import com.github.chenlijia1111.commonModule.common.responseVo.shopCar.ClientSho
 import com.github.chenlijia1111.commonModule.entity.ShopCar;
 import org.apache.ibatis.annotations.Param;
 import tk.mybatis.mapper.common.Mapper;
+import tk.mybatis.mapper.common.special.InsertListMapper;
 
 import java.util.List;
 import java.util.Set;
@@ -16,7 +17,7 @@ import java.util.Set;
  * @version 1.0
  * @since 2020-02-19 17:37:03
  **/
-public interface ShopCarMapper extends Mapper<ShopCar> {
+public interface ShopCarMapper extends Mapper<ShopCar>, InsertListMapper<ShopCar> {
 
 
     /**

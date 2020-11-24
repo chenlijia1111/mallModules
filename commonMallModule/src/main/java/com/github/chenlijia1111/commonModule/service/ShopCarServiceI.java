@@ -121,4 +121,11 @@ public interface ShopCarServiceI {
      */
     List<ShopCar> listByShopCarIdSet(Set<Integer> shopCarIdSet);
 
+    /**
+     * 批量添加
+     * @param list
+     * @return
+     */
+    Result batchAdd(List<ShopCar> list);
+
 }

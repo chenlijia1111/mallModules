@@ -228,5 +228,17 @@ public class ShopCarServiceImpl implements ShopCarServiceI {
         return new ArrayList<>();
     }
 
-
+    /**
+     * 批量添加
+     * @param list
+     * @return
+     */
+    @Override
+    public Result batchAdd(List<ShopCar> list) {
+        if(Lists.isNotEmpty(list)){
+            int i = shopCarMapper.insertList(list);
+            return i > 0 ? Result.success("操作成功") : Result.failure("操作失败");
+        }
+        return Result.success("操作成功");
+    }
 }
