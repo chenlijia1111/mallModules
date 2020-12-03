@@ -2,9 +2,11 @@ package com.github.chenlijia1111.commonModule.common.requestVo.product;
 
 import com.github.chenlijia1111.commonModule.common.checkFunction.NaturalNumberCheck;
 import com.github.chenlijia1111.commonModule.common.checkFunction.PriceCheck;
+import com.github.chenlijia1111.commonModule.common.responseVo.product.AdminProductVo;
 import com.github.chenlijia1111.commonModule.common.responseVo.product.GoodVo;
 import com.github.chenlijia1111.commonModule.common.responseVo.product.ReleaseProductSkuSpecVo;
 import com.github.chenlijia1111.commonModule.common.responseVo.product.ReleaseProductSkuVo;
+import com.github.chenlijia1111.utils.core.JSONUtil;
 import com.github.chenlijia1111.utils.core.StringUtils;
 import com.github.chenlijia1111.utils.core.annos.PropertyCheck;
 import com.github.chenlijia1111.utils.list.Lists;
@@ -79,6 +81,13 @@ public class GoodAddParams {
      */
     @ApiModelProperty(value = "商品图片")
     private String goodImage;
+
+    /**
+     * 2020-12-03
+     * 商品标签价格添加参数
+     */
+    @ApiModelProperty(value = "商品标签价格添加参数")
+    private List<GoodLabelPriceAddParams> goodLabelPriceList;
 
 
     /**

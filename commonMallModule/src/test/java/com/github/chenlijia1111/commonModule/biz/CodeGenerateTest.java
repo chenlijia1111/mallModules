@@ -35,7 +35,20 @@ public class CodeGenerateTest {
         mybatisCodeGeneratorUtil.setCommonCode(false);
 
         Map<String, String> tableToDomain = mybatisCodeGeneratorUtil.getTableToDoMain();
-        tableToDomain.put("s_good_spec_json", "GoodSpecJson");
+        tableToDomain.put("s_good_label_price", null);
+
+        //首字母大写
+        for (String s : tableToDomain.keySet()) {
+            StringBuilder stringBuilder = new StringBuilder();
+            String[] strings = s.split("_");
+            for (int i = 1; i < strings.length; i++) {
+                String word = strings[i];
+                //首字母大写
+                word = word.substring(0, 1).toUpperCase() + word.substring(1);
+                stringBuilder.append(word);
+            }
+            tableToDomain.put(s, stringBuilder.toString());
+        }
 
         List<String> ignoreDoMainToBusiness = mybatisCodeGeneratorUtil.getIgnoreDoMainToBusiness();
     }

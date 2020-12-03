@@ -36,4 +36,6 @@ public class AdminProductVo extends Product {
     @ApiModelProperty(value = "商品集合")
     private List<GoodVo> goodVoList;
 
+    private String abc;
+
 }

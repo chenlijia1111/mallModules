@@ -3,6 +3,7 @@ package com.github.chenlijia1111.commonModule.service.impl;
 import com.github.chenlijia1111.commonModule.common.pojo.CommonMallConstants;
 import com.github.chenlijia1111.commonModule.common.responseVo.product.*;
 import com.github.chenlijia1111.commonModule.dao.*;
+import com.github.chenlijia1111.commonModule.entity.GoodLabelPrice;
 import com.github.chenlijia1111.commonModule.entity.Goods;
 import com.github.chenlijia1111.commonModule.entity.Product;
 import com.github.chenlijia1111.commonModule.entity.ProductSpecValue;
@@ -45,6 +46,8 @@ public class ProductServiceImpl implements ProductServiceI {
     private GoodSpecMapper goodSpecMapper;//商品规格
     @Resource
     private ShoppingOrderMapper shoppingOrderMapper;//订单
+    @Resource
+    private GoodLabelPriceMapper goodLabelPriceMapper;// 商品标签价格
 
 
     /**
@@ -209,6 +212,14 @@ public class ProductServiceImpl implements ProductServiceI {
                 for (GoodVo goodVo : goodVoList) {
                     List<GoodSpecVo> collect = goodSpecVoMap.get(goodVo.getId());
                     goodVo.setGoodSpecVoList(collect);
+                }
+                // 关联商品的标签价格
+                Set<String> goodIdSet = goodVoList.stream().map(e -> e.getId()).collect(Collectors.toSet());
+                List<GoodLabelPrice> goodLabelPriceList = goodLabelPriceMapper.listByGoodIdSet(goodIdSet, null);
+                for (GoodVo goodVo : goodVoList) {
+                    List<GoodLabelPrice> hitGoodLabelPriceList = goodLabelPriceList.stream().filter(e -> Objects.equals(e.getGoodId(), goodVo.getId())).
+                            collect(Collectors.toList());
+                    goodVo.setGoodLabelPriceList(hitGoodLabelPriceList);
                 }
                 //产品的商品列表
                 productVo.setGoodVoList(goodVoList);

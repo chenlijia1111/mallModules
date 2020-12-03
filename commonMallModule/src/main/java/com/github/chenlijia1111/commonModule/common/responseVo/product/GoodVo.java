@@ -1,5 +1,6 @@
 package com.github.chenlijia1111.commonModule.common.responseVo.product;
 
+import com.github.chenlijia1111.commonModule.entity.GoodLabelPrice;
 import com.github.chenlijia1111.commonModule.entity.Goods;
 import com.github.chenlijia1111.utils.core.StringUtils;
 import com.github.chenlijia1111.utils.list.Lists;
@@ -54,6 +55,12 @@ public class GoodVo extends Goods {
      */
     @ApiModelProperty(value = "商品规格")
     private List<GoodSpecVo> goodSpecVoList;
+
+    /**
+     * 商品标签价格集合
+     */
+    @ApiModelProperty(value = "商品标签价格集合")
+    private List<GoodLabelPrice> goodLabelPriceList;
 
     /**
      * 查询商品规格值
