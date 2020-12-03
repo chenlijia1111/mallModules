@@ -71,10 +71,12 @@ public class ShoppingOrderBiz {
     private GoodsServiceI goodsService;//商品
     @Autowired
     private ProductServiceI productService;//产品
-    @Resource
-    private CommonModuleUserServiceI commonModuleUserService;//用户
+    @Autowired
+    private GoodLabelPriceServiceI goodLabelPriceService;// 商品价格标签
     @Autowired
     private CouponServiceI couponService;//优惠券
+    @Resource
+    private CommonModuleUserServiceI commonModuleUserService;//用户
 
 
     /**
@@ -121,6 +123,39 @@ public class ShoppingOrderBiz {
                       IdGeneratorServiceI shoppingIdGenerateImpl, IdGeneratorServiceI sendIdGenerateImpl,
                       IdGeneratorServiceI receiveIdGenerateImpl, IdGeneratorServiceI shopGroupIdGeneratorImpl) {
 
+        return add(params, null, groupIdGenerateImpl, shoppingIdGenerateImpl, sendIdGenerateImpl, receiveIdGenerateImpl, shopGroupIdGeneratorImpl);
+    }
+
+    /**
+     * 添加订单
+     * 如果需要在此基础上进行扩展，调用者可以继承这个类，然后进行扩展
+     * <p>
+     * 优惠券的使用方式的话,一般有以下方式:
+     * 不指定,所有都可以用
+     * 指定类别可用
+     * 指定商品可用
+     * <p>
+     * 先计算每个订单的订单单个订单的应付金额 {@link ShoppingOrder#getOrderAmountTotal()}
+     * 计算完之后再根据所有的优惠券计算每个订单的单个应付金额
+     * 注意,物流券是最后算的
+     * <p>
+     * 总应付金额等于所有单个订单的应付金额之和 {@link ShoppingOrder#getPayable()}
+     *
+     * @param params                   1
+     * @param goodPriceLabel           商品价格标签
+     * @param groupIdGenerateImpl      组订单单号生成规则
+     * @param shoppingIdGenerateImpl   购物订单单号生成规则
+     * @param sendIdGenerateImpl       发货订单单号生成规则
+     * @param receiveIdGenerateImpl    收货订单单号生成规则
+     * @param shopGroupIdGeneratorImpl 商家组订单号生成规则
+     * @return com.github.chenlijia1111.utils.common.Result
+     * @since 下午 4:53 2019/11/5 0005
+     **/
+    @Transactional
+    public Result add(OrderAddParams params, String goodPriceLabel, IdGeneratorServiceI groupIdGenerateImpl,
+                      IdGeneratorServiceI shoppingIdGenerateImpl, IdGeneratorServiceI sendIdGenerateImpl,
+                      IdGeneratorServiceI receiveIdGenerateImpl, IdGeneratorServiceI shopGroupIdGeneratorImpl) {
+
         //校验参数
         Result result = PropertyCheckUtil.checkProperty(params);
         if (!result.getSuccess()) {
@@ -141,6 +176,18 @@ public class ShoppingOrderBiz {
             return Result.notLogin();
         }
 
+        // 校验数据，判断商品信息是否都存在
+        Set<String> goodIdSet = singleOrderList.stream().map(e -> e.getGoodId()).collect(Collectors.toSet());
+        List<GoodVo> goodVoList = goodsService.listByGoodIdSet(goodIdSet);
+        // 查询对应的产品信息列表，判断产品是否都存在
+        Set<String> productIdSet = goodVoList.stream().map(e -> e.getProductId()).collect(Collectors.toSet());
+        List<Product> productList = productService.listByProductIdSet(productIdSet);
+
+        // 标签价格，如果指定了标签，就用对应标签的价格
+        List<GoodLabelPrice> goodLabelPriceList = new ArrayList<>();
+        if (StringUtils.isNotEmpty(goodPriceLabel)) {
+            goodLabelPriceList = goodLabelPriceService.listByGoodIdSet(goodIdSet, goodPriceLabel);
+        }
 
         //组订单Id
         String groupId = groupIdGenerateImpl.createOrderNo();
@@ -164,12 +211,13 @@ public class ShoppingOrderBiz {
             }
 
             //查询商品信息
-            GoodVo goodVo = goodsService.findByGoodId(goodId);
+            GoodVo goodVo = goodVoList.stream().filter(e -> Objects.equals(e.getId(), goodId)).findAny().orElse(null);
             if (Objects.isNull(goodVo)) {
                 return Result.failure("商品不存在");
             }
             //判断产品是否存在且上架
-            Product product = productService.findByProductId(goodVo.getProductId());
+            String productId = goodVo.getProductId();
+            Product product = productList.stream().filter(e -> Objects.equals(e.getId(), productId)).findAny().orElse(null);
             if (Objects.isNull(product) || Objects.equals(BooleanConstant.YES_INTEGER, product.getDeleteStatus())) {
                 return Result.failure("产品不存在");
             }
@@ -192,11 +240,17 @@ public class ShoppingOrderBiz {
                 shopGroupIdMap.put(product.getShops(), shopGroupId);
             }
 
+            // 商品价格
+            Double goodPrice = goodVo.getPrice();
+            // 判断是否需要取标签价格
+            if (StringUtils.isNotEmpty(goodPriceLabel)) {
+                goodPrice = goodLabelPriceList.stream().filter(e -> Objects.equals(e.getGoodId(), goodId)).map(e -> e.getGoodPrice()).findAny().orElse(goodPrice);
+            }
             //订单价格
             //先用 double 用着，1.7的时候会全部替换成 decimal
-            Double orderAmountTotal = goodVo.getPrice() * count.doubleValue();
+            Double orderAmountTotal = goodPrice * count.doubleValue();
             orderAmountTotal = NumberUtil.doubleToFixLengthDouble(orderAmountTotal, 2);
-            Double productAmountTotal = goodVo.getPrice() * count.doubleValue();
+            Double productAmountTotal = goodPrice * count.doubleValue();
             productAmountTotal = NumberUtil.doubleToFixLengthDouble(productAmountTotal, 2);
 
             //构造订单对象
@@ -208,7 +262,7 @@ public class ShoppingOrderBiz {
                     setState(CommonMallConstants.ORDER_INIT).
                     setOrderType(OrderTypeEnum.ORDINARY_ORDER.getType()).
                     setProductAmountTotal(productAmountTotal).
-                    setGoodPrice(goodVo.getPrice()).
+                    setGoodPrice(goodPrice).
                     setOrderAmountTotal(orderAmountTotal).
                     setShopGroupId(shopGroupId).
                     setGroupId(groupId).
@@ -323,7 +377,7 @@ public class ShoppingOrderBiz {
             //下单成功之后,减库存
             GoodVo goodsVO = order.getGoodsVO();
             BigDecimal stockCount = goodsVO.getStockCount();
-            stockCount = BigDecimalUtil.sub(stockCount,order.getCount());
+            stockCount = BigDecimalUtil.sub(stockCount, order.getCount());
             Goods goods = new Goods().setId(goodsVO.getId()).
                     setStockCount(stockCount);
             goodsService.update(goods);
@@ -346,6 +400,7 @@ public class ShoppingOrderBiz {
         return Result.success("操作成功", groupId);
     }
 
+
     /**
      * 试算订单金额
      *
@@ -354,12 +409,25 @@ public class ShoppingOrderBiz {
      * @since 下午 4:20 2019/11/22 0022
      **/
     public Result calculatePrice(OrderAddParams params) {
+        return calculatePrice(params, null);
+    }
+
+    /**
+     * 试算订单金额
+     *
+     * @param params         1
+     * @param goodPriceLabel 商品价格标签
+     * @return com.github.chenlijia1111.utils.common.Result
+     * @since 下午 4:20 2019/11/22 0022
+     **/
+    public Result calculatePrice(OrderAddParams params, String goodPriceLabel) {
 
         //校验参数
         Result result = PropertyCheckUtil.checkProperty(params, Lists.asList("singleOrderList"));
         if (!result.getSuccess()) {
             return result;
         }
+
         //校验订单中的商品参数
         List<SingleOrderAddParams> singleOrderList = params.getSingleOrderList();
         for (SingleOrderAddParams addParams : singleOrderList) {
@@ -373,6 +441,19 @@ public class ShoppingOrderBiz {
         String userId = commonModuleUserService.currentUserId();
         if (StringUtils.isEmpty(userId)) {
             return Result.notLogin();
+        }
+
+        // 校验数据，判断商品信息是否都存在
+        Set<String> goodIdSet = singleOrderList.stream().map(e -> e.getGoodId()).collect(Collectors.toSet());
+        List<GoodVo> goodVoList = goodsService.listByGoodIdSet(goodIdSet);
+        // 查询对应的产品信息列表，判断产品是否都存在
+        Set<String> productIdSet = goodVoList.stream().map(e -> e.getProductId()).collect(Collectors.toSet());
+        List<Product> productList = productService.listByProductIdSet(productIdSet);
+
+        // 标签价格，如果指定了标签，就用对应标签的价格
+        List<GoodLabelPrice> goodLabelPriceList = new ArrayList<>();
+        if (StringUtils.isNotEmpty(goodPriceLabel)) {
+            goodLabelPriceList = goodLabelPriceService.listByGoodIdSet(goodIdSet, goodPriceLabel);
         }
 
 
@@ -390,12 +471,13 @@ public class ShoppingOrderBiz {
             BigDecimal count = addParams.getCount();
 
             //查询商品信息
-            GoodVo goodVo = goodsService.findByGoodId(goodId);
+            GoodVo goodVo = goodVoList.stream().filter(e -> Objects.equals(e.getId(), goodId)).findAny().orElse(null);
             if (Objects.isNull(goodVo)) {
                 return Result.failure("商品不存在");
             }
             //判断产品是否存在且上架
-            Product product = productService.findByProductId(goodVo.getProductId());
+            String productId = goodVo.getProductId();
+            Product product = productList.stream().filter(e -> Objects.equals(e.getId(), productId)).findAny().orElse(null);
             if (Objects.isNull(product)) {
                 return Result.failure("产品不存在");
             }
@@ -406,11 +488,17 @@ public class ShoppingOrderBiz {
             //订单编号 只做计算，不消耗实际id
             String orderNo = String.valueOf(IDGenerateFactory.ORDER_ID_UTIL.nextId());
 
+            // 商品价格
+            Double goodPrice = goodVo.getPrice();
+            // 判断是否需要取标签价格
+            if (StringUtils.isNotEmpty(goodPriceLabel)) {
+                goodPrice = goodLabelPriceList.stream().filter(e -> Objects.equals(e.getGoodId(), goodId)).map(e -> e.getGoodPrice()).findAny().orElse(goodPrice);
+            }
             //订单价格
             //先用 double 用着，1.7的时候会全部替换成 decimal
-            Double orderAmountTotal = goodVo.getPrice() * count.doubleValue();
+            Double orderAmountTotal = goodPrice * count.doubleValue();
             orderAmountTotal = NumberUtil.doubleToFixLengthDouble(orderAmountTotal, 2);
-            Double productAmountTotal = goodVo.getPrice() * count.doubleValue();
+            Double productAmountTotal = goodPrice * count.doubleValue();
             productAmountTotal = NumberUtil.doubleToFixLengthDouble(productAmountTotal, 2);
 
             ShoppingOrder shoppingOrder = new ShoppingOrder().setOrderNo(orderNo).
@@ -421,7 +509,7 @@ public class ShoppingOrderBiz {
                     setState(CommonMallConstants.ORDER_INIT).
                     setOrderType(OrderTypeEnum.ORDINARY_ORDER.getType()).
                     setProductAmountTotal(productAmountTotal).
-                    setGoodPrice(goodVo.getPrice()).
+                    setGoodPrice(goodPrice).
                     setOrderAmountTotal(orderAmountTotal).
                     setGroupId(groupId).
                     setCreateTime(currentTime).setRemarks(params.getRemarks()).
