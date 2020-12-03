@@ -211,6 +211,7 @@ public class ShoppingOrder {
      * 订单快照
      *
      * @see com.github.chenlijia1111.commonModule.common.responseVo.product.AdminProductVo
+     * 2020-12-03 修改为关联 {@link ProductSnapshot} id
      */
     @ApiModelProperty("订单快照")
     @PropertyCheck(name = "订单快照")

@@ -9,11 +9,9 @@ import com.github.chenlijia1111.commonModule.common.responseVo.product.AdminProd
 import com.github.chenlijia1111.commonModule.common.responseVo.user.CommonSimpleUser;
 import com.github.chenlijia1111.commonModule.entity.Evaluation;
 import com.github.chenlijia1111.commonModule.entity.EvaluationLabel;
+import com.github.chenlijia1111.commonModule.entity.ProductSnapshot;
 import com.github.chenlijia1111.commonModule.entity.ShoppingOrder;
-import com.github.chenlijia1111.commonModule.service.CommonModuleUserServiceI;
-import com.github.chenlijia1111.commonModule.service.EvaluationLabelServiceI;
-import com.github.chenlijia1111.commonModule.service.EvaluationServiceI;
-import com.github.chenlijia1111.commonModule.service.ShoppingOrderServiceI;
+import com.github.chenlijia1111.commonModule.service.*;
 import com.github.chenlijia1111.utils.common.Result;
 import com.github.chenlijia1111.utils.common.constant.BooleanConstant;
 import com.github.chenlijia1111.utils.core.JSONUtil;
@@ -49,6 +47,8 @@ public class EvaluationBiz {
     private CommonModuleUserServiceI userService;//用户
     @Autowired
     private ShoppingOrderServiceI shoppingOrderService;//订单
+    @Autowired
+    private ProductSnapshotServiceI productSnapshotService;// 产品快照信息
 
 
     /**
@@ -103,8 +103,16 @@ public class EvaluationBiz {
         }
 
         //订单快照
-        String detailsJson = order.getDetailsJson();
-        AdminProductVo adminProductVo = JSONUtil.strToObj(detailsJson, AdminProductVo.class);
+        String productSnapshotId = order.getDetailsJson();
+        Optional<AdminProductVo> adminProductVoOptional = Optional.empty();
+        // 查询订单快照信息
+        if (StringUtils.isInt(productSnapshotId)){
+            ProductSnapshot productSnapshot = productSnapshotService.findById(Integer.valueOf(productSnapshotId));
+            if (Objects.nonNull(productSnapshot)){
+                AdminProductVo adminProductVo = JSONUtil.strToObj(productSnapshot.getProductJson(), AdminProductVo.class);
+                adminProductVoOptional = Optional.ofNullable(adminProductVo);
+            }
+        }
 
         //添加评价数据
         //评价id
@@ -114,7 +122,7 @@ public class EvaluationBiz {
                 setShopId(order.getShops()).
                 setOrderNo(order.getOrderNo()).
                 setGoodId(order.getGoodsId()).
-                setProductId(adminProductVo.getId()).
+                setProductId(adminProductVoOptional.map(e->e.getId()).orElse(null)).
                 setComment(params.getComment()).
                 setImages(params.getImages()).
                 setProductLevel(params.getProductLevel()).

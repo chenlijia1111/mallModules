@@ -1,19 +1,18 @@
 package com.github.chenlijia1111.fightGroup.biz;
 
 import com.github.chenlijia1111.commonModule.common.enums.OrderTypeEnum;
+import com.github.chenlijia1111.commonModule.common.enums.ProductSnapshotTypeEnum;
 import com.github.chenlijia1111.commonModule.common.pojo.CommonMallConstants;
 import com.github.chenlijia1111.commonModule.common.pojo.IDGenerateFactory;
 import com.github.chenlijia1111.commonModule.common.pojo.coupon.AbstractCoupon;
 import com.github.chenlijia1111.commonModule.common.requestVo.order.CouponWithGoodIds;
 import com.github.chenlijia1111.commonModule.common.responseVo.order.CalculateOrderPriceVo;
-import com.github.chenlijia1111.commonModule.common.responseVo.product.AdminProductVo;
 import com.github.chenlijia1111.commonModule.common.responseVo.product.GoodVo;
 import com.github.chenlijia1111.commonModule.entity.*;
 import com.github.chenlijia1111.commonModule.service.*;
 import com.github.chenlijia1111.commonModule.utils.BigDecimalUtil;
 import com.github.chenlijia1111.fightGroup.common.enums.FightGroupStstusEnum;
 import com.github.chenlijia1111.fightGroup.common.requestVo.fightGroupOrder.FightGroupOrderAddParams;
-import com.github.chenlijia1111.fightGroup.common.response.product.FightGroupAdminProductVo;
 import com.github.chenlijia1111.fightGroup.entity.FightGroup;
 import com.github.chenlijia1111.fightGroup.entity.FightGroupProduct;
 import com.github.chenlijia1111.fightGroup.entity.FightGroupUserOrder;
@@ -23,9 +22,12 @@ import com.github.chenlijia1111.fightGroup.service.FightGroupUserOrderServiceI;
 import com.github.chenlijia1111.fightGroup.service.impl.FightNoGeneratorServiceImpl;
 import com.github.chenlijia1111.utils.common.Result;
 import com.github.chenlijia1111.utils.common.constant.BooleanConstant;
-import com.github.chenlijia1111.utils.core.*;
+import com.github.chenlijia1111.utils.core.JSONUtil;
+import com.github.chenlijia1111.utils.core.PropertyCheckUtil;
+import com.github.chenlijia1111.utils.core.RandomUtil;
+import com.github.chenlijia1111.utils.core.StringUtils;
 import com.github.chenlijia1111.utils.list.Lists;
-import org.springframework.beans.BeanUtils;
+import com.github.chenlijia1111.utils.list.Sets;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -79,6 +81,8 @@ public class FightGroupOrderBiz {
     private FightGroupServiceI fightGroupService;//拼团-团
     @Autowired
     private FightGroupUserOrderServiceI fightGroupUserOrderService;//拼团订单关联记录
+    @Autowired
+    private ProductSnapshotServiceI productSnapshotService;// 产品快照信息
 
 
     /**
@@ -280,24 +284,13 @@ public class FightGroupOrderBiz {
                 setGroupId(groupId).
                 setCreateTime(currentTime).setRemarks(params.getRemarks());
 
-        //订单快照
-        AdminProductVo adminProductVo = productService.findAdminProductVoByProductId(goodVo.getProductId());
-        FightGroupAdminProductVo fightGroupAdminProductVo = new FightGroupAdminProductVo();
-        BeanUtils.copyProperties(adminProductVo, fightGroupAdminProductVo);
-        //拼团开始时间
-        fightGroupAdminProductVo.setFightStartTime(fightGroupProduct.getStartTime());
-        //拼团结束时间
-        fightGroupAdminProductVo.setFightEndTime(fightGroupProduct.getEndTime());
-        //拼团价格
-        fightGroupAdminProductVo.setFightPrice(fightGroupProduct.getFightPrice());
-        //成团人数
-        fightGroupAdminProductVo.setGroupPersonCount(fightGroupProduct.getGroupPersonCount());
-        //每人限购数量
-        fightGroupAdminProductVo.setFightGroupPersonLimitCount(fightGroupProduct.getPersonLimitCount());
-        //最大拼团时间(分钟),超过自动解散
-        fightGroupAdminProductVo.setMaxFightTime(fightGroupProduct.getMaxFightTime());
-        //转json字符串
-        String productSnapshot = JSONUtil.objToStr(fightGroupAdminProductVo);
+        //订单拼团产品快照
+        String productSnapshot = null;
+        // 查询拼团产品快照信息
+        List<ProductSnapshot> productSnapshotList = productSnapshotService.listByProductIdSet(Sets.asSets(goodVo.getProductId()), ProductSnapshotTypeEnum.FIGHT_GROUP.getType());
+        if (Lists.isNotEmpty(productSnapshotList)) {
+            productSnapshot = productSnapshotList.get(0).getProductJson();
+        }
         shoppingOrder.setDetailsJson(productSnapshot);
 
         //订单备注

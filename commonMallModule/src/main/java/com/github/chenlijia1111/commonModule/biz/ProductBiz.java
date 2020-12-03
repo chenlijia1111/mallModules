@@ -1,5 +1,6 @@
 package com.github.chenlijia1111.commonModule.biz;
 
+import com.github.chenlijia1111.commonModule.common.enums.ProductSnapshotTypeEnum;
 import com.github.chenlijia1111.commonModule.common.pojo.CommonMallConstants;
 import com.github.chenlijia1111.commonModule.common.pojo.IDGenerateFactory;
 import com.github.chenlijia1111.commonModule.common.requestVo.product.*;
@@ -177,7 +178,7 @@ public class ProductBiz {
 
         // 添加快照信息--2020-12-03
         AdminProductVo adminProductVo = productService.findAdminProductVoByProductId(productId);
-        ProductSnapshot productSnapshot = new ProductSnapshot(productId, JSONUtil.objToStr(adminProductVo), currentTime);
+        ProductSnapshot productSnapshot = new ProductSnapshot(productId, ProductSnapshotTypeEnum.COMMON.getType(), JSONUtil.objToStr(adminProductVo), currentTime);
         productSnapshotService.add(productSnapshot);
 
         return Result.success("操作成功", productId);
@@ -361,7 +362,7 @@ public class ProductBiz {
 
         // 添加快照信息--2020-12-03
         AdminProductVo adminProductVo = productService.findAdminProductVoByProductId(productId);
-        ProductSnapshot productSnapshot = new ProductSnapshot(productId, JSONUtil.objToStr(adminProductVo), currentTime);
+        ProductSnapshot productSnapshot = new ProductSnapshot(productId, ProductSnapshotTypeEnum.COMMON.getType(), JSONUtil.objToStr(adminProductVo), currentTime);
         productSnapshotService.add(productSnapshot);
 
         return Result.success("操作成功");

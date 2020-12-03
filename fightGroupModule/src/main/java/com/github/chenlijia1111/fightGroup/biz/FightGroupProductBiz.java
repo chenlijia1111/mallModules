@@ -1,16 +1,24 @@
 package com.github.chenlijia1111.fightGroup.biz;
 
+import com.github.chenlijia1111.commonModule.common.enums.ProductSnapshotTypeEnum;
 import com.github.chenlijia1111.commonModule.common.pojo.IDGenerateFactory;
+import com.github.chenlijia1111.commonModule.common.responseVo.product.AdminProductVo;
+import com.github.chenlijia1111.commonModule.entity.ProductSnapshot;
+import com.github.chenlijia1111.commonModule.service.ProductServiceI;
+import com.github.chenlijia1111.commonModule.service.ProductSnapshotServiceI;
 import com.github.chenlijia1111.fightGroup.common.requestVo.fightGroupProduct.FightGroupProductAddParams;
+import com.github.chenlijia1111.fightGroup.common.response.product.FightGroupAdminProductVo;
 import com.github.chenlijia1111.fightGroup.entity.FightGroupProduct;
 import com.github.chenlijia1111.fightGroup.service.FightGroupProductServiceI;
 import com.github.chenlijia1111.utils.common.Result;
 import com.github.chenlijia1111.utils.common.constant.BooleanConstant;
 import com.github.chenlijia1111.utils.common.constant.TimeConstant;
+import com.github.chenlijia1111.utils.core.JSONUtil;
 import com.github.chenlijia1111.utils.core.PropertyCheckUtil;
 import com.github.chenlijia1111.utils.core.RandomUtil;
 import com.github.chenlijia1111.utils.list.Lists;
 import org.joda.time.DateTime;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,6 +41,10 @@ public class FightGroupProductBiz {
 
     @Autowired
     private FightGroupProductServiceI fightGroupProductService;//拼团商品
+    @Autowired
+    private ProductServiceI productService;// 产品
+    @Autowired
+    private ProductSnapshotServiceI productSnapshotService;// 产品快照
 
 
     /**
@@ -47,19 +59,19 @@ public class FightGroupProductBiz {
     public Result batchAdd(List<FightGroupProductAddParams> list, boolean repeatWithRange) {
 
         //校验参数
-        if(Lists.isEmpty(list)){
+        if (Lists.isEmpty(list)) {
             return Result.failure("参数为空");
         }
         for (FightGroupProductAddParams productAddParams : list) {
             Result result = PropertyCheckUtil.checkProperty(productAddParams);
-            if(!result.getSuccess()){
+            if (!result.getSuccess()) {
                 return result;
             }
         }
 
         for (FightGroupProductAddParams productAddParams : list) {
             Result result = add(productAddParams, repeatWithRange);
-            if(!result.getSuccess()){
+            if (!result.getSuccess()) {
                 //回滚
                 TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
                 return result;
@@ -84,7 +96,7 @@ public class FightGroupProductBiz {
             return result;
         }
         //成团人数必须大于2
-        if(params.getGroupPersonCount() < 2){
+        if (params.getGroupPersonCount() < 2) {
             return Result.failure("成团人数必须大于等于2");
         }
 
@@ -115,7 +127,33 @@ public class FightGroupProductBiz {
                 setUpdateTime(new Date()).
                 setUpdateVersion(RandomUtil.createUUID()).
                 setDeleteStatus(BooleanConstant.NO_INTEGER);
-        return fightGroupProductService.add(fightGroupProduct);
+
+        result = fightGroupProductService.add(fightGroupProduct);
+        if (result.getSuccess()) {
+            // 添加拼团产品缓存
+            //订单快照
+            AdminProductVo adminProductVo = productService.findAdminProductVoByProductId(params.getProductId());
+            FightGroupAdminProductVo fightGroupAdminProductVo = new FightGroupAdminProductVo();
+            BeanUtils.copyProperties(adminProductVo, fightGroupAdminProductVo);
+            //拼团开始时间
+            fightGroupAdminProductVo.setFightStartTime(fightGroupProduct.getStartTime());
+            //拼团结束时间
+            fightGroupAdminProductVo.setFightEndTime(fightGroupProduct.getEndTime());
+            //拼团价格
+            fightGroupAdminProductVo.setFightPrice(fightGroupProduct.getFightPrice());
+            //成团人数
+            fightGroupAdminProductVo.setGroupPersonCount(fightGroupProduct.getGroupPersonCount());
+            //每人限购数量
+            fightGroupAdminProductVo.setFightGroupPersonLimitCount(fightGroupProduct.getPersonLimitCount());
+            //最大拼团时间(分钟),超过自动解散
+            fightGroupAdminProductVo.setMaxFightTime(fightGroupProduct.getMaxFightTime());
+            //转json字符串
+            String productSnapshotStr = JSONUtil.objToStr(fightGroupAdminProductVo);
+
+            ProductSnapshot productSnapshot = new ProductSnapshot(params.getProductId(), ProductSnapshotTypeEnum.FIGHT_GROUP.getType(), productSnapshotStr, new Date());
+            productSnapshotService.add(productSnapshot);
+        }
+        return result;
     }
 
 }

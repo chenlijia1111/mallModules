@@ -1,18 +1,17 @@
 package com.github.chenlijia1111.spike.biz;
 
 import com.github.chenlijia1111.commonModule.common.enums.OrderTypeEnum;
+import com.github.chenlijia1111.commonModule.common.enums.ProductSnapshotTypeEnum;
 import com.github.chenlijia1111.commonModule.common.pojo.CommonMallConstants;
 import com.github.chenlijia1111.commonModule.common.pojo.IDGenerateFactory;
 import com.github.chenlijia1111.commonModule.common.pojo.coupon.AbstractCoupon;
 import com.github.chenlijia1111.commonModule.common.requestVo.order.CouponWithGoodIds;
 import com.github.chenlijia1111.commonModule.common.responseVo.order.CalculateOrderPriceVo;
-import com.github.chenlijia1111.commonModule.common.responseVo.product.AdminProductVo;
 import com.github.chenlijia1111.commonModule.common.responseVo.product.GoodVo;
 import com.github.chenlijia1111.commonModule.entity.*;
 import com.github.chenlijia1111.commonModule.service.*;
 import com.github.chenlijia1111.commonModule.utils.BigDecimalUtil;
 import com.github.chenlijia1111.spike.common.requestVo.spikeOrder.SpikeOrderAddParams;
-import com.github.chenlijia1111.spike.common.response.product.SpikeAdminProductVo;
 import com.github.chenlijia1111.spike.entity.SpikeOrderRecode;
 import com.github.chenlijia1111.spike.entity.SpikeProduct;
 import com.github.chenlijia1111.spike.service.SpikeOrderRecodeServiceI;
@@ -25,7 +24,7 @@ import com.github.chenlijia1111.utils.core.PropertyCheckUtil;
 import com.github.chenlijia1111.utils.core.RandomUtil;
 import com.github.chenlijia1111.utils.core.StringUtils;
 import com.github.chenlijia1111.utils.list.Lists;
-import org.springframework.beans.BeanUtils;
+import com.github.chenlijia1111.utils.list.Sets;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -70,6 +69,8 @@ public class SpikeOrderBiz {
     private CommonModuleUserServiceI commonModuleUserService;//用户
     @Autowired
     private CouponServiceI couponService;//优惠券 主要用于计算物流费,一般秒杀无法使用优惠券,但也有例外
+    @Autowired
+    private ProductSnapshotServiceI productSnapshotService;// 产品快照
 
 
     /**
@@ -172,7 +173,7 @@ public class SpikeOrderBiz {
         //新版本号
         String newUpdateVersion = RandomUtil.createUUID();
         //减去之后的库存
-        BigDecimal newStockCount = BigDecimalUtil.sub(spikeProduct.getStockCount(),params.getCount());
+        BigDecimal newStockCount = BigDecimalUtil.sub(spikeProduct.getStockCount(), params.getCount());
         spikeProduct.setUpdateVersion(newUpdateVersion);
         Result updateStockByVersion = spikeProductService.updateStockByVersion(spikeProduct.getId(), newStockCount, spikeProduct.getUpdateVersion(), newUpdateVersion);
         if (!updateStockByVersion.getSuccess()) {
@@ -180,7 +181,7 @@ public class SpikeOrderBiz {
             while (retryLength > 0) {
                 //进行重试
                 spikeProduct = spikeProductService.findById(params.getSpikeProductId());
-                newStockCount = BigDecimalUtil.sub(spikeProduct.getStockCount(),params.getCount());
+                newStockCount = BigDecimalUtil.sub(spikeProduct.getStockCount(), params.getCount());
                 //判断库存
                 if (spikeProduct.getStockCount().compareTo(params.getCount()) < 0) {
                     return Result.failure("商品已被秒杀完");
@@ -207,7 +208,7 @@ public class SpikeOrderBiz {
 
         //构建订单
         //订单金额
-        BigDecimal productOrderAmountTotal = BigDecimalUtil.mul(spikeProduct.getSpikePrice(),count);
+        BigDecimal productOrderAmountTotal = BigDecimalUtil.mul(spikeProduct.getSpikePrice(), count);
         ShoppingOrder shoppingOrder = new ShoppingOrder().setOrderNo(orderNo).
                 setCustom(userId).
                 setShops(product.getShops()).
@@ -223,16 +224,12 @@ public class SpikeOrderBiz {
                 setCreateTime(currentTime).setRemarks(params.getRemarks());
 
         //秒杀订单产品快照
-        AdminProductVo adminProductVo = productService.findAdminProductVoByProductId(goodVo.getProductId());
-        SpikeAdminProductVo spikeAdminProductVo = new SpikeAdminProductVo();
-        BeanUtils.copyProperties(adminProductVo, spikeAdminProductVo);
-        //参与场次开始时间
-        spikeAdminProductVo.setSpikeStartTime(spikeProduct.getStartTime());
-        //参与场次结束时间
-        spikeAdminProductVo.setSpikeEndTime(spikeProduct.getEndTime());
-        //秒杀价格
-        spikeAdminProductVo.setSpikePrice(spikeProduct.getSpikePrice());
-        String productSnapshot = JSONUtil.objToStr(spikeAdminProductVo);
+        // 查询产品秒杀快照
+        List<ProductSnapshot> productSnapshotList = productSnapshotService.listByProductIdSet(Sets.asSets(goodVo.getProductId()), ProductSnapshotTypeEnum.SPIKE.getType());
+        String productSnapshot = null;
+        if (Lists.isNotEmpty(productSnapshotList)) {
+            productSnapshot = productSnapshotList.get(0).getProductJson();
+        }
         shoppingOrder.setDetailsJson(productSnapshot);
 
         //订单备注
@@ -395,7 +392,7 @@ public class SpikeOrderBiz {
 
         //构建订单
         //订单金额
-        BigDecimal productAmountTotal = BigDecimalUtil.mul(spikeProduct.getSpikePrice(),count);
+        BigDecimal productAmountTotal = BigDecimalUtil.mul(spikeProduct.getSpikePrice(), count);
         ShoppingOrder shoppingOrder = new ShoppingOrder().setOrderNo(orderNo).
                 setCustom(userId).
                 setShops(product.getShops()).

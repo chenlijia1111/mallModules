@@ -1,5 +1,6 @@
 package com.github.chenlijia1111.commonModule.service.impl;
 
+import com.github.chenlijia1111.commonModule.common.enums.ProductSnapshotTypeEnum;
 import com.github.chenlijia1111.commonModule.dao.ProductSnapshotMapper;
 import com.github.chenlijia1111.commonModule.entity.ProductSnapshot;
 import com.github.chenlijia1111.commonModule.service.ProductSnapshotServiceI;
@@ -108,13 +109,32 @@ public class ProductSnapshotServiceImpl implements ProductSnapshotServiceI {
      * 查询最近的产品快照信息
      *
      * @param productIdSet 产品id集合
+     * @param productType  产品类型 {@link com.github.chenlijia1111.commonModule.common.enums.ProductSnapshotTypeEnum}
      * @return
      */
     @Override
-    public List<ProductSnapshot> listByProductIdSet(Set<String> productIdSet) {
+    public List<ProductSnapshot> listByProductIdSet(Set<String> productIdSet, Integer productType) {
         if (Sets.isNotEmpty(productIdSet)) {
-            return productSnapshotMapper.listByProductIdSet(productIdSet);
+            // productType 默认为普通产品
+            if (Objects.isNull(productType)) {
+                productType = ProductSnapshotTypeEnum.COMMON.getType();
+            }
+            return productSnapshotMapper.listByProductIdSet(productIdSet, productType);
         }
         return new ArrayList<>();
+    }
+
+    /**
+     * 主键查询
+     *
+     * @param id
+     * @return
+     */
+    @Override
+    public ProductSnapshot findById(Integer id) {
+        if (Objects.nonNull(id)) {
+            return productSnapshotMapper.selectByPrimaryKey(id);
+        }
+        return null;
     }
 }

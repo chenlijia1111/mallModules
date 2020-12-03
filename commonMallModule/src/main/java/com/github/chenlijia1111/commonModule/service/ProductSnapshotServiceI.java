@@ -61,7 +61,15 @@ public interface ProductSnapshotServiceI {
     /**
      * 查询最近的产品快照信息
      * @param productIdSet 产品id集合
+     * @param productType 产品类型
      * @return
      */
-    List<ProductSnapshot> listByProductIdSet(Set<String> productIdSet);
+    List<ProductSnapshot> listByProductIdSet(Set<String> productIdSet, Integer productType);
+
+    /**
+     * 主键查询
+     * @param id
+     * @return
+     */
+    ProductSnapshot findById(Integer id);
 }

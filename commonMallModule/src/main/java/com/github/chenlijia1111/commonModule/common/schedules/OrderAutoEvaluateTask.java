@@ -3,11 +3,14 @@ package com.github.chenlijia1111.commonModule.common.schedules;
 import com.github.chenlijia1111.commonModule.common.pojo.IDGenerateFactory;
 import com.github.chenlijia1111.commonModule.common.responseVo.product.AdminProductVo;
 import com.github.chenlijia1111.commonModule.dao.EvaluationMapper;
+import com.github.chenlijia1111.commonModule.dao.ProductSnapshotMapper;
 import com.github.chenlijia1111.commonModule.dao.ShoppingOrderMapper;
 import com.github.chenlijia1111.commonModule.entity.Evaluation;
+import com.github.chenlijia1111.commonModule.entity.ProductSnapshot;
 import com.github.chenlijia1111.commonModule.entity.ShoppingOrder;
 import com.github.chenlijia1111.utils.common.constant.BooleanConstant;
 import com.github.chenlijia1111.utils.core.JSONUtil;
+import com.github.chenlijia1111.utils.core.StringUtils;
 import com.github.chenlijia1111.utils.list.Lists;
 import com.github.chenlijia1111.utils.list.Sets;
 
@@ -15,6 +18,7 @@ import javax.annotation.Resource;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * 订单隔指定时间自动评价
@@ -34,6 +38,8 @@ public class OrderAutoEvaluateTask implements IOrderAutoTask {
     private ShoppingOrderMapper shoppingOrderMapper;
     @Resource
     private EvaluationMapper evaluationMapper;//评价
+    @Resource
+    private ProductSnapshotMapper productSnapshotMapper;// 产品快照
 
     /**
      * 默认好评内容
@@ -60,8 +66,15 @@ public class OrderAutoEvaluateTask implements IOrderAutoTask {
                 ShoppingOrder shoppingOrder = shoppingOrderMapper.selectByPrimaryKey(orderNo);
                 if (Objects.nonNull(shoppingOrder)) {
                     //查询产品id
-                    String detailsJson = shoppingOrder.getDetailsJson();
-                    AdminProductVo adminProductVo = JSONUtil.strToObj(detailsJson, AdminProductVo.class);
+                    String productSnapshotId = shoppingOrder.getDetailsJson();
+                    Optional<AdminProductVo> adminProductVoOptional = Optional.empty();
+                    if (StringUtils.isInt(productSnapshotId)) {
+                        ProductSnapshot productSnapshot = productSnapshotMapper.selectByPrimaryKey(Integer.valueOf(productSnapshotId));
+                        if (Objects.nonNull(productSnapshot)) {
+                            AdminProductVo adminProductVo = JSONUtil.strToObj(productSnapshot.getProductJson(), AdminProductVo.class);
+                            adminProductVoOptional = Optional.ofNullable(adminProductVo);
+                        }
+                    }
                     //添加评价
                     String evaluateId = String.valueOf(IDGenerateFactory.EVALUATION_ID_UTIL.nextId());
                     Evaluation evaluation = new Evaluation().setId(evaluateId).
@@ -69,7 +82,7 @@ public class OrderAutoEvaluateTask implements IOrderAutoTask {
                             setShopId(shoppingOrder.getShops()).
                             setOrderNo(shoppingOrder.getOrderNo()).
                             setGoodId(shoppingOrder.getGoodsId()).
-                            setProductId(adminProductVo.getId()).
+                            setProductId(adminProductVoOptional.map(e -> e.getId()).orElse(null)).
                             setComment(defaultEvaluateComment).
                             setProductLevel(defaultEvaluateLevel).
                             setShopLevel(defaultEvaluateLevel).

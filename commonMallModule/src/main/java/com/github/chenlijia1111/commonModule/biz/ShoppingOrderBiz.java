@@ -1,12 +1,12 @@
 package com.github.chenlijia1111.commonModule.biz;
 
 import com.github.chenlijia1111.commonModule.common.enums.OrderTypeEnum;
+import com.github.chenlijia1111.commonModule.common.enums.ProductSnapshotTypeEnum;
 import com.github.chenlijia1111.commonModule.common.pojo.CommonMallConstants;
 import com.github.chenlijia1111.commonModule.common.pojo.IDGenerateFactory;
 import com.github.chenlijia1111.commonModule.common.pojo.coupon.AbstractCoupon;
 import com.github.chenlijia1111.commonModule.common.requestVo.order.*;
 import com.github.chenlijia1111.commonModule.common.responseVo.order.CalculateOrderPriceVo;
-import com.github.chenlijia1111.commonModule.common.responseVo.product.AdminProductVo;
 import com.github.chenlijia1111.commonModule.common.responseVo.product.GoodVo;
 import com.github.chenlijia1111.commonModule.common.schedules.OrderAutoEvaluateTask;
 import com.github.chenlijia1111.commonModule.common.schedules.OrderAutoTasks;
@@ -148,7 +148,7 @@ public class ShoppingOrderBiz {
         Set<String> productIdSet = goodVoList.stream().map(e -> e.getProductId()).collect(Collectors.toSet());
         List<Product> productList = productService.listByProductIdSet(productIdSet);
         // 查询产品快照信息，避免单个查询消耗时间
-        List<ProductSnapshot> productSnapshotList = productSnapshotService.listByProductIdSet(productIdSet);
+        List<ProductSnapshot> productSnapshotList = productSnapshotService.listByProductIdSet(productIdSet, ProductSnapshotTypeEnum.COMMON.getType());
 
 
         //组订单Id
@@ -375,6 +375,13 @@ public class ShoppingOrderBiz {
             return Result.notLogin();
         }
 
+        // 校验数据，判断商品信息是否都存在
+        Set<String> goodIdSet = singleOrderList.stream().map(e -> e.getGoodId()).collect(Collectors.toSet());
+        List<GoodVo> goodVoList = goodsService.listByGoodIdSet(goodIdSet);
+        // 查询对应的产品信息列表，判断产品是否都存在
+        Set<String> productIdSet = goodVoList.stream().map(e -> e.getProductId()).collect(Collectors.toSet());
+        List<Product> productList = productService.listByProductIdSet(productIdSet);
+
 
         //组订单Id 只做计算，不消耗实际id
         String groupId = String.valueOf(IDGenerateFactory.ORDER_ID_UTIL.nextId());
@@ -390,12 +397,13 @@ public class ShoppingOrderBiz {
             BigDecimal count = addParams.getCount();
 
             //查询商品信息
-            GoodVo goodVo = goodsService.findByGoodId(goodId);
+            GoodVo goodVo = goodVoList.stream().filter(e -> Objects.equals(e.getId(), goodId)).findAny().orElse(null);
             if (Objects.isNull(goodVo)) {
                 return Result.failure("商品不存在");
             }
             //判断产品是否存在且上架
-            Product product = productService.findByProductId(goodVo.getProductId());
+            String productId = goodVo.getProductId();
+            Product product = productList.stream().filter(e -> Objects.equals(e.getId(), productId)).findAny().orElse(null);
             if (Objects.isNull(product)) {
                 return Result.failure("产品不存在");
             }
@@ -424,11 +432,6 @@ public class ShoppingOrderBiz {
                     setDeleteStatus(BooleanConstant.NO_INTEGER).
                     setCompleteStatus(BooleanConstant.NO_INTEGER).
                     setOrderType(params.getOrderType());
-
-            //订单快照
-            AdminProductVo adminProductVo = productService.findAdminProductVoByProductId(goodVo.getProductId());
-            String productSnapshot = JSONUtil.objToStr(adminProductVo);
-            shoppingOrder.setDetailsJson(productSnapshot);
 
             //订单备注
             shoppingOrder.setRemarks(params.getRemarks());

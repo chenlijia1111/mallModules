@@ -1,16 +1,24 @@
 package com.github.chenlijia1111.spike.biz;
 
+import com.github.chenlijia1111.commonModule.common.enums.ProductSnapshotTypeEnum;
 import com.github.chenlijia1111.commonModule.common.pojo.IDGenerateFactory;
+import com.github.chenlijia1111.commonModule.common.responseVo.product.AdminProductVo;
+import com.github.chenlijia1111.commonModule.entity.ProductSnapshot;
+import com.github.chenlijia1111.commonModule.service.ProductServiceI;
+import com.github.chenlijia1111.commonModule.service.ProductSnapshotServiceI;
 import com.github.chenlijia1111.spike.common.requestVo.spikeProduct.SpikeProductAddParams;
+import com.github.chenlijia1111.spike.common.response.product.SpikeAdminProductVo;
 import com.github.chenlijia1111.spike.entity.SpikeProduct;
 import com.github.chenlijia1111.spike.service.SpikeProductServiceI;
 import com.github.chenlijia1111.utils.common.Result;
 import com.github.chenlijia1111.utils.common.constant.BooleanConstant;
 import com.github.chenlijia1111.utils.common.constant.TimeConstant;
+import com.github.chenlijia1111.utils.core.JSONUtil;
 import com.github.chenlijia1111.utils.core.PropertyCheckUtil;
 import com.github.chenlijia1111.utils.core.RandomUtil;
 import com.github.chenlijia1111.utils.list.Lists;
 import org.joda.time.DateTime;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,6 +44,10 @@ public class SpikeProductBiz {
 
     @Autowired
     private SpikeProductServiceI spikeProductService;//商品参与秒杀记录表
+    @Autowired
+    private ProductServiceI productService;// 产品 //
+    @Autowired
+    private ProductSnapshotServiceI productSnapshotService;// 产品快照
 
     /**
      * 产品批量加入秒杀
@@ -113,6 +125,25 @@ public class SpikeProductBiz {
                 setOrderNumber(params.getOrderNumber()).
                 setDeleteStatus(BooleanConstant.NO_INTEGER);
 
-        return spikeProductService.add(spikeProduct);
+        result = spikeProductService.add(spikeProduct);
+
+        if (result.getSuccess()) {
+            //秒杀订单产品快照
+            AdminProductVo adminProductVo = productService.findAdminProductVoByProductId(params.getProductId());
+            SpikeAdminProductVo spikeAdminProductVo = new SpikeAdminProductVo();
+            BeanUtils.copyProperties(adminProductVo, spikeAdminProductVo);
+            //参与场次开始时间
+            spikeAdminProductVo.setSpikeStartTime(spikeProduct.getStartTime());
+            //参与场次结束时间
+            spikeAdminProductVo.setSpikeEndTime(spikeProduct.getEndTime());
+            //秒杀价格
+            spikeAdminProductVo.setSpikePrice(spikeProduct.getSpikePrice());
+            String productSnapshotStr = JSONUtil.objToStr(spikeAdminProductVo);
+
+            ProductSnapshot productSnapshot = new ProductSnapshot(params.getProductId(), ProductSnapshotTypeEnum.SPIKE.getType(), productSnapshotStr, new Date());
+            productSnapshotService.add(productSnapshot);
+        }
+
+        return result;
     }
 }

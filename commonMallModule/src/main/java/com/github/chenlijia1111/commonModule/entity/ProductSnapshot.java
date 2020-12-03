@@ -39,6 +39,17 @@ public class ProductSnapshot {
     private String productId;
 
     /**
+     * 产品类型
+     * 1普通产品2拼团产品3秒杀产品
+     * 其他类型可由调用者自定义
+     * {@link com.github.chenlijia1111.commonModule.common.enums.ProductSnapshotTypeEnum}
+     */
+    @ApiModelProperty("产品类型")
+    @PropertyCheck(name = "产品类型")
+    @Column(name = "product_type")
+    private Integer productType;
+
+    /**
      * 产品详情
      */
     @ApiModelProperty("产品详情")
@@ -57,11 +68,10 @@ public class ProductSnapshot {
     public ProductSnapshot() {
     }
 
-    public ProductSnapshot(String productId, String productJson, Date createTime) {
+    public ProductSnapshot(String productId, Integer productType, String productJson, Date createTime) {
         this.productId = productId;
+        this.productType = productType;
         this.productJson = productJson;
         this.createTime = createTime;
     }
-
-
 }

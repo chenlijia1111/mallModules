@@ -4,6 +4,7 @@
   <resultMap id="BaseResultMap" type="com.github.chenlijia1111.commonModule.entity.ProductSnapshot">
     <id column="id" jdbcType="INTEGER" property="id" />
     <result column="product_id" jdbcType="VARCHAR" property="productId" />
+    <result column="product_type" jdbcType="INTEGER" property="productType" />
     <result column="product_json" jdbcType="VARCHAR" property="productJson" />
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
   </resultMap>
@@ -16,7 +17,8 @@
     FROM s_product_snapshot,
       (SELECT innerProductSnapshot.product_id productId, max(innerProductSnapshot.id) maxId
       FROM s_product_snapshot innerProductSnapshot
-      <foreach collection="productIdSet" item="productId" open="WHERE innerProductSnapshot.product_id IN (" close=")" separator=",">
+      WHERE innerProductSnapshot.product_type = #{productType}
+      <foreach collection="productIdSet" item="productId" open="AND innerProductSnapshot.product_id IN (" close=")" separator=",">
         #{productId}
       </foreach>
       GROUP BY innerProductSnapshot.product_id) tempTable

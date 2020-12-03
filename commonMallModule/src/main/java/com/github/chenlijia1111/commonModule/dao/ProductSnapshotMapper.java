@@ -18,8 +18,9 @@ public interface ProductSnapshotMapper extends Mapper<ProductSnapshot> {
     /**
      * 查询最近的产品快照信息
      * @param productIdSet 产品id集合
+     * @param productType 产品类型
      * @return
      */
-    List<ProductSnapshot> listByProductIdSet(@Param("productIdSet") Set<String> productIdSet);
+    List<ProductSnapshot> listByProductIdSet(@Param("productIdSet") Set<String> productIdSet,@Param("productType") Integer productType);
 
 }
