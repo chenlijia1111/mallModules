@@ -69,6 +69,8 @@ public class ShoppingOrderBiz {
     private GoodsServiceI goodsService;//商品
     @Autowired
     private ProductServiceI productService;//产品
+    @Autowired
+    private ProductSnapshotServiceI productSnapshotService;// 产品快照信息
     @Resource
     private CommonModuleUserServiceI commonModuleUserService;//用户
     @Autowired
@@ -139,6 +141,15 @@ public class ShoppingOrderBiz {
             return Result.notLogin();
         }
 
+        // 校验数据，判断商品信息是否都存在
+        Set<String> goodIdSet = singleOrderList.stream().map(e -> e.getGoodId()).collect(Collectors.toSet());
+        List<GoodVo> goodVoList = goodsService.listByGoodIdSet(goodIdSet);
+        // 查询对应的产品信息列表，判断产品是否都存在
+        Set<String> productIdSet = goodVoList.stream().map(e -> e.getProductId()).collect(Collectors.toSet());
+        List<Product> productList = productService.listByProductIdSet(productIdSet);
+        // 查询产品快照信息，避免单个查询消耗时间
+        List<ProductSnapshot> productSnapshotList = productSnapshotService.listByProductIdSet(productIdSet);
+
 
         //组订单Id
         String groupId = groupIdGenerateImpl.createOrderNo();
@@ -162,12 +173,13 @@ public class ShoppingOrderBiz {
             }
 
             //查询商品信息
-            GoodVo goodVo = goodsService.findByGoodId(goodId);
+            GoodVo goodVo = goodVoList.stream().filter(e -> Objects.equals(e.getId(), goodId)).findAny().orElse(null);
             if (Objects.isNull(goodVo)) {
                 return Result.failure("商品不存在");
             }
             //判断产品是否存在且上架
-            Product product = productService.findByProductId(goodVo.getProductId());
+            String productId = goodVo.getProductId();
+            Product product = productList.stream().filter(e -> Objects.equals(e.getId(), productId)).findAny().orElse(null);
             if (Objects.isNull(product) || Objects.equals(BooleanConstant.YES_INTEGER, product.getDeleteStatus())) {
                 return Result.failure("产品不存在");
             }
@@ -211,10 +223,11 @@ public class ShoppingOrderBiz {
                     setOrderType(params.getOrderType()).
                     setSingleOrderAppend(addParams.getSingleOrderAppend());
 
-            //订单快照
-            AdminProductVo adminProductVo = productService.findAdminProductVoByProductId(goodVo.getProductId());
-            String productSnapshot = JSONUtil.objToStr(adminProductVo);
-            shoppingOrder.setDetailsJson(productSnapshot);
+            //订单快照--2020-12-03 从快照表里查询
+            String productSnapshotId = productSnapshotList.stream().filter(e -> Objects.equals(e.getProductId(), productId)).findAny().map(e -> String.valueOf(e.getId())).orElse(null);
+            // 如果没有快照信息，就存 null
+            // 存快照关联的 id ，这样可以避免订单表过大
+            shoppingOrder.setDetailsJson(productSnapshotId);
 
             //订单备注
             shoppingOrder.setRemarks(params.getRemarks());

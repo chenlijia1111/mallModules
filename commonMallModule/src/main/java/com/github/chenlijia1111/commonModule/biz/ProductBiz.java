@@ -8,6 +8,7 @@ import com.github.chenlijia1111.commonModule.entity.*;
 import com.github.chenlijia1111.commonModule.service.*;
 import com.github.chenlijia1111.utils.common.Result;
 import com.github.chenlijia1111.utils.common.constant.BooleanConstant;
+import com.github.chenlijia1111.utils.core.JSONUtil;
 import com.github.chenlijia1111.utils.core.PropertyCheckUtil;
 import com.github.chenlijia1111.utils.core.StringUtils;
 import com.github.chenlijia1111.utils.list.Lists;
@@ -52,6 +53,8 @@ public class ProductBiz {
     private ProductSpecValueServiceI productSpecValueService;//产品规格值
     @Autowired
     private GoodSpecServiceI goodSpecService;//商品规格
+    @Autowired
+    private ProductSnapshotServiceI productSnapshotService;// 产品快照信息
     @Resource
     private CommonModuleShopServiceI shopService;//商家
 
@@ -172,6 +175,11 @@ public class ProductBiz {
         goodsService.batchAdd(goodsList);
         goodSpecService.batchAdd(goodSpecList);
 
+        // 添加快照信息--2020-12-03
+        AdminProductVo adminProductVo = productService.findAdminProductVoByProductId(productId);
+        ProductSnapshot productSnapshot = new ProductSnapshot(productId, JSONUtil.objToStr(adminProductVo), currentTime);
+        productSnapshotService.add(productSnapshot);
+
         return Result.success("操作成功", productId);
     }
 
@@ -201,8 +209,9 @@ public class ProductBiz {
             return result;
         }
 
+        String productId = params.getId();
         //判断商品是否存在
-        Product productCondition = new Product().setId(params.getId()).setDeleteStatus(BooleanConstant.NO_INTEGER);
+        Product productCondition = new Product().setId(productId).setDeleteStatus(BooleanConstant.NO_INTEGER);
         List<Product> products = productService.listByCondition(productCondition);
         if (Lists.isEmpty(products)) {
             return Result.failure("数据不存在");
@@ -349,6 +358,11 @@ public class ProductBiz {
         List<GoodVo> deletedGoodList = listByCondition.stream().filter(e -> !updatedGoodIdList.contains(e.getId())).collect(Collectors.toList());
         Set<String> deletedGoodIdSet = deletedGoodList.stream().map(e -> e.getId()).collect(Collectors.toSet());
         goodsService.batchDelete(deletedGoodIdSet);
+
+        // 添加快照信息--2020-12-03
+        AdminProductVo adminProductVo = productService.findAdminProductVoByProductId(productId);
+        ProductSnapshot productSnapshot = new ProductSnapshot(productId, JSONUtil.objToStr(adminProductVo), currentTime);
+        productSnapshotService.add(productSnapshot);
 
         return Result.success("操作成功");
     }

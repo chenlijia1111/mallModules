@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.github.chenlijia1111.commonModule.dao.ProductSnapshotMapper">
+  <resultMap id="BaseResultMap" type="com.github.chenlijia1111.commonModule.entity.ProductSnapshot">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="product_id" jdbcType="VARCHAR" property="productId" />
+    <result column="product_json" jdbcType="VARCHAR" property="productJson" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, product_id, product_json, create_time
+  </sql>
+
+  <select id="listByProductIdSet" resultMap="BaseResultMap">
+    SELECT s_product_snapshot.id, product_id, product_json, create_time
+    FROM s_product_snapshot,
+      (SELECT innerProductSnapshot.product_id productId, max(innerProductSnapshot.id) maxId
+      FROM s_product_snapshot innerProductSnapshot
+      <foreach collection="productIdSet" item="productId" open="WHERE innerProductSnapshot.product_id IN (" close=")" separator=",">
+        #{productId}
+      </foreach>
+      GROUP BY innerProductSnapshot.product_id) tempTable
+    WHERE s_product_snapshot.id = tempTable.maxId
+  </select>
+</mapper>
