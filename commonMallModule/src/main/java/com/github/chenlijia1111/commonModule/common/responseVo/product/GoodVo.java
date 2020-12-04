@@ -9,6 +9,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -186,6 +187,18 @@ public class GoodVo extends Goods {
             }
         }
         return skuName.toString();
+    }
+
+    /**
+     * 根据标签重新渲染价格
+     *
+     * @param labelName
+     */
+    public void reRenderPriceWithLabel(String labelName) {
+        if (StringUtils.isNotEmpty(labelName) && Lists.isNotEmpty(this.goodLabelPriceList)) {
+            BigDecimal price = this.goodLabelPriceList.stream().filter(e -> Objects.equals(e.getLabelName(), labelName)).map(e -> e.getGoodPrice()).findAny().orElse(this.getPrice());
+            setPrice(price);
+        }
     }
 
 }
