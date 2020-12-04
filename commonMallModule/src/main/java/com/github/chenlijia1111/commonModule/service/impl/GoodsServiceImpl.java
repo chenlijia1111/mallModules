@@ -3,8 +3,10 @@ package com.github.chenlijia1111.commonModule.service.impl;
 import com.github.chenlijia1111.commonModule.common.pojo.CommonMallConstants;
 import com.github.chenlijia1111.commonModule.common.responseVo.product.GoodSpecVo;
 import com.github.chenlijia1111.commonModule.common.responseVo.product.GoodVo;
+import com.github.chenlijia1111.commonModule.dao.GoodLabelPriceMapper;
 import com.github.chenlijia1111.commonModule.dao.GoodSpecMapper;
 import com.github.chenlijia1111.commonModule.dao.GoodsMapper;
+import com.github.chenlijia1111.commonModule.entity.GoodLabelPrice;
 import com.github.chenlijia1111.commonModule.entity.Goods;
 import com.github.chenlijia1111.commonModule.service.GoodsServiceI;
 import com.github.chenlijia1111.utils.common.Result;
@@ -38,6 +40,8 @@ public class GoodsServiceImpl implements GoodsServiceI {
     private GoodsMapper goodsMapper;//商品
     @Resource
     private GoodSpecMapper goodSpecMapper;//商品规格
+    @Resource
+    private GoodLabelPriceMapper goodLabelPriceMapper;// 商品标签价格
 
 
     /**
@@ -197,6 +201,16 @@ public class GoodsServiceImpl implements GoodsServiceI {
             List<GoodSpecVo> goodSpecVos = goodSpecMapper.listGoodSpecVoByProductIdSet(productIdSet);
             Map<String, List<GoodSpecVo>> goodSpecVoMap = goodSpecVos.stream().collect(Collectors.groupingBy(e -> e.getGoodId()));
             list.stream().forEach(e -> e.setGoodSpecVoList(goodSpecVoMap.get(e.getId())));
+
+            // 商品标签价格
+            // 关联商品的标签价格
+            Set<String> goodIdSet = list.stream().map(e -> e.getId()).collect(Collectors.toSet());
+            List<GoodLabelPrice> goodLabelPriceList = goodLabelPriceMapper.listByGoodIdSet(goodIdSet, null);
+            for (GoodVo goodVo : list) {
+                List<GoodLabelPrice> hitGoodLabelPriceList = goodLabelPriceList.stream().filter(e -> Objects.equals(e.getGoodId(), goodVo.getId())).
+                        collect(Collectors.toList());
+                goodVo.setGoodLabelPriceList(hitGoodLabelPriceList);
+            }
         }
     }
 
