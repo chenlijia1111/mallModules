@@ -35,7 +35,7 @@ public class CodeGenerateTest {
         mybatisCodeGeneratorUtil.setCommonCode(false);
 
         Map<String, String> tableToDomain = mybatisCodeGeneratorUtil.getTableToDoMain();
-        tableToDomain.put("s_product_snapshot", "s_product_snapshot");
+        tableToDomain.put("s_good_label_price", "s_good_label_price");
 
         //首字母大写
         for (String s : tableToDomain.keySet()) {

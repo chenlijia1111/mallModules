@@ -56,6 +56,8 @@ public class ProductBiz {
     private GoodSpecServiceI goodSpecService;//商品规格
     @Autowired
     private ProductSnapshotServiceI productSnapshotService;// 产品快照信息
+    @Autowired
+    private GoodLabelPriceServiceI goodLabelPriceService;// 商品标签价格
     @Resource
     private CommonModuleShopServiceI shopService;//商家
 
@@ -134,6 +136,10 @@ public class ProductBiz {
         //构造批量插入商品 商品规格数据
         List<Goods> goodsList = new ArrayList<>();
         List<GoodSpec> goodSpecList = new ArrayList<>();
+        // 添加这个商品的标签价格 2020-12-04
+        // 定义集合用于批量添加标签价格
+        List<GoodLabelPrice> goodLabelPriceList = new ArrayList<>();
+
         for (GoodAddParams goodAddParams : goodList) {
             //商品id
             String goodId = String.valueOf(IDGenerateFactory.GOOD_ID_UTIL.nextId());
@@ -170,11 +176,23 @@ public class ProductBiz {
                     }
                 }
             }
+
+            // 开始处理标签价格数据
+            List<GoodLabelPriceAddParams> goodLabelPriceParamsList = goodAddParams.getGoodLabelPriceList();
+            if (Lists.isNotEmpty(goodLabelPriceList)) {
+                for (GoodLabelPriceAddParams goodLabelPriceAddParams : goodLabelPriceParamsList) {
+                    GoodLabelPrice goodLabelPrice = new GoodLabelPrice(goodId, goodLabelPriceAddParams.getLabelName(), goodLabelPriceAddParams.getGoodPrice(), currentTime);
+                    goodLabelPriceList.add(goodLabelPrice);
+                }
+            }
         }
 
         //批量插入商品 商品规格
         goodsService.batchAdd(goodsList);
         goodSpecService.batchAdd(goodSpecList);
+
+        // 批量添加标签价格
+        goodLabelPriceService.batchAdd(goodLabelPriceList);
 
         // 添加快照信息--2020-12-03
         AdminProductVo adminProductVo = productService.findAdminProductVoByProductId(productId);
@@ -276,6 +294,11 @@ public class ProductBiz {
         List<GoodAddParams> goodList = params.getGoodList();
         //商品规格集合,用于批量添加  减少时间消耗
         List<GoodSpec> batchAddGoodSpecList = new ArrayList<>();
+        // 商品集合，用户批量添加，减少时间消耗，那些编辑的商品只能一个一个编辑了，但是添加的还是可以批量添加的
+        List<Goods> goodsList = new ArrayList<>();
+        // 添加这个商品的标签价格 2020-12-03
+        // 定义集合用于批量添加标签价格
+        List<GoodLabelPrice> goodLabelPriceList = new ArrayList<>();
 
         for (GoodAddParams goodAddParams : goodList) {
             //看能不能找到匹配的商品信息，找到了，就用更新操作，没找到就用添加操作
@@ -327,7 +350,7 @@ public class ProductBiz {
 
                 //规格名称
                 goods.setDefaultSkuName(goodAddParams.releaseSkuName());
-                goodsService.add(goods);
+                goodsList.add(goods);
             }
 
 
@@ -348,6 +371,15 @@ public class ProductBiz {
                     }
                 }
             }
+
+            // 开始处理标签价格数据
+            List<GoodLabelPriceAddParams> goodLabelPriceParamsList = goodAddParams.getGoodLabelPriceList();
+            if (Lists.isNotEmpty(goodLabelPriceList)) {
+                for (GoodLabelPriceAddParams goodLabelPriceAddParams : goodLabelPriceParamsList) {
+                    GoodLabelPrice goodLabelPrice = new GoodLabelPrice(goods.getId(), goodLabelPriceAddParams.getLabelName(), goodLabelPriceAddParams.getGoodPrice(), currentTime);
+                    goodLabelPriceList.add(goodLabelPrice);
+                }
+            }
         }
 
         //批量添加商品规格
@@ -359,6 +391,14 @@ public class ProductBiz {
         List<GoodVo> deletedGoodList = listByCondition.stream().filter(e -> !updatedGoodIdList.contains(e.getId())).collect(Collectors.toList());
         Set<String> deletedGoodIdSet = deletedGoodList.stream().map(e -> e.getId()).collect(Collectors.toSet());
         goodsService.batchDelete(deletedGoodIdSet);
+
+        // 先删除之气那的标签价格
+        goodLabelPriceService.deleteByProductId(productId);
+        // 批量添加标签价格
+        goodLabelPriceService.batchAdd(goodLabelPriceList);
+
+        // 批量添加商品
+        goodsService.batchAdd(goodsList);
 
         // 添加快照信息--2020-12-03
         AdminProductVo adminProductVo = productService.findAdminProductVoByProductId(productId);

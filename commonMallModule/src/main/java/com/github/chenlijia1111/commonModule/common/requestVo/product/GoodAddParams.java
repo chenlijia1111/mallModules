@@ -80,6 +80,13 @@ public class GoodAddParams {
     @ApiModelProperty(value = "商品图片")
     private String goodImage;
 
+    /**
+     * 2020-12-03
+     * 商品标签价格添加参数
+     */
+    @ApiModelProperty(value = "商品标签价格添加参数")
+    private List<GoodLabelPriceAddParams> goodLabelPriceList;
+
 
     /**
      * 转换 为构建规格对象
