@@ -179,7 +179,7 @@ public class ProductBiz {
 
             // 开始处理标签价格数据
             List<GoodLabelPriceAddParams> goodLabelPriceParamsList = goodAddParams.getGoodLabelPriceList();
-            if (Lists.isNotEmpty(goodLabelPriceList)) {
+            if (Lists.isNotEmpty(goodLabelPriceParamsList)) {
                 for (GoodLabelPriceAddParams goodLabelPriceAddParams : goodLabelPriceParamsList) {
                     GoodLabelPrice goodLabelPrice = new GoodLabelPrice(goodId, goodLabelPriceAddParams.getLabelName(), goodLabelPriceAddParams.getGoodPrice(), currentTime);
                     goodLabelPriceList.add(goodLabelPrice);
@@ -374,7 +374,7 @@ public class ProductBiz {
 
             // 开始处理标签价格数据
             List<GoodLabelPriceAddParams> goodLabelPriceParamsList = goodAddParams.getGoodLabelPriceList();
-            if (Lists.isNotEmpty(goodLabelPriceList)) {
+            if (Lists.isNotEmpty(goodLabelPriceParamsList)) {
                 for (GoodLabelPriceAddParams goodLabelPriceAddParams : goodLabelPriceParamsList) {
                     GoodLabelPrice goodLabelPrice = new GoodLabelPrice(goods.getId(), goodLabelPriceAddParams.getLabelName(), goodLabelPriceAddParams.getGoodPrice(), currentTime);
                     goodLabelPriceList.add(goodLabelPrice);
