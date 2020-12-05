@@ -26,8 +26,7 @@
         <lombok.version>1.18.10</lombok.version>
         <junit.version>4.12</junit.version>
         <pagehelper.version>3.7.4</pagehelper.version>
-        <springfox-swagger2.version>2.7.0</springfox-swagger2.version>
-        <swagger-bootstrap-ui.version>1.9.5</swagger-bootstrap-ui.version>
+        <swagger.version>2.0.7</swagger.version>
         <mapper-spring-boot-starter.version>2.1.5</mapper-spring-boot-starter.version>
         <tk.mybatis.version>4.1.5</tk.mybatis.version>
         <mybatis.version>3.5.3</mybatis.version>
@@ -67,18 +66,12 @@
 <!--                <artifactId>pagehelper</artifactId>-->
 <!--                <version>${pagehelper.version}</version>-->
 <!--            </dependency>-->
-            <!-- swagger-ui -->
-            <!-- https://mvnrepository.com/artifact/com.github.xiaoymin/swagger-bootstrap-ui -->
+            <!-- 2020-12-04 修改文档UI swagger-ui knife -->
+            <!-- https://gitee.com/xiaoym/knife4j -->
             <dependency>
                 <groupId>com.github.xiaoymin</groupId>
-                <artifactId>swagger-bootstrap-ui</artifactId>
-                <version>${swagger-bootstrap-ui.version}</version>
-            </dependency>
-            <!-- swagger 2.9.2的版本有问题,不要升级 -->
-            <dependency>
-                <groupId>io.springfox</groupId>
-                <artifactId>springfox-swagger2</artifactId>
-                <version>${springfox-swagger2.version}</version>
+                <artifactId>knife4j-spring-boot-starter</artifactId>
+                <version>${swagger.version}</version>
             </dependency>
             <!-- servlet api 依赖于具体环境 必须要一起打包走 只需要调用方有这个包就行了-->
             <dependency>
