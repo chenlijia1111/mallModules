@@ -479,13 +479,6 @@ public class ShoppingOrderBiz {
         for (Product product : productList) {
             productMap.put(product.getId(), product);
         }
-        // 快照信息列表
-        List<AdminProductVo> adminProductVoList = productService.listAdminProductVoByProductIdSet(productIdSet);
-        // 转成 map
-        Map<String, AdminProductVo> productSnapshotMap = new HashMap<>();
-        for (AdminProductVo product : adminProductVoList) {
-            productSnapshotMap.put(product.getId(), product);
-        }
 
         // 标签价格，如果指定了标签，就用对应标签的价格
         List<GoodLabelPrice> goodLabelPriceList = new ArrayList<>();
