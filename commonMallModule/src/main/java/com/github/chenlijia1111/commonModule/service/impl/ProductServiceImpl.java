@@ -265,6 +265,14 @@ public class ProductServiceImpl implements ProductServiceI {
                 List<GoodSpecVo> hitGoodSpecVoList = goodSpecVoMap.get(goodVo.getId());
                 goodVo.setGoodSpecVoList(hitGoodSpecVoList);
             }
+            // 关联商品的标签价格
+            Set<String> goodIdSet = goodVoList.stream().map(e -> e.getId()).collect(Collectors.toSet());
+            List<GoodLabelPrice> goodLabelPriceList = goodLabelPriceMapper.listByGoodIdSet(goodIdSet, null);
+            Map<String, List<GoodLabelPrice>> goodLabelPriceMap = goodLabelPriceList.stream().collect(Collectors.groupingBy(e -> e.getGoodId()));
+            for (GoodVo goodVo : goodVoList) {
+                List<GoodLabelPrice> hitGoodLabelPriceList = goodLabelPriceMap.get(goodVo.getId());
+                goodVo.setGoodLabelPriceList(hitGoodLabelPriceList);
+            }
 
             Map<String, List<ProductSpecVo>> productSpecVoMap = productSpecVos.stream().collect(Collectors.groupingBy(e -> e.getProductId()));
             Map<String, List<GoodVo>> goodVoMap = goodVoList.stream().collect(Collectors.groupingBy(e -> e.getProductId()));

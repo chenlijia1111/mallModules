@@ -89,7 +89,7 @@ public class ProductAddParams {
      * 是否上架 0未上架 1上架
      */
     @ApiModelProperty("是否上架 0未上架 1上架")
-    @PropertyCheck(name = "商品状态", checkFunction = StateCheck.class)
+    @PropertyCheck(name = "商品状态")
     private Integer shelfStatus;
 
     /**
