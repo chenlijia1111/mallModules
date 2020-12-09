@@ -21,6 +21,7 @@ import com.github.chenlijia1111.utils.core.JSONUtil;
 import com.github.chenlijia1111.utils.core.PropertyCheckUtil;
 import com.github.chenlijia1111.utils.core.StringUtils;
 import com.github.chenlijia1111.utils.list.Lists;
+import com.github.chenlijia1111.utils.list.Maps;
 import com.github.chenlijia1111.utils.list.Sets;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -141,7 +142,7 @@ public class ShoppingOrderBiz {
      * 总应付金额等于所有单个订单的应付金额之和 {@link ShoppingOrder#getPayable()}
      *
      * @param params                   1
-     * @param goodPriceLabel           商品价格标签 {@link GoodLabelPrice}
+     * @param goodLabelMap             商品价格标签map
      * @param groupIdGenerateImpl      组订单单号生成规则
      * @param shoppingIdGenerateImpl   购物订单单号生成规则
      * @param sendIdGenerateImpl       发货订单单号生成规则
@@ -151,7 +152,7 @@ public class ShoppingOrderBiz {
      * @since 下午 4:53 2019/11/5 0005
      **/
     @Transactional
-    public Result add(OrderAddParams params, String goodPriceLabel, IdGeneratorServiceI groupIdGenerateImpl,
+    public Result add(OrderAddParams params, Map<String, String> goodLabelMap, IdGeneratorServiceI groupIdGenerateImpl,
                       IdGeneratorServiceI shoppingIdGenerateImpl, IdGeneratorServiceI sendIdGenerateImpl,
                       IdGeneratorServiceI receiveIdGenerateImpl, IdGeneratorServiceI shopGroupIdGeneratorImpl) {
 
@@ -178,16 +179,31 @@ public class ShoppingOrderBiz {
         // 校验数据，判断商品信息是否都存在
         Set<String> goodIdSet = singleOrderList.stream().map(e -> e.getGoodId()).collect(Collectors.toSet());
         List<GoodVo> goodVoList = goodsService.listByGoodIdSet(goodIdSet);
+        // 转成 map 加快查询速率，防止数据多的时候反复遍历
+        Map<String, GoodVo> goodMap = new HashMap<>();
+        for (GoodVo goodVo : goodVoList) {
+            goodMap.put(goodVo.getId(), goodVo);
+        }
         // 查询对应的产品信息列表，判断产品是否都存在
         Set<String> productIdSet = goodVoList.stream().map(e -> e.getProductId()).collect(Collectors.toSet());
         List<Product> productList = productService.listByProductIdSet(productIdSet);
+        // 转成 map 加快查询速率，防止数据多的时候反复遍历
+        Map<String, Product> productMap = new HashMap<>();
+        for (Product product : productList) {
+            productMap.put(product.getId(), product);
+        }
         // 查询产品快照信息，避免单个查询消耗时间
         List<ProductSnapshot> productSnapshotList = productSnapshotService.listByProductIdSet(productIdSet, ProductSnapshotTypeEnum.COMMON.getType());
+        // 转成 map product -> snapshotId
+        Map<String, Integer> productSnapshotMap = new HashMap<>();
+        for (ProductSnapshot productSnapshot : productSnapshotList) {
+            productSnapshotMap.put(productSnapshot.getProductId(), productSnapshot.getId());
+        }
 
         // 标签价格，如果指定了标签，就用对应标签的价格
         List<GoodLabelPrice> goodLabelPriceList = new ArrayList<>();
-        if (StringUtils.isNotEmpty(goodPriceLabel)) {
-            goodLabelPriceList = goodLabelPriceService.listByGoodIdSet(goodIdSet, goodPriceLabel);
+        if (Maps.isNotEmpty(goodLabelMap)) {
+            goodLabelPriceList = goodLabelPriceService.listByGoodIdSet(goodIdSet, null);
         }
 
 
@@ -213,13 +229,13 @@ public class ShoppingOrderBiz {
             }
 
             //查询商品信息
-            GoodVo goodVo = goodVoList.stream().filter(e -> Objects.equals(e.getId(), goodId)).findAny().orElse(null);
+            GoodVo goodVo = goodMap.get(goodId);
             if (Objects.isNull(goodVo)) {
                 return Result.failure("商品不存在");
             }
             //判断产品是否存在且上架
             String productId = goodVo.getProductId();
-            Product product = productList.stream().filter(e -> Objects.equals(e.getId(), productId)).findAny().orElse(null);
+            Product product = productMap.get(productId);
             if (Objects.isNull(product) || Objects.equals(BooleanConstant.YES_INTEGER, product.getDeleteStatus())) {
                 return Result.failure("产品不存在");
             }
@@ -245,8 +261,10 @@ public class ShoppingOrderBiz {
             // 商品价格
             BigDecimal goodPrice = goodVo.getPrice();
             // 判断是否需要取标签价格
-            if (StringUtils.isNotEmpty(goodPriceLabel)) {
-                goodPrice = goodLabelPriceList.stream().filter(e -> Objects.equals(e.getGoodId(), goodId)).map(e -> e.getGoodPrice()).findAny().orElse(goodPrice);
+            if (Maps.isNotEmpty(goodLabelMap) && goodLabelMap.containsKey(goodId)) {
+                goodPrice = goodLabelPriceList.stream().filter(e -> Objects.equals(e.getGoodId(), goodId) &&
+                        Objects.equals(e.getLabelName(), goodLabelMap.get(goodId))).
+                        map(e -> e.getGoodPrice()).findAny().orElse(goodPrice);
             }
 
             //商品金额
@@ -271,7 +289,7 @@ public class ShoppingOrderBiz {
                     setSingleOrderAppend(addParams.getSingleOrderAppend());
 
             //订单快照--2020-12-03 从快照表里查询
-            String productSnapshotId = productSnapshotList.stream().filter(e -> Objects.equals(e.getProductId(), productId)).findAny().map(e -> String.valueOf(e.getId())).orElse(null);
+            String productSnapshotId = String.valueOf(productSnapshotMap.get(productId));
             // 如果没有快照信息，就存 null
             // 存快照关联的 id ，这样可以避免订单表过大
             shoppingOrder.setDetailsJson(productSnapshotId);
@@ -408,11 +426,11 @@ public class ShoppingOrderBiz {
      * 试算订单金额
      *
      * @param params         1
-     * @param goodPriceLabel 商品标签价格
+     * @param goodLabelMap  商品标签价格map
      * @return com.github.chenlijia1111.utils.common.Result
      * @since 下午 4:20 2019/11/22 0022
      **/
-    public Result calculatePrice(OrderAddParams params, String goodPriceLabel) {
+    public Result calculatePrice(OrderAddParams params, Map<String, String> goodLabelMap) {
 
         //校验参数
         Result result = PropertyCheckUtil.checkProperty(params, Lists.asList("singleOrderList"));
@@ -437,14 +455,24 @@ public class ShoppingOrderBiz {
         // 校验数据，判断商品信息是否都存在
         Set<String> goodIdSet = singleOrderList.stream().map(e -> e.getGoodId()).collect(Collectors.toSet());
         List<GoodVo> goodVoList = goodsService.listByGoodIdSet(goodIdSet);
+        // 转成 map 加快查询速率，防止数据多的时候反复遍历
+        Map<String, GoodVo> goodMap = new HashMap<>();
+        for (GoodVo goodVo : goodVoList) {
+            goodMap.put(goodVo.getId(), goodVo);
+        }
         // 查询对应的产品信息列表，判断产品是否都存在
         Set<String> productIdSet = goodVoList.stream().map(e -> e.getProductId()).collect(Collectors.toSet());
         List<Product> productList = productService.listByProductIdSet(productIdSet);
+        // 转成 map 加快查询速率，防止数据多的时候反复遍历
+        Map<String, Product> productMap = new HashMap<>();
+        for (Product product : productList) {
+            productMap.put(product.getId(), product);
+        }
 
         // 标签价格，如果指定了标签，就用对应标签的价格
         List<GoodLabelPrice> goodLabelPriceList = new ArrayList<>();
-        if (StringUtils.isNotEmpty(goodPriceLabel)) {
-            goodLabelPriceList = goodLabelPriceService.listByGoodIdSet(goodIdSet, goodPriceLabel);
+        if (Maps.isNotEmpty(goodLabelMap)) {
+            goodLabelPriceList = goodLabelPriceService.listByGoodIdSet(goodIdSet, null);
         }
 
 
@@ -462,13 +490,13 @@ public class ShoppingOrderBiz {
             BigDecimal count = addParams.getCount();
 
             //查询商品信息
-            GoodVo goodVo = goodVoList.stream().filter(e -> Objects.equals(e.getId(), goodId)).findAny().orElse(null);
+            GoodVo goodVo = goodMap.get(goodId);
             if (Objects.isNull(goodVo)) {
                 return Result.failure("商品不存在");
             }
             //判断产品是否存在且上架
             String productId = goodVo.getProductId();
-            Product product = productList.stream().filter(e -> Objects.equals(e.getId(), productId)).findAny().orElse(null);
+            Product product = productMap.get(productId);
             if (Objects.isNull(product)) {
                 return Result.failure("产品不存在");
             }
@@ -482,8 +510,10 @@ public class ShoppingOrderBiz {
             // 商品价格
             BigDecimal goodPrice = goodVo.getPrice();
             // 判断是否需要取标签价格
-            if (StringUtils.isNotEmpty(goodPriceLabel)) {
-                goodPrice = goodLabelPriceList.stream().filter(e -> Objects.equals(e.getGoodId(), goodId)).map(e -> e.getGoodPrice()).findAny().orElse(goodPrice);
+            if (Maps.isNotEmpty(goodLabelMap) && goodLabelMap.containsKey(goodId)) {
+                goodPrice = goodLabelPriceList.stream().filter(e -> Objects.equals(e.getGoodId(), goodId) &&
+                        Objects.equals(e.getLabelName(), goodLabelMap.get(goodId))).
+                        map(e -> e.getGoodPrice()).findAny().orElse(goodPrice);
             }
 
             //商品金额
