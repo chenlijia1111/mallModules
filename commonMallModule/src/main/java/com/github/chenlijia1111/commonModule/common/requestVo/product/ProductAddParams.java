@@ -1,7 +1,9 @@
 package com.github.chenlijia1111.commonModule.common.requestVo.product;
 
 import com.github.chenlijia1111.commonModule.common.checkFunction.StateCheck;
+import com.github.chenlijia1111.utils.common.Result;
 import com.github.chenlijia1111.utils.core.annos.PropertyCheck;
+import com.github.chenlijia1111.utils.list.Lists;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
@@ -9,6 +11,7 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * 产品添加参数
@@ -137,5 +140,35 @@ public class ProductAddParams {
     public BigDecimal getMinPrice() {
         BigDecimal minPrice = goodList.stream().map(e -> e.getPrice()).min(BigDecimal::compareTo).orElse(new BigDecimal("0.0"));
         return minPrice;
+    }
+
+    /**
+     * 校验规格信息
+     *
+     * @return
+     */
+    public Result checkSpec() {
+        // 规格名称不能重复
+        List<ProductSpecParams> productSpecParamsList = this.getProductSpecParamsList();
+        if (Lists.isNotEmpty(productSpecParamsList)) {
+            Long productSpecCount = productSpecParamsList.stream().map(e -> e.getSpecName()).distinct().count();
+            if (!Objects.equals(productSpecParamsList.size(), productSpecCount.intValue())) {
+                return Result.failure("规格名称不能重复");
+            }
+        }
+
+
+        // 规格值不能重复
+        List<GoodAddParams> goodList = this.getGoodList();
+        if (Lists.isNotEmpty(goodList)) {
+            for (GoodAddParams goodAddParams : goodList) {
+                List<GoodSpecParams> goodSpecParamsList = goodAddParams.getGoodSpecParamsList();
+                Long goodSpecCount = goodSpecParamsList.stream().map(e -> e.getSpecName()).distinct().count();
+                if (!Objects.equals(goodSpecParamsList.size(), goodSpecCount.intValue())) {
+                    return Result.failure("规格值名称不能重复");
+                }
+            }
+        }
+        return Result.success("操作成功");
     }
 }

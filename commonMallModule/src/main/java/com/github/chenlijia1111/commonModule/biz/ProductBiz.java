@@ -86,6 +86,12 @@ public class ProductBiz {
             }
         }
 
+        // 校验规格名称，不能重复
+        Result checkSpec = params.checkSpec();
+        if (!checkSpec.getSuccess()){
+            return checkSpec;
+        }
+
         //当前商家id,为了适配有些系统可能不需要商家这个角色，直接就是后台添加商品,所以这里不做限制
         String shopId = shopService.currentShopId();
         //当前时间
@@ -226,6 +232,12 @@ public class ProductBiz {
         Result result = PropertyCheckUtil.checkPropertyWithIgnore(params, Lists.asList("content"));
         if (!result.getSuccess()) {
             return result;
+        }
+
+        // 校验规格名称，不能重复
+        Result checkSpec = params.checkSpec();
+        if (!checkSpec.getSuccess()){
+            return checkSpec;
         }
 
         String productId = params.getId();
