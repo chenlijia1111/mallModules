@@ -64,5 +64,14 @@ public interface SystemConfigServiceI {
      */
     SystemConfig findByKey(String key);
 
+    /**
+     * 查询数据
+     * 如果数据不存在，就用初始数据进行初始化
+     * @param key
+     * @param initValue
+     * @return
+     */
+    SystemConfig findInitValue(String key,String initValue);
+
 
 }

@@ -126,4 +126,28 @@ public class SystemConfigServiceImpl implements SystemConfigServiceI {
         }
         return null;
     }
+
+    /**
+     * 查询数据
+     * 如果数据不存在，就用初始数据进行初始化
+     *
+     * @param key
+     * @param initValue
+     * @return
+     */
+    @Override
+    public SystemConfig findInitValue(String key, String initValue) {
+        if (StringUtils.isNotEmpty(key)) {
+            SystemConfig systemConfig = systemConfigMapper.selectByPrimaryKey(key);
+            if (Objects.isNull(systemConfig)) {
+                // 还没有创建，进行初始化
+                systemConfig = new SystemConfig();
+                systemConfig.setSystemKey(key);
+                systemConfig.setSystemValue(initValue);
+                systemConfigMapper.insertSelective(systemConfig);
+            }
+            return systemConfig;
+        }
+        return null;
+    }
 }
