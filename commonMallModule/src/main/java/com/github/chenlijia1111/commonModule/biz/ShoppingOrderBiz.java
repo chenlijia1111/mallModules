@@ -156,6 +156,40 @@ public class ShoppingOrderBiz {
     public Result add(OrderAddParams params, Map<String, String> goodLabelMap, IdGeneratorServiceI groupIdGenerateImpl,
                       IdGeneratorServiceI shoppingIdGenerateImpl, IdGeneratorServiceI sendIdGenerateImpl,
                       IdGeneratorServiceI receiveIdGenerateImpl, IdGeneratorServiceI shopGroupIdGeneratorImpl) {
+        //返回groupId
+        return add(params, goodLabelMap, null, groupIdGenerateImpl, shoppingIdGenerateImpl, sendIdGenerateImpl, receiveIdGenerateImpl, shopGroupIdGeneratorImpl);
+    }
+
+    /**
+     * 添加订单
+     * 如果需要在此基础上进行扩展，调用者可以继承这个类，然后进行扩展
+     * <p>
+     * 优惠券的使用方式的话,一般有以下方式:
+     * 不指定,所有都可以用
+     * 指定类别可用
+     * 指定商品可用
+     * <p>
+     * 先计算每个订单的订单单个订单的应付金额 {@link ShoppingOrder#getOrderAmountTotal()}
+     * 计算完之后再根据所有的优惠券计算每个订单的单个应付金额
+     * 注意,物流券是最后算的
+     * <p>
+     * 总应付金额等于所有单个订单的应付金额之和 {@link ShoppingOrder#getPayable()}
+     *
+     * @param params                   1
+     * @param goodLabelMap             商品价格标签map
+     * @param goodPriceMap             商品价格 下单时，可直接指定价格，如果指定了，就不会再去用标签价格或者商品本身的价格了，优先级最高
+     * @param groupIdGenerateImpl      组订单单号生成规则
+     * @param shoppingIdGenerateImpl   购物订单单号生成规则
+     * @param sendIdGenerateImpl       发货订单单号生成规则
+     * @param receiveIdGenerateImpl    收货订单单号生成规则
+     * @param shopGroupIdGeneratorImpl 商家组订单号生成规则
+     * @return com.github.chenlijia1111.utils.common.Result
+     * @since 下午 4:53 2019/11/5 0005
+     **/
+    @Transactional
+    public Result add(OrderAddParams params, Map<String, String> goodLabelMap, Map<String, Double> goodPriceMap, IdGeneratorServiceI groupIdGenerateImpl,
+                      IdGeneratorServiceI shoppingIdGenerateImpl, IdGeneratorServiceI sendIdGenerateImpl,
+                      IdGeneratorServiceI receiveIdGenerateImpl, IdGeneratorServiceI shopGroupIdGeneratorImpl) {
 
         //校验参数
         Result result = PropertyCheckUtil.checkProperty(params);
@@ -265,6 +299,10 @@ public class ShoppingOrderBiz {
                 goodPrice = goodLabelPriceList.stream().filter(e -> Objects.equals(e.getGoodId(), goodId) &&
                         Objects.equals(e.getLabelName(), goodLabelMap.get(goodId))).
                         map(e -> e.getGoodPrice()).findAny().orElse(goodPrice);
+            }
+            // 判断是否指定了价格
+            if (Maps.isNotEmpty(goodPriceMap) && goodPriceMap.containsKey(goodId)) {
+                goodPrice = goodPriceMap.get(goodId);
             }
             //订单价格
             //先用 double 用着，1.7的时候会全部替换成 decimal
@@ -435,8 +473,8 @@ public class ShoppingOrderBiz {
     /**
      * 试算订单金额
      *
-     * @param params         1
-     * @param goodLabelMap             商品价格标签map
+     * @param params       1
+     * @param goodLabelMap 商品价格标签map
      * @return com.github.chenlijia1111.utils.common.Result
      * @since 下午 4:20 2019/11/22 0022
      **/
