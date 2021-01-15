@@ -153,41 +153,8 @@ public class ShoppingOrderBiz {
      * @since 下午 4:53 2019/11/5 0005
      **/
     @Transactional
-    public Result add(OrderAddParams params, Map<String, String> goodLabelMap, IdGeneratorServiceI groupIdGenerateImpl,
-                      IdGeneratorServiceI shoppingIdGenerateImpl, IdGeneratorServiceI sendIdGenerateImpl,
-                      IdGeneratorServiceI receiveIdGenerateImpl, IdGeneratorServiceI shopGroupIdGeneratorImpl) {
-        //返回groupId
-        return add(params, goodLabelMap, null, groupIdGenerateImpl, shoppingIdGenerateImpl, sendIdGenerateImpl, receiveIdGenerateImpl, shopGroupIdGeneratorImpl);
-    }
-
-    /**
-     * 添加订单
-     * 如果需要在此基础上进行扩展，调用者可以继承这个类，然后进行扩展
-     * <p>
-     * 优惠券的使用方式的话,一般有以下方式:
-     * 不指定,所有都可以用
-     * 指定类别可用
-     * 指定商品可用
-     * <p>
-     * 先计算每个订单的订单单个订单的应付金额 {@link ShoppingOrder#getOrderAmountTotal()}
-     * 计算完之后再根据所有的优惠券计算每个订单的单个应付金额
-     * 注意,物流券是最后算的
-     * <p>
-     * 总应付金额等于所有单个订单的应付金额之和 {@link ShoppingOrder#getPayable()}
-     *
-     * @param params                   1
-     * @param goodLabelMap             商品价格标签map
-     * @param goodPriceMap             商品价格 下单时，可直接指定价格，如果指定了，就不会再去用标签价格或者商品本身的价格了，优先级最高
-     * @param groupIdGenerateImpl      组订单单号生成规则
-     * @param shoppingIdGenerateImpl   购物订单单号生成规则
-     * @param sendIdGenerateImpl       发货订单单号生成规则
-     * @param receiveIdGenerateImpl    收货订单单号生成规则
-     * @param shopGroupIdGeneratorImpl 商家组订单号生成规则
-     * @return com.github.chenlijia1111.utils.common.Result
-     * @since 下午 4:53 2019/11/5 0005
-     **/
-    @Transactional
-    public Result add(OrderAddParams params, Map<String, String> goodLabelMap, Map<String, Double> goodPriceMap, IdGeneratorServiceI groupIdGenerateImpl,
+    public Result add(OrderAddParams params, Map<String, String> goodLabelMap,
+                      IdGeneratorServiceI groupIdGenerateImpl,
                       IdGeneratorServiceI shoppingIdGenerateImpl, IdGeneratorServiceI sendIdGenerateImpl,
                       IdGeneratorServiceI receiveIdGenerateImpl, IdGeneratorServiceI shopGroupIdGeneratorImpl) {
 
@@ -301,8 +268,330 @@ public class ShoppingOrderBiz {
                         map(e -> e.getGoodPrice()).findAny().orElse(goodPrice);
             }
             // 判断是否指定了价格
-            if (Maps.isNotEmpty(goodPriceMap) && goodPriceMap.containsKey(goodId)) {
-                goodPrice = goodPriceMap.get(goodId);
+            if (Objects.equals(BooleanConstant.YES_INTEGER,params.getAppointPriceStatus()) && Objects.nonNull(addParams.getGoodPrice())) {
+                goodPrice = addParams.getGoodPrice();
+            }
+            //订单价格
+            //先用 double 用着，1.7的时候会全部替换成 decimal
+            Double orderAmountTotal = goodPrice * count.doubleValue();
+            orderAmountTotal = NumberUtil.doubleToFixLengthDouble(orderAmountTotal, 2);
+            Double productAmountTotal = goodPrice * count.doubleValue();
+            productAmountTotal = NumberUtil.doubleToFixLengthDouble(productAmountTotal, 2);
+
+            //构造订单对象
+            ShoppingOrder shoppingOrder = new ShoppingOrder().setOrderNo(orderNo).
+                    setCustom(userId).
+                    setShops(product.getShops()).
+                    setGoodsId(goodId).
+                    setCount(count).
+                    setState(CommonMallConstants.ORDER_INIT).
+                    setOrderType(OrderTypeEnum.ORDINARY_ORDER.getType()).
+                    setProductAmountTotal(productAmountTotal).
+                    setGoodPrice(goodPrice).
+                    setOrderAmountTotal(orderAmountTotal).
+                    setShopGroupId(shopGroupId).
+                    setGroupId(groupId).
+                    setCreateTime(currentTime).setRemarks(params.getRemarks()).
+                    setDeleteStatus(BooleanConstant.NO_INTEGER).
+                    setCompleteStatus(BooleanConstant.NO_INTEGER).
+                    setOrderType(params.getOrderType()).
+                    setSingleOrderAppend(addParams.getSingleOrderAppend());
+
+            //订单快照
+            AdminProductVo adminProductVo = productSnapshotMap.get(productId);
+            String productSnapshot = JSONUtil.objToStr(adminProductVo);
+            shoppingOrder.setDetailsJson(productSnapshot);
+
+            //订单备注
+            shoppingOrder.setRemarks(params.getRemarks());
+            //订单对应的商品详情
+            shoppingOrder.setGoodsVO(goodVo);
+
+            //添加发货单
+            //发货单单号
+            String sendOrderNo = sendIdGenerateImpl.createOrderNo();
+            ImmediatePaymentOrder immediatePaymentOrder = new ImmediatePaymentOrder().
+                    setOrderNo(sendOrderNo).
+                    setCustom(userId).
+                    setShops(product.getShops()).
+                    setState(CommonMallConstants.ORDER_INIT).
+                    setRecUser(params.getReceiverName()).
+                    setRecTel(params.getReceiverTelephone()).
+                    setRecProvince(params.getRecProvince()).
+                    setRecCity(params.getRecCity()).
+                    setRecArea(params.getRecArea()).
+                    setRecAddr(params.getRecAddr()).
+                    setFrontOrder(orderNo).
+                    setShoppingOrder(orderNo).
+                    setCreateTime(currentTime).
+                    setExpressSignStatus(BooleanConstant.NO_INTEGER);
+
+            shoppingOrder.setImmediatePaymentOrder(immediatePaymentOrder);
+
+            //添加收货单
+            //收货单单号
+            String receiveOrderNo = receiveIdGenerateImpl.createOrderNo();
+            ReceivingGoodsOrder receivingGoodsOrder = new ReceivingGoodsOrder().
+                    setOrderNo(receiveOrderNo).
+                    setCustom(userId).
+                    setShops(product.getShops()).
+                    setState(CommonMallConstants.ORDER_INIT).
+                    setShoppingOrder(orderNo).
+                    setImmediatePaymentOrder(sendOrderNo).
+                    setFrontOrder(sendOrderNo).
+                    setRecUser(params.getReceiverName()).
+                    setCreateTime(currentTime);
+            immediatePaymentOrder.setReceivingGoodsOrder(receivingGoodsOrder);
+
+            orderList.add(shoppingOrder);
+        }
+
+        //计算各种优惠券,结算最终应付金额
+        List<CouponWithGoodIds> couponWithGoodIdsList = params.getCouponWithGoodIdsList();
+        if (Lists.isNotEmpty(couponWithGoodIdsList)) {
+            //优惠券id集合
+            Set<String> couponIdSet = couponWithGoodIdsList.stream().map(e -> e.getCouponId()).collect(Collectors.toSet());
+            List<Coupon> coupons = couponService.listByIdSet(couponIdSet);
+            if (Lists.isNotEmpty(coupons)) {
+                for (CouponWithGoodIds couponWithGoodId : couponWithGoodIdsList) {
+                    //优惠券Id
+                    String couponId = couponWithGoodId.getCouponId();
+                    //优惠券作用的商品id集合
+                    List<String> goodIdList = couponWithGoodId.getGoodIdList();
+
+                    Optional<Coupon> any = coupons.stream().filter(e -> Objects.equals(e.getId(), couponId)).findAny();
+                    Coupon coupon = any.get();
+                    //找出符合条件的订单进行计算
+                    //作用的订单
+                    List<ShoppingOrder> hitOrderList = orderList.stream().filter(e -> goodIdList.contains(e.getGoodsId())).collect(Collectors.toList());
+                    if (Lists.isNotEmpty(hitOrderList)) {
+                        String couponJson = coupon.getCouponJson();
+                        AbstractCoupon abstractCoupon = AbstractCoupon.transferTypeToCoupon(couponJson);
+                        abstractCoupon.calculatePayable(hitOrderList);
+                    }
+                }
+
+            }
+        }
+
+
+        //总应付金额
+        Double payAble = orderList.stream().collect(Collectors.summingDouble(ShoppingOrder::getOrderAmountTotal));
+        //保留两位小数
+        payAble = NumberUtil.doubleToFixLengthDouble(payAble, 2);
+        for (ShoppingOrder order : orderList) {
+            //最终的应付金额,待考虑
+            order.setPayable(payAble);
+
+            //订单使用的优惠券
+            List<AbstractCoupon> couponList = order.getCouponList();
+            String s = JSONUtil.objToStr(couponList);
+            order.setOrderCoupon(s);
+        }
+
+        //批量插入数据
+        shoppingOrderService.batchAdd(orderList);
+        List<ImmediatePaymentOrder> immediatePaymentOrders = orderList.stream().map(e -> e.getImmediatePaymentOrder()).collect(Collectors.toList());
+        immediatePaymentOrderService.batchAdd(immediatePaymentOrders);
+        List<ReceivingGoodsOrder> receivingGoodsOrders = immediatePaymentOrders.stream().map(e -> e.getReceivingGoodsOrder()).collect(Collectors.toList());
+        receivingGoodsOrderService.batchAdd(receivingGoodsOrders);
+
+        //修改库存
+        for (ShoppingOrder order : orderList) {
+
+            //下单成功之后,减库存
+            GoodVo goodsVO = order.getGoodsVO();
+            BigDecimal stockCount = goodsVO.getStockCount();
+            stockCount = BigDecimalUtil.sub(stockCount, order.getCount());
+            Goods goods = new Goods().setId(goodsVO.getId()).
+                    setStockCount(stockCount);
+            goodsService.update(goods);
+        }
+
+
+        //操作成功，添加订单到延时队列，超时未支付取消订单
+        if (Objects.equals(ADD_DELAY_NOT_PAY_AFTER_ADD_ORDER_STATUS, BooleanConstant.YES_INTEGER)) {
+            try {
+                OrderCancelTimeLimitTask task = SpringContextHolder.getBean(OrderCancelTimeLimitTask.class);
+                if (Objects.nonNull(task)) {
+                    task.addNotPayOrder(groupId, currentTime, CommonMallConstants.CANCEL_NOT_PAY_ORDER_LIMIT_MINUTES);
+                }
+            } catch (Exception e) {
+                //没有获取到bean，说明没有注入
+            }
+        }
+
+        //返回groupId
+        return Result.success("操作成功", groupId);
+    }
+
+
+    /**
+     * 添加订单
+     * 如果需要在此基础上进行扩展，调用者可以继承这个类，然后进行扩展
+     * <p>
+     * 优惠券的使用方式的话,一般有以下方式:
+     * 不指定,所有都可以用
+     * 指定类别可用
+     * 指定商品可用
+     * <p>
+     * 先计算每个订单的订单单个订单的应付金额 {@link ShoppingOrder#getOrderAmountTotal()}
+     * 计算完之后再根据所有的优惠券计算每个订单的单个应付金额
+     * 注意,物流券是最后算的
+     * <p>
+     * 总应付金额等于所有单个订单的应付金额之和 {@link ShoppingOrder#getPayable()}
+     * <p>
+     * 喜餐定制接口 2021-01-14
+     * 不需要同步版本
+     * 支持添加的时候指定创建时间，组订单编号
+     *
+     * @param params                   1
+     * @param goodLabelMap             商品价格标签map
+     * @param groupIdGenerateImpl      组订单单号生成规则
+     * @param shoppingIdGenerateImpl   购物订单单号生成规则
+     * @param sendIdGenerateImpl       发货订单单号生成规则
+     * @param receiveIdGenerateImpl    收货订单单号生成规则
+     * @param shopGroupIdGeneratorImpl 商家组订单号生成规则
+     * @return com.github.chenlijia1111.utils.common.Result
+     * @since 下午 4:53 2019/11/5 0005
+     **/
+    @Transactional
+    public Result addXC(XCOrderAddParams params, Map<String, String> goodLabelMap,
+                        IdGeneratorServiceI groupIdGenerateImpl,
+                        IdGeneratorServiceI shoppingIdGenerateImpl, IdGeneratorServiceI sendIdGenerateImpl,
+                        IdGeneratorServiceI receiveIdGenerateImpl, IdGeneratorServiceI shopGroupIdGeneratorImpl) {
+
+        //校验参数
+        Result result = PropertyCheckUtil.checkProperty(params);
+        if (!result.getSuccess()) {
+            return result;
+        }
+        //校验订单中的商品参数
+        List<SingleOrderAddParams> singleOrderList = params.getSingleOrderList();
+        for (SingleOrderAddParams addParams : singleOrderList) {
+            result = PropertyCheckUtil.checkProperty(addParams);
+            if (!result.getSuccess()) {
+                return result;
+            }
+        }
+
+        //当前用户
+        String userId = commonModuleUserService.currentUserId();
+        if (StringUtils.isEmpty(userId)) {
+            return Result.notLogin();
+        }
+
+        // 校验数据，判断商品信息是否都存在
+        Set<String> goodIdSet = singleOrderList.stream().map(e -> e.getGoodId()).collect(Collectors.toSet());
+        List<GoodVo> goodVoList = goodsService.listByGoodIdSet(goodIdSet);
+        // 转成 map 加快查询速率，防止数据多的时候反复遍历
+        Map<String, GoodVo> goodMap = new HashMap<>();
+        for (GoodVo goodVo : goodVoList) {
+            goodMap.put(goodVo.getId(), goodVo);
+        }
+        // 查询对应的产品信息列表，判断产品是否都存在
+        Set<String> productIdSet = goodVoList.stream().map(e -> e.getProductId()).collect(Collectors.toSet());
+        List<Product> productList = productService.listByProductIdSet(productIdSet);
+        // 转成 map 加快查询速率，防止数据多的时候反复遍历
+        Map<String, Product> productMap = new HashMap<>();
+        for (Product product : productList) {
+            productMap.put(product.getId(), product);
+        }
+        // 快照信息
+        List<AdminProductVo> adminProductVoList = productService.listAdminProductVoByProductIdSet(productIdSet);
+        // 转成 map
+        Map<String, AdminProductVo> productSnapshotMap = new HashMap<>();
+        for (AdminProductVo product : adminProductVoList) {
+            productSnapshotMap.put(product.getId(), product);
+        }
+
+        // 标签价格，如果指定了标签，就用对应标签的价格
+        List<GoodLabelPrice> goodLabelPriceList = new ArrayList<>();
+        if (Maps.isNotEmpty(goodLabelMap)) {
+            goodLabelPriceList = goodLabelPriceService.listByGoodIdSet(goodIdSet, null);
+        }
+
+        //组订单Id
+        // 先判断是否有指定
+        String groupId = null;
+        if (StringUtils.isNotEmpty(params.getGroupId())) {
+            groupId = params.getGroupId();
+        } else {
+            groupId = groupIdGenerateImpl.createOrderNo();
+        }
+
+        //当前时间
+        // 判断有没有指定创建时间
+        Date currentTime = null;
+        if (Objects.nonNull(params.getCreateTime())) {
+            currentTime = params.getCreateTime();
+        } else {
+            currentTime = new Date();
+        }
+        //商家组订单id集合-用于判断是否生成过了商家组订单号,防止重复生成
+        // 先判断有没有指定商家组订单编号
+        Map<String, String> shopGroupIdMap = null;
+        if (Objects.nonNull(params.getShopGroupNoMap())) {
+            shopGroupIdMap = params.getShopGroupNoMap();
+        } else {
+            shopGroupIdMap = new HashMap<>();
+        }
+
+        //开始处理订单
+        ArrayList<ShoppingOrder> orderList = Lists.newArrayList();
+        for (SingleOrderAddParams addParams : singleOrderList) {
+            //商品id
+            String goodId = addParams.getGoodId();
+            //商品数量
+            BigDecimal count = addParams.getCount();
+
+            //这个商品所有的下单数量，允许参数中多个相同的 goodId ，但是要判断库存
+            BigDecimal goodTotalCount = new BigDecimal("0.0");
+            for (SingleOrderAddParams singleOrderAddParams : singleOrderList) {
+                goodTotalCount = BigDecimalUtil.add(goodTotalCount, singleOrderAddParams.getCount());
+            }
+
+            //查询商品信息
+            GoodVo goodVo = goodMap.get(goodId);
+            if (Objects.isNull(goodVo)) {
+                return Result.failure("商品不存在");
+            }
+            //判断产品是否存在且上架
+            String productId = goodVo.getProductId();
+            Product product = productMap.get(productId);
+            if (Objects.isNull(product) || Objects.equals(BooleanConstant.YES_INTEGER, product.getDeleteStatus())) {
+                return Result.failure("产品不存在");
+            }
+            if (Objects.equals(BooleanConstant.NO_INTEGER, product.getShelfStatus())) {
+                return Result.failure("产品未上架");
+            }
+
+            //判断库存是否充足
+            if (Objects.equals(BooleanConstant.YES_INTEGER, CHECK_GOOD_STOCK_STATUS) &&
+                    goodVo.getStockCount().compareTo(goodTotalCount) < 0) {
+                return Result.failure("商品库存不足");
+            }
+
+            //订单编号
+            String orderNo = shoppingIdGenerateImpl.createOrderNo();
+            //商家组订单编号
+            String shopGroupId = shopGroupIdMap.get(product.getShops());
+            if (Objects.isNull(shopGroupId)) {
+                shopGroupId = shopGroupIdGeneratorImpl.createOrderNo();
+                shopGroupIdMap.put(product.getShops(), shopGroupId);
+            }
+
+            // 商品价格
+            Double goodPrice = goodVo.getPrice();
+            // 判断是否需要取标签价格
+            if (Maps.isNotEmpty(goodLabelMap) && goodLabelMap.containsKey(goodId)) {
+                goodPrice = goodLabelPriceList.stream().filter(e -> Objects.equals(e.getGoodId(), goodId) &&
+                        Objects.equals(e.getLabelName(), goodLabelMap.get(goodId))).
+                        map(e -> e.getGoodPrice()).findAny().orElse(goodPrice);
+            }
+            // 判断是否指定了价格
+            if (Objects.equals(BooleanConstant.YES_INTEGER,params.getAppointPriceStatus()) && Objects.nonNull(addParams.getGoodPrice())) {
+                goodPrice = addParams.getGoodPrice();
             }
             //订单价格
             //先用 double 用着，1.7的时候会全部替换成 decimal

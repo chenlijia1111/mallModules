@@ -1,6 +1,5 @@
 package com.github.chenlijia1111.commonModule.common.requestVo.order;
 
-import com.github.chenlijia1111.utils.common.constant.BooleanConstant;
 import com.github.chenlijia1111.utils.core.annos.PropertyCheck;
 import com.github.chenlijia1111.utils.core.enums.PropertyCheckType;
 import io.swagger.annotations.ApiModel;
@@ -8,7 +7,6 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.persistence.Column;
 import java.util.List;
 
 /**
@@ -107,6 +105,13 @@ public class OrderAddParams {
      */
     @ApiModelProperty(value = "订单类型")
     private Integer orderType;
+
+    /**
+     * 是否由下单者指定下单价格
+     * {@link SingleOrderAddParams#getGoodPrice()}
+     */
+    @ApiModelProperty(value = "是否由下单者指定下单价格")
+    private Integer appointPriceStatus;
 
 
 }

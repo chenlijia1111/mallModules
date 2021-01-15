@@ -49,4 +49,10 @@ public class SingleOrderAddParams {
     @ApiModelProperty(value = "单个订单补充参数")
     private String singleOrderAppend;
 
+    /**
+     * 指定价格
+     */
+    @ApiModelProperty(value = "指定价格")
+    private Double goodPrice;
+
 }
