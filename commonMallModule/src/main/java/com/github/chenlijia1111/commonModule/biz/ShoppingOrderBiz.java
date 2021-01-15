@@ -264,7 +264,7 @@ public class ShoppingOrderBiz {
             if (Maps.isNotEmpty(goodLabelMap) && goodLabelMap.containsKey(goodId)) {
                 goodPrice = goodLabelPriceList.stream().filter(e -> Objects.equals(e.getGoodId(), goodId) &&
                         Objects.equals(e.getLabelName(), goodLabelMap.get(goodId))).
-                        map(e -> e.getGoodPrice()).findAny().orElse(goodPrice);
+                        findAny().map(e -> e.getGoodPrice()).orElse(goodPrice);
             }
             // 判断是否指定了价格
             if (Objects.equals(BooleanConstant.YES_INTEGER, params.getAppointPriceStatus()) && Objects.nonNull(addParams.getGoodPrice())) {
