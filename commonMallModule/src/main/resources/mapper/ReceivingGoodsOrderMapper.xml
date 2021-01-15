@@ -14,7 +14,7 @@
     <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
   </resultMap>
   <sql id="Base_Column_List">
-    order_no, custom, shops, state, shopping_order, immediate_payment_order, receive_time, 
+    order_no, custom, shops, state, shopping_order, immediate_payment_order, receive_time,
     rec_user, front_order, create_time
   </sql>
   <select id="listByFrontOrderNoSet" resultMap="BaseResultMap">
@@ -29,7 +29,7 @@
   <select id="maxOrderNo" resultType="java.lang.String">
     SELECT s_receiving_goods_order.order_no
     FROM s_receiving_goods_order
-    ORDER BY s_receiving_goods_order.create_time DESC,s_receiving_goods_order.order_no DESC
+    ORDER BY s_receiving_goods_order.order_no DESC
     LIMIT 1
   </select>
   <insert id="batchAdd">

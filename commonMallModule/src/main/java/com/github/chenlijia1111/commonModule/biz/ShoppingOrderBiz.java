@@ -268,7 +268,7 @@ public class ShoppingOrderBiz {
                         findAny().map(e -> e.getGoodPrice()).orElse(goodPrice);
             }
             // 判断是否指定了价格
-            if (Objects.equals(BooleanConstant.YES_INTEGER,params.getAppointPriceStatus()) && Objects.nonNull(addParams.getGoodPrice())) {
+            if (Objects.equals(BooleanConstant.YES_INTEGER, params.getAppointPriceStatus()) && Objects.nonNull(addParams.getGoodPrice())) {
                 goodPrice = addParams.getGoodPrice();
             }
             //订单价格
@@ -559,10 +559,11 @@ public class ShoppingOrderBiz {
             //判断产品是否存在且上架
             String productId = goodVo.getProductId();
             Product product = productMap.get(productId);
-            if (Objects.isNull(product) || Objects.equals(BooleanConstant.YES_INTEGER, product.getDeleteStatus())) {
+            if (Objects.isNull(product) ||
+                    (Objects.equals(BooleanConstant.YES_INTEGER, product.getDeleteStatus()) && !Objects.equals(BooleanConstant.YES_INTEGER, params.getNotCheckProduct()))) {
                 return Result.failure("产品不存在");
             }
-            if (Objects.equals(BooleanConstant.NO_INTEGER, product.getShelfStatus())) {
+            if (Objects.equals(BooleanConstant.NO_INTEGER, product.getShelfStatus()) && !Objects.equals(BooleanConstant.YES_INTEGER, params.getNotCheckProduct())) {
                 return Result.failure("产品未上架");
             }
 
@@ -590,7 +591,7 @@ public class ShoppingOrderBiz {
                         findAny().map(e -> e.getGoodPrice()).orElse(goodPrice);
             }
             // 判断是否指定了价格
-            if (Objects.equals(BooleanConstant.YES_INTEGER,params.getAppointPriceStatus()) && Objects.nonNull(addParams.getGoodPrice())) {
+            if (Objects.equals(BooleanConstant.YES_INTEGER, params.getAppointPriceStatus()) && Objects.nonNull(addParams.getGoodPrice())) {
                 goodPrice = addParams.getGoodPrice();
             }
             //订单价格
