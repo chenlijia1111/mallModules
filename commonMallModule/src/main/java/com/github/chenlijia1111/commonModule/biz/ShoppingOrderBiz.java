@@ -266,6 +266,11 @@ public class ShoppingOrderBiz {
                         Objects.equals(e.getLabelName(), goodLabelMap.get(goodId))).
                         map(e -> e.getGoodPrice()).findAny().orElse(goodPrice);
             }
+            // 判断是否指定了价格
+            if (Objects.equals(BooleanConstant.YES_INTEGER, params.getAppointPriceStatus()) && Objects.nonNull(addParams.getGoodPrice())) {
+                goodPrice = addParams.getGoodPrice();
+            }
+
 
             //商品金额
             BigDecimal productAmountTotal = BigDecimalUtil.mul(goodPrice, count);
@@ -425,8 +430,8 @@ public class ShoppingOrderBiz {
     /**
      * 试算订单金额
      *
-     * @param params         1
-     * @param goodLabelMap  商品标签价格map
+     * @param params       1
+     * @param goodLabelMap 商品标签价格map
      * @return com.github.chenlijia1111.utils.common.Result
      * @since 下午 4:20 2019/11/22 0022
      **/
