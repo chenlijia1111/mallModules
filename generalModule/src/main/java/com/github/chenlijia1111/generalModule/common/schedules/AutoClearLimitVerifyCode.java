@@ -10,13 +10,13 @@ import org.quartz.JobExecutionException;
  * 清理过期验证码
  * 如果需要清除，将当前 Job 在项目初始化的时候创建即可
  * {@code
- *      String groupName = "autoClearCode";
- *
- *      //每天3点运行
- *      Trigger autoClearTrigger = TriggerUtil.createCronTrigger("0 0 3 * * ?", "autoClearCodeTrigger", groupName);
- *
- *      TimerTaskUtil.doTask(autoClearTrigger, AutoClearLimitVerifyCode.class, AutoClearLimitVerifyCode.class.getSimpleName(), groupName);
- * }
+       String groupName = "autoClearCode";
+
+       //每天3点运行
+       Trigger autoClearTrigger = TriggerUtil.createCronTrigger("0 0 3 * * ?", "autoClearCodeTrigger", groupName);
+
+       TimerTaskUtil.doTask(autoClearTrigger, AutoClearLimitVerifyCode.class, AutoClearLimitVerifyCode.class.getSimpleName(), groupName);
+  }
  *
  * @author Chen LiJia
  * @since 2020/2/26
