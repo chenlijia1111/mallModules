@@ -110,6 +110,7 @@ public interface ShoppingOrderServiceI {
      * @param canCancelStatus 可以取消订单的状态
      * @return
      */
+    @Deprecated
     Result cancelOrder(String groupId, List<Integer> canCancelStatus);
 
     /**
@@ -119,7 +120,16 @@ public interface ShoppingOrderServiceI {
      * @param canCancelStatus 可以取消订单的状态
      * @return
      */
+    @Deprecated
     Result cancelOrderByOrderNo(String orderNo, List<Integer> canCancelStatus);
+
+    /**
+     * 取消订单
+     * 前置判断由调用者自己判断
+     * @param orderNoSet
+     * @return
+     */
+    Result cancelOrderByOrderNoSet(Set<String> orderNoSet);
 
 
     /**

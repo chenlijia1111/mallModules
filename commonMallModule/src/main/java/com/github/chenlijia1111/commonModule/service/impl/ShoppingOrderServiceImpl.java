@@ -4,8 +4,10 @@ import com.github.chenlijia1111.commonModule.common.enums.OrderStatusEnum;
 import com.github.chenlijia1111.commonModule.common.pojo.CommonMallConstants;
 import com.github.chenlijia1111.commonModule.common.responseVo.order.OrderStatusFieldVo;
 import com.github.chenlijia1111.commonModule.dao.GoodsMapper;
+import com.github.chenlijia1111.commonModule.dao.ShopGroupOrderMapper;
 import com.github.chenlijia1111.commonModule.dao.ShoppingOrderMapper;
 import com.github.chenlijia1111.commonModule.entity.Goods;
+import com.github.chenlijia1111.commonModule.entity.ShopGroupOrder;
 import com.github.chenlijia1111.commonModule.entity.ShoppingOrder;
 import com.github.chenlijia1111.commonModule.service.IFindOrderStateHook;
 import com.github.chenlijia1111.commonModule.service.ShoppingOrderServiceI;
@@ -19,6 +21,7 @@ import com.github.chenlijia1111.utils.list.Lists;
 import com.github.chenlijia1111.utils.list.Sets;
 import org.springframework.stereotype.Service;
 import tk.mybatis.mapper.entity.Example;
+import tk.mybatis.mapper.util.Sqls;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
@@ -39,6 +42,8 @@ public class ShoppingOrderServiceImpl implements ShoppingOrderServiceI {
     private ShoppingOrderMapper shoppingOrderMapper;//购物单
     @Resource
     private GoodsMapper goodsMapper;//商品
+    @Resource
+    private ShopGroupOrderMapper shopGroupOrderMapper;// 商家组订单
 
 
     /**
@@ -353,6 +358,58 @@ public class ShoppingOrderServiceImpl implements ShoppingOrderServiceI {
         return Result.success("操作成功");
     }
 
+    /**
+     * 取消订单
+     * 前置判断由调用者自己判断
+     *
+     * @param orderNoSet
+     * @return
+     */
+    @Override
+    public Result cancelOrderByOrderNoSet(Set<String> orderNoSet) {
+        if (Sets.isNotEmpty(orderNoSet)) {
+            List<ShoppingOrder> shoppingOrderList = shoppingOrderMapper.listByOrderNoSetFilterLongField(orderNoSet);
+            if (Lists.isNotEmpty(shoppingOrderList)) {
+                Set<String> goodIdSet = new HashSet<>();
+                Set<String> shopGroupIdSet = new HashSet<>();
+                for (ShoppingOrder shoppingOrder : shoppingOrderList) {
+                    goodIdSet.add(shoppingOrder.getGoodsId());
+                    shopGroupIdSet.add(shoppingOrder.getShopGroupId());
+                }
+                // 开始执行取消操作
+                Date currentTime = new Date();
+                ShoppingOrder shoppingOrderSetCondition = new ShoppingOrder().setCancelTime(currentTime).
+                        setState(CommonMallConstants.ORDER_CANCEL);
+                Example shoppingOrderWhereCondition = Example.builder(ShoppingOrder.class).
+                        where(Sqls.custom().andIn("orderNo", orderNoSet)).build();
+                shoppingOrderMapper.updateByExampleSelective(shoppingOrderSetCondition, shoppingOrderWhereCondition);
+                // 商家组订单
+                ShopGroupOrder shopGroupOrderSetCondition = new ShopGroupOrder();
+                shopGroupOrderSetCondition.setCancelStatus(BooleanConstant.YES_INTEGER);
+                Example shopGroupOrderWhereCondition = Example.builder(ShopGroupOrder.class).
+                        where(Sqls.custom().andIn("shopGroupId", shopGroupIdSet)).build();
+                shopGroupOrderMapper.updateByExampleSelective(shopGroupOrderSetCondition, shopGroupOrderWhereCondition);
+
+                // 回补库存
+                List<Goods> goodsList = goodsMapper.selectByExample(Example.builder(Goods.class).
+                        where(Sqls.custom().andIn("id", goodIdSet)).build());
+                if (Lists.isNotEmpty(goodsList)) {
+                    // 进行回补库存
+                    for (ShoppingOrder shoppingOrder : shoppingOrderList) {
+                        String goodsId = shoppingOrder.getGoodsId();
+                        Goods goods = goodsList.stream().filter(e -> Objects.equals(e.getId(), goodsId)).
+                                findAny().orElse(null);
+                        if (Objects.nonNull(goods)) {
+                            BigDecimal stackCount = BigDecimalUtil.add(goods.getStockCount(), shoppingOrder.getCount());
+                            goods.setStockCount(stackCount);
+                            goodsMapper.updateByPrimaryKeySelective(goods);
+                        }
+                    }
+                }
+            }
+        }
+        return Result.success("操作成功");
+    }
 
     /**
      * 条件查询

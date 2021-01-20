@@ -27,7 +27,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.interceptor.TransactionAspectSupport;
+import tk.mybatis.mapper.entity.Example;
+import tk.mybatis.mapper.util.Sqls;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
@@ -78,6 +79,8 @@ public class ShoppingOrderBiz {
     private CommonModuleUserServiceI commonModuleUserService;//用户
     @Autowired
     private CouponServiceI couponService;//优惠券
+    @Autowired
+    private ShopGroupOrderServiceI shopGroupOrderService;// 商家组订单
 
 
     /**
@@ -215,7 +218,9 @@ public class ShoppingOrderBiz {
         Map<String, String> shopGroupIdMap = new HashMap<>();
 
         //开始处理订单
-        ArrayList<ShoppingOrder> orderList = Lists.newArrayList();
+        List<ShoppingOrder> orderList = Lists.newArrayList();
+        // 商家组订单集合
+        List<ShopGroupOrder> shopGroupOrderList = Lists.newArrayList();
         for (SingleOrderAddParams addParams : singleOrderList) {
             //商品id
             String goodId = addParams.getGoodId();
@@ -256,6 +261,9 @@ public class ShoppingOrderBiz {
             if (Objects.isNull(shopGroupId)) {
                 shopGroupId = shopGroupIdGeneratorImpl.createOrderNo();
                 shopGroupIdMap.put(product.getShops(), shopGroupId);
+                // 不存在，需要构建商家组订单对象--2021-01-20
+                ShopGroupOrder shopGroupOrder = ShopGroupOrder.generateInitShopGroupOrderVo(shopGroupId, userId, product.getShops(), currentTime);
+                shopGroupOrderList.add(shopGroupOrder);
             }
 
             // 商品价格
@@ -291,7 +299,10 @@ public class ShoppingOrderBiz {
                     setDeleteStatus(BooleanConstant.NO_INTEGER).
                     setCompleteStatus(BooleanConstant.NO_INTEGER).
                     setOrderType(params.getOrderType()).
-                    setSingleOrderAppend(addParams.getSingleOrderAppend());
+                    setSingleOrderAppend(addParams.getSingleOrderAppend()).
+                    setSendStatus(BooleanConstant.NO_INTEGER).
+                    setReceiveStatus(BooleanConstant.NO_INTEGER).
+                    setEvaluateStatus(BooleanConstant.NO_INTEGER);
 
             //订单快照--2020-12-03 从快照表里查询
             String productSnapshotId = String.valueOf(productSnapshotMap.get(productId));
@@ -393,6 +404,8 @@ public class ShoppingOrderBiz {
         immediatePaymentOrderService.batchAdd(immediatePaymentOrders);
         List<ReceivingGoodsOrder> receivingGoodsOrders = immediatePaymentOrders.stream().map(e -> e.getReceivingGoodsOrder()).collect(Collectors.toList());
         receivingGoodsOrderService.batchAdd(receivingGoodsOrders);
+        // 批量添加商家组订单
+        shopGroupOrderService.batchAdd(shopGroupOrderList);
 
         //修改库存
         for (ShoppingOrder order : orderList) {
@@ -628,6 +641,7 @@ public class ShoppingOrderBiz {
      * @see com.github.chenlijia1111.commonModule.common.enums.OrderStatusEnum
      * @since 下午 5:51 2019/11/22 0022
      **/
+    @Deprecated
     public Result customCancelOrder(String groupId, List<Integer> canCancelStatus) {
 
         //校验参数
@@ -659,6 +673,7 @@ public class ShoppingOrderBiz {
      * @see com.github.chenlijia1111.commonModule.common.enums.OrderStatusEnum
      * @since 下午 5:51 2019/11/22 0022
      **/
+    @Deprecated
     public Result customCancelOrderByOrderNo(String orderNo, List<Integer> canCancelStatus) {
 
         //校验参数
@@ -699,6 +714,13 @@ public class ShoppingOrderBiz {
             return Result.failure("订单不存在");
         }
 
+        // 判断订单状态，只有未删除，未取消，未发货的订单才可以操作
+        if (!(Objects.equals(BooleanConstant.NO_INTEGER, shoppingOrder.getDeleteStatus()) &&
+                !Objects.equals(CommonMallConstants.ORDER_CANCEL, shoppingOrder.getState()) &&
+                Objects.equals(BooleanConstant.NO_INTEGER, shoppingOrder.getSendStatus()))) {
+            return Result.failure("订单状态不合法");
+        }
+
         //查询该订单的发货单
         List<ImmediatePaymentOrder> immediatePaymentOrders = immediatePaymentOrderService.listByFrontNoSet(Sets.asSets(params.getOrderNo()));
         if (Lists.isEmpty(immediatePaymentOrders)) {
@@ -720,7 +742,15 @@ public class ShoppingOrderBiz {
         immediatePaymentOrder.setExpressNo(params.getExpressNo());
         immediatePaymentOrder.setSendTime(new Date());
 
-        return immediatePaymentOrderService.update(immediatePaymentOrder);
+        result = immediatePaymentOrderService.update(immediatePaymentOrder);
+        if (result.getSuccess()) {
+            // 修改订单的发货状态
+            shoppingOrder.setSendStatus(BooleanConstant.YES_INTEGER);
+            shoppingOrderService.update(shoppingOrder);
+
+            // 是否需要修改商家组订单的发货状态需要由调用者自己决定
+        }
+        return result;
     }
 
     /**
@@ -730,7 +760,6 @@ public class ShoppingOrderBiz {
      * @return com.github.chenlijia1111.utils.common.Result
      * @since 下午 5:51 2019/11/22 0022
      **/
-    @Transactional
     public Result shopBatchSendExpress(BatchShipParams params) {
         //校验参数
         Result result = PropertyCheckUtil.checkProperty(params);
@@ -738,20 +767,45 @@ public class ShoppingOrderBiz {
             return result;
         }
 
-        List<String> orderNos = params.getOrderNos();
-        for (String orderNo : orderNos) {
-            ShipParams shipParams = new ShipParams().setOrderNo(orderNo).
-                    setExpressCom(params.getExpressCom()).
-                    setExpressName(params.getExpressName()).
-                    setExpressNo(params.getExpressNo());
-            Result sendExpress = shopSendExpress(shipParams);
-            if (!sendExpress.getSuccess()) {
-                //回滚
-                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                return sendExpress;
+        Set<String> orderNoSet = params.getOrderNos().stream().collect(Collectors.toSet());
+
+        // 批量查询订单信息
+        List<ShoppingOrder> shoppingOrderList = shoppingOrderService.listByOrderNoSetFilterLongField(orderNoSet);
+        if (Lists.isEmpty(shoppingOrderList)) {
+            return Result.failure("数据不存在");
+        }
+        // 判断订单状态，只有未删除，未取消，未发货的订单才可以操作
+        for (ShoppingOrder shoppingOrder : shoppingOrderList) {
+            if (!(Objects.equals(BooleanConstant.NO_INTEGER, shoppingOrder.getDeleteStatus()) &&
+                    !Objects.equals(CommonMallConstants.ORDER_CANCEL, shoppingOrder.getState()) &&
+                    Objects.equals(BooleanConstant.NO_INTEGER, shoppingOrder.getSendStatus()))) {
+                return Result.failure("订单状态不合法");
             }
         }
+        // 批量查询发货单信息
+        List<ImmediatePaymentOrder> immediatePaymentOrderList = immediatePaymentOrderService.listByFrontNoSet(orderNoSet);
+        if (Lists.isNotEmpty(immediatePaymentOrderList)) {
+            return Result.failure("发货单不存在");
+        }
 
+        // 批量更新
+        ImmediatePaymentOrder immediatePaymentOrderSetCondition = new ImmediatePaymentOrder();
+        immediatePaymentOrderSetCondition.setExpressName(params.getExpressName());
+        immediatePaymentOrderSetCondition.setExpressCom(params.getExpressCom());
+        immediatePaymentOrderSetCondition.setExpressNo(params.getExpressNo());
+        immediatePaymentOrderSetCondition.setSendTime(new Date());
+        Example immediatePaymentOrderWhereCondition = Example.builder(ImmediatePaymentOrder.class).
+                where(Sqls.custom().andIn("frontOrder", orderNoSet)).build();
+        immediatePaymentOrderService.update(immediatePaymentOrderSetCondition, immediatePaymentOrderWhereCondition);
+
+        // 修改订单的发货状态
+        ShoppingOrder shoppingOrderSetCondition = new ShoppingOrder();
+        shoppingOrderSetCondition.setSendStatus(BooleanConstant.YES_INTEGER);
+        Example shoppingOrderWhereCondition = Example.builder(ShoppingOrder.class).where(Sqls.custom().
+                andIn("orderNo", orderNoSet)).build();
+        shoppingOrderService.update(shoppingOrderSetCondition, shoppingOrderWhereCondition);
+
+        // 是否修改商家组订单状态由调用者决定
         return Result.success("操作成功");
     }
 
@@ -772,6 +826,14 @@ public class ShoppingOrderBiz {
         ShoppingOrder shoppingOrder = shoppingOrderService.findByOrderNo(orderNo);
         if (Objects.isNull(shoppingOrder)) {
             return Result.failure("订单不存在");
+        }
+
+        // 判断订单状态，只有未删除，未取消，已发货，待收货的订单才可以操作
+        if (!(Objects.equals(BooleanConstant.NO_INTEGER, shoppingOrder.getDeleteStatus()) &&
+                !Objects.equals(CommonMallConstants.ORDER_CANCEL, shoppingOrder.getState()) &&
+                Objects.equals(BooleanConstant.YES_INTEGER, shoppingOrder.getSendStatus()) &&
+                Objects.equals(BooleanConstant.NO_INTEGER, shoppingOrder.getReceiveStatus()))) {
+            return Result.failure("订单状态不合法");
         }
 
         //查询发货单与收货单,判断收货单是否已收货,在本系统中收货就是完成的意思
@@ -851,6 +913,7 @@ public class ShoppingOrderBiz {
      * @return
      * @see com.github.chenlijia1111.commonModule.common.enums.OrderStatusEnum
      */
+    @Deprecated
     public Result deleteOrder(String orderNo, List<Integer> canDeleteOrderStatus) {
 
         //校验参数

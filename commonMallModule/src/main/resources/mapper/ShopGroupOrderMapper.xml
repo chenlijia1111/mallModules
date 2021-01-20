@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.github.chenlijia1111.commonModule.dao.ShopGroupOrderMapper">
+  <resultMap id="BaseResultMap" type="com.github.chenlijia1111.commonModule.entity.ShopGroupOrder">
+    <result column="shop_group_id" jdbcType="VARCHAR" property="shopGroupId" />
+    <result column="custom" jdbcType="VARCHAR" property="custom" />
+    <result column="shops" jdbcType="VARCHAR" property="shops" />
+    <result column="pay_status" jdbcType="INTEGER" property="payStatus" />
+    <result column="send_status" jdbcType="INTEGER" property="sendStatus" />
+    <result column="receive_status" jdbcType="INTEGER" property="receiveStatus" />
+    <result column="evaluate_status" jdbcType="INTEGER" property="evaluateStatus" />
+    <result column="complete_status" jdbcType="INTEGER" property="completeStatus" />
+    <result column="cancel_status" jdbcType="INTEGER" property="cancelStatus" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="delete_status" jdbcType="INTEGER" property="deleteStatus" />
+    <result column="extend_column1" jdbcType="INTEGER" property="extendColumn1" />
+    <result column="extend_column2" jdbcType="INTEGER" property="extendColumn2" />
+    <result column="extend_column3" jdbcType="INTEGER" property="extendColumn3" />
+    <result column="extend_column4" jdbcType="INTEGER" property="extendColumn4" />
+    <result column="extend_column5" jdbcType="INTEGER" property="extendColumn5" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    shop_group_id, custom, shops, pay_status, send_status, receive_status, evaluate_status,
+    complete_status, cancel_status, create_time, delete_status, extend_column1, extend_column2,
+    extend_column3, extend_column4, extend_column5
+  </sql>
+</mapper>

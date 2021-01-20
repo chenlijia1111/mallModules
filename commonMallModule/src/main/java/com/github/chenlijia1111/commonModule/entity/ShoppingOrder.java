@@ -271,6 +271,33 @@ public class ShoppingOrder {
     private String singleOrderAppend;
 
     /**
+     * 是否发货
+     * 2021-01-20
+     */
+    @ApiModelProperty("是否发货")
+    @PropertyCheck(name = "是否发货")
+    @Column(name = "send_status")
+    private Integer sendStatus;
+
+    /**
+     * 是否收货
+     * 2021-01-20
+     */
+    @ApiModelProperty("是否收货")
+    @PropertyCheck(name = "是否收货")
+    @Column(name = "receive_status")
+    private Integer receiveStatus;
+
+    /**
+     * 是否评价
+     * 2021-01-20
+     */
+    @ApiModelProperty("是否评价")
+    @PropertyCheck(name = "是否评价")
+    @Column(name = "evaluate_status")
+    private Integer evaluateStatus;
+
+    /**
      * 订单使用的券
      *
      * @see #orderCoupon

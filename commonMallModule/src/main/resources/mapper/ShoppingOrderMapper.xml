@@ -28,13 +28,17 @@
     <result column="cancel_time" jdbcType="TIMESTAMP" property="cancelTime" />
     <result column="complete_status" jdbcType="INTEGER" property="completeStatus" />
     <result column="single_order_append" jdbcType="VARCHAR" property="singleOrderAppend" />
+    <result column="send_status" jdbcType="INTEGER" property="sendStatus" />
+    <result column="receive_status" jdbcType="INTEGER" property="receiveStatus" />
+    <result column="evaluate_status" jdbcType="INTEGER" property="evaluateStatus" />
   </resultMap>
   <sql id="Base_Column_List">
     order_no, custom, shops, goods_id, count, state, order_type,
            product_amount_total, pay_channel, pay_record, transaction_id,
            good_price, order_amount_total, pay_time, details_json, shop_group_id,
            group_id, payable, order_coupon, create_time, remarks, shop_remarks,
-           delete_status,cancel_time,complete_status, single_order_append
+           delete_status,cancel_time,complete_status, single_order_append,
+    send_status, receive_status, evaluate_status
   </sql>
   <select id="listByGroupIdSet" resultMap="BaseResultMap">
     SELECT
@@ -51,7 +55,8 @@
     product_amount_total, pay_channel, pay_record, transaction_id,
     good_price, order_amount_total, pay_time, shop_group_id,
     group_id, payable, create_time, remarks, shop_remarks,
-    delete_status,cancel_time,complete_status, single_order_append
+    delete_status,cancel_time,complete_status, single_order_append,
+    send_status, receive_status, evaluate_status
     FROM
     s_shopping_order
     <foreach collection="groupIdSet" item="groupId" open="WHERE group_id IN (" close=")" separator=",">
@@ -73,7 +78,8 @@
     product_amount_total, pay_channel, pay_record, transaction_id,
     good_price, order_amount_total, pay_time, shop_group_id,
     group_id, payable, create_time, remarks, shop_remarks,
-    delete_status,cancel_time,complete_status, single_order_append
+    delete_status,cancel_time,complete_status, single_order_append,
+    send_status, receive_status, evaluate_status
     FROM
     s_shopping_order
     <foreach collection="orderNoSet" item="orderNo" open="WHERE order_no IN (" close=")" separator=",">
@@ -95,7 +101,8 @@
     product_amount_total, pay_channel, pay_record, transaction_id,
     good_price, order_amount_total, pay_time, shop_group_id,
     group_id, payable, create_time, remarks, shop_remarks,
-    delete_status,cancel_time,complete_status, single_order_append
+    delete_status,cancel_time,complete_status, single_order_append,
+    send_status, receive_status, evaluate_status
     FROM
     s_shopping_order
     <foreach collection="shopGroupIdSet" item="shopGroupId" open="WHERE shop_group_id IN (" close=")" separator=",">
@@ -124,7 +131,8 @@
     INSERT INTO s_shopping_order (order_no, custom, shops, goods_id, count, state, order_type, product_amount_total,
                                   pay_channel, pay_record, transaction_id, good_price, order_amount_total, pay_time,
                                   details_json, shop_group_id, group_id, payable, order_coupon, create_time, remarks,
-                                  shop_remarks, delete_status,cancel_time,complete_status,single_order_append) VALUES
+                                  shop_remarks, delete_status,cancel_time,complete_status,single_order_append,
+    send_status, receive_status, evaluate_status) VALUES
     <foreach collection="shoppingOrderList" item="shoppingOrder" separator=",">
       (#{shoppingOrder.orderNo},#{shoppingOrder.custom},#{shoppingOrder.shops},#{shoppingOrder.goodsId},
        #{shoppingOrder.count},#{shoppingOrder.state},
@@ -134,7 +142,8 @@
        #{shoppingOrder.shopGroupId},#{shoppingOrder.groupId},#{shoppingOrder.payable},
       #{shoppingOrder.orderCoupon},#{shoppingOrder.createTime},#{shoppingOrder.remarks},
        #{shoppingOrder.shopRemarks},#{shoppingOrder.deleteStatus},#{shoppingOrder.cancelTime},
-      #{shoppingOrder.completeStatus},#{shoppingOrder.singleOrderAppend})
+      #{shoppingOrder.completeStatus},#{shoppingOrder.singleOrderAppend},
+      #{shoppingOrder.sendStatus},#{shoppingOrder.receiveStatus},#{shoppingOrder.evaluateStatus})
     </foreach>
   </insert>
   <select id="listDelayNotPayOrder" resultType="com.github.chenlijia1111.commonModule.common.responseVo.order.DelayNotPayOrder">
