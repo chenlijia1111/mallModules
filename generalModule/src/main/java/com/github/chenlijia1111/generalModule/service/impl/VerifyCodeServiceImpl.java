@@ -14,6 +14,9 @@ import java.util.*;
 
 /**
  * 系统验证码
+ * 注意要及时清理验证码，防止验证码表无用数据过多
+ * 如需要控制发送频率，可以查看最近发送的时间进行校验以控制客户端发送验证码的请求
+ * 阿里云也有流量控制
  *
  * @author chenLiJia
  * @since 2020-02-22 09:04:18
@@ -36,17 +39,6 @@ public class VerifyCodeServiceImpl implements VerifyCodeServiceI {
      **/
     @Override
     public Result add(VerifyCode params) {
-        //判断是否存在,如果存在,就变更
-        VerifyCode verifyCodeCondition = new VerifyCode().
-                setCodeKey(params.getCodeKey()).
-                setCodeType(params.getCodeType());
-        List<VerifyCode> verifyCodeList = verifyCodeMapper.select(verifyCodeCondition);
-        if (Lists.isNotEmpty(verifyCodeList)) {
-            //变更
-            params.setId(verifyCodeList.get(0).getId());
-            params.setCreateTime(new Date());
-            return update(params);
-        }
         int i = verifyCodeMapper.insertSelective(params);
         return i > 0 ? Result.success("操作成功") : Result.failure("操作失败");
     }
