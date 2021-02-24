@@ -238,16 +238,16 @@ public class ShoppingOrderBiz {
             String productId = goodVo.getProductId();
             Product product = productMap.get(productId);
             if (Objects.isNull(product) || Objects.equals(BooleanConstant.YES_INTEGER, product.getDeleteStatus())) {
-                return Result.failure("产品不存在");
+                return Result.failure(product.getName() + "产品不存在");
             }
             if (Objects.equals(BooleanConstant.NO_INTEGER, product.getShelfStatus())) {
-                return Result.failure("产品未上架");
+                return Result.failure(product.getName() + "产品未上架");
             }
 
             //判断库存是否充足
             if (Objects.equals(BooleanConstant.YES_INTEGER, CHECK_GOOD_STOCK_STATUS) &&
                     goodVo.getStockCount().compareTo(goodTotalCount) < 0) {
-                return Result.failure("商品库存不足");
+                return Result.failure(product.getName() + "商品库存不足");
             }
 
             //订单编号
@@ -561,16 +561,16 @@ public class ShoppingOrderBiz {
             Product product = productMap.get(productId);
             if (Objects.isNull(product) ||
                     (Objects.equals(BooleanConstant.YES_INTEGER, product.getDeleteStatus()) && !Objects.equals(BooleanConstant.YES_INTEGER, params.getNotCheckProduct()))) {
-                return Result.failure("产品不存在");
+                return Result.failure(product.getName() + "产品不存在");
             }
             if (Objects.equals(BooleanConstant.NO_INTEGER, product.getShelfStatus()) && !Objects.equals(BooleanConstant.YES_INTEGER, params.getNotCheckProduct())) {
-                return Result.failure("产品未上架");
+                return Result.failure(product.getName() + "产品未上架");
             }
 
             //判断库存是否充足
             if (Objects.equals(BooleanConstant.YES_INTEGER, CHECK_GOOD_STOCK_STATUS) &&
                     goodVo.getStockCount().compareTo(goodTotalCount) < 0) {
-                return Result.failure("商品库存不足");
+                return Result.failure(product.getName() + "商品库存不足");
             }
 
             //订单编号
