@@ -242,7 +242,7 @@ public class ShoppingOrderBiz {
             String productId = goodVo.getProductId();
             Product product = productMap.get(productId);
             if (Objects.isNull(product) || Objects.equals(BooleanConstant.YES_INTEGER, product.getDeleteStatus())) {
-                return Result.failure("产品不存在");
+                return Result.failure(product.getName() + "产品不存在");
             }
             if (Objects.equals(BooleanConstant.NO_INTEGER, product.getShelfStatus())) {
                 return Result.failure("产品未上架");
