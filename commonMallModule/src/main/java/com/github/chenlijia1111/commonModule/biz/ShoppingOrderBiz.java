@@ -516,10 +516,10 @@ public class ShoppingOrderBiz {
             String productId = goodVo.getProductId();
             Product product = productMap.get(productId);
             if (Objects.isNull(product)) {
-                return Result.failure("产品不存在");
+                return Result.failure(product.getName() + "产品不存在");
             }
             if (Objects.equals(BooleanConstant.NO_INTEGER, product.getShelfStatus())) {
-                return Result.failure("产品未上架");
+                return Result.failure(product.getName() + "产品未上架");
             }
 
             //订单编号 只做计算，不消耗实际id
