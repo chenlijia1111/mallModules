@@ -60,6 +60,22 @@ public class CategoryServiceImpl implements CategoryServiceI {
     }
 
     /**
+     * 编辑
+     * 字段为 null 会更新
+     * 允许 parentId 为 null
+     *
+     * @param params      1
+     * @return com.github.chenlijia1111.utils.common.Result
+     * @author chenLiJia
+     * @since 2020-03-12 15:35:34
+     **/
+    @Override
+    public Result updateWithNull(Category params) {
+        int i = categoryMapper.updateByPrimaryKey(params);
+        return i > 0 ? Result.success("操作成功") : Result.failure("操作失败");
+    }
+
+    /**
      * 条件查询
      *
      * @param condition

@@ -1,6 +1,7 @@
 package com.github.chenlijia1111.commonModule.dao;
 
 import com.github.chenlijia1111.commonModule.entity.CategoryAncestor;
+import org.apache.ibatis.annotations.Param;
 import tk.mybatis.mapper.common.Mapper;
 import tk.mybatis.mapper.common.special.InsertListMapper;
 
@@ -12,6 +13,10 @@ import tk.mybatis.mapper.common.special.InsertListMapper;
  **/
 public interface CategoryAncestorMapper extends Mapper<CategoryAncestor>, InsertListMapper<CategoryAncestor> {
 
-
+    /**
+     * 删除跟自己有关联的类别
+     * @param categoryId
+     */
+    void deleteRelation(@Param("categoryId") Integer categoryId);
 
 }

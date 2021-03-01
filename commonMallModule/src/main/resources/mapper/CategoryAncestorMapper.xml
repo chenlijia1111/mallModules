@@ -10,4 +10,8 @@
   <sql id="Base_Column_List">
     id, category_id, ancestor_id, create_time
   </sql>
+
+  <delete id="deleteRelation">
+    DELETE FROM s_category_ancestor WHERE (category_id = #{categoryId} OR ancestor_id = #{categoryId})
+  </delete>
 </mapper>
