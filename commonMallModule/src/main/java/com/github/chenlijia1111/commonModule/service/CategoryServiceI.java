@@ -37,6 +37,18 @@ public interface CategoryServiceI {
     Result update(Category params);
 
     /**
+     * 编辑
+     * 字段为 null 会更新
+     * 允许 parentId 为 null
+     *
+     * @param params      1
+     * @return com.github.chenlijia1111.utils.common.Result
+     * @author chenLiJia
+     * @since 2020-03-12 15:35:34
+     **/
+    Result updateWithNull(Category params);
+
+    /**
      * 条件查询
      *
      * @param condition      1

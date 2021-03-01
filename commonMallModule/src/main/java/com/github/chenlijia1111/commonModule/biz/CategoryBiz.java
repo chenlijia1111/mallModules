@@ -100,18 +100,19 @@ public class CategoryBiz {
             return Result.failure("数据不存在");
         }
         Category originalCategory = categories.get(0);
+        Integer originParentId = originalCategory.getParentId();
 
         //更新类别
-        Category category = new Category();
+        Category category = originalCategory;
         BeanUtils.copyProperties(params, category);
 
         category.setUpdateTime(new Date());
-        Result result = categoryService.update(category);
+        Result result = categoryService.updateWithNull(category);
         if (result.getSuccess()) {
             //判断有没有更新上级，如果更新了上级，那么需要将所有下级的祖宗关系进行修改
-            if (!Objects.equals(originalCategory.getParentId(), params.getParentId()) ||
+            if (!Objects.equals(originParentId, params.getParentId()) ||
                     !Objects.equals(originalCategory.getOpenStatus(), params.getOpenStatus())) {
-                categoryAncestorService.recursiveUpdateAncestor(params.getId());
+                categoryAncestorService.recursiveUpdateAncestor(params.getId(), originParentId);
             }
 
             //判断有没有更新启用状态

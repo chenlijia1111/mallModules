@@ -42,7 +42,7 @@ public interface CategoryAncestorServiceI {
      * 条件查询
      *
      * @param condition      1
-     * @return 
+     * @return
      * @since 2020-07-17 10:33:07
      **/
     List<CategoryAncestor> listByCondition(CategoryAncestor condition);
@@ -51,7 +51,7 @@ public interface CategoryAncestorServiceI {
      * 条件查询
      *
      * @param condition      1
-     * @return 
+     * @return
      * @since 2020-07-17 10:33:07
      **/
     List<CategoryAncestor> listByCondition(Example condition);
@@ -68,5 +68,15 @@ public interface CategoryAncestorServiceI {
      * @param categoryId
      */
     void recursiveUpdateAncestor(Integer categoryId);
+
+    /**
+     * 更新类别祖宗关系
+     * 推荐使用
+     * 不用递归
+     *
+     * @param categoryId
+     * @param originParentId
+     */
+    void recursiveUpdateAncestor(Integer categoryId, Integer originParentId);
 
 }
