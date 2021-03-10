@@ -194,6 +194,214 @@ public class ProductBiz {
         return Result.success("操作成功", productId);
     }
 
+
+    /**
+     * 批量添加商品
+     * 前置要求，批量添加的时候，商品名称不可以重复，因为需要按照商品名称来判断是否是同一个商品
+     * 最后返回的是 productNameMap 产品名称 -> 产品 id
+     *
+     * @param addParamsList             1
+     * @param productIdGeneratorService 产品id生成器
+     * @return com.github.chenlijia1111.utils.common.Result
+     * @since 下午 2:18 2019/11/1 0001
+     **/
+    @Transactional
+    public Result batchAdd(List<? extends ProductAddParams> addParamsList, IdGeneratorServiceI productIdGeneratorService) {
+
+        if (Lists.isEmpty(addParamsList)) {
+            return Result.failure("数据为空");
+        }
+
+        Result result;
+        for (ProductAddParams params : addParamsList) {
+            //校验参数
+            result = PropertyCheckUtil.checkProperty(params);
+            if (!result.getSuccess()) {
+                return result;
+            }
+            //校验商品
+            List<GoodAddParams> goodList = params.getGoodList();
+            for (GoodAddParams goodAddParams : goodList) {
+                result = PropertyCheckUtil.checkProperty(goodAddParams);
+                if (!result.getSuccess()) {
+                    return result;
+                }
+            }
+        }
+
+
+        //当前商家id,为了适配有些系统可能不需要商家这个角色，直接就是后台添加商品,所以这里不做限制
+        String shopId = shopService.currentShopId();
+        //当前时间
+        Date currentTime = new Date();
+
+        // 开始批量构建添加数据
+        List<Product> productList = new ArrayList<>();
+        //所有产品规格记录,用于后面添加商品关联id
+        List<ProductSpec> allProductSpecRecode = Lists.newArrayList();
+        List<ProductSpecValue> allProductSpecValueRecode = Lists.newArrayList();
+        //构造批量插入商品 商品规格数据
+        List<Goods> goodsList = new ArrayList<>();
+        List<GoodSpec> goodSpecList = new ArrayList<>();
+        // 添加这个商品的标签价格 2020-12-03
+        // 定义集合用于批量添加标签价格
+        List<GoodLabelPrice> goodLabelPriceList = new ArrayList<>();
+
+        // 产品名称 -> id 映射
+        Map<String, String> productNameMap = new HashMap<>();
+
+        for (ProductAddParams params : addParamsList) {
+            //产品id
+            String productId = productIdGeneratorService.createOrderNo();
+            // 添加产品名称 -> 产品 id 映射
+            productNameMap.put(params.getName(), productId);
+
+            Product product = new Product().setId(productId).
+                    setName(params.getName()).
+                    setCategoryId(params.getCategoryId()).
+                    setBrand(params.getBrand()).
+                    setUnit(params.getUnit()).
+                    setSortNumber(params.getSortNumber()).
+                    setSmallPic(params.getSmallPic()).
+                    setContent(params.getContent()).
+                    setDescription(params.getDescription()).
+                    setShelfStatus(params.getShelfStatus()).
+                    setCreateTime(currentTime).
+                    setUpdateTime(currentTime).
+                    setDeleteStatus(BooleanConstant.NO_INTEGER).
+                    setShops(shopId);
+            productList.add(product);
+
+            //添加产品规格
+            List<ProductSpecParams> productSpecParamsList = params.getProductSpecParamsList();
+            for (ProductSpecParams specParams : productSpecParamsList) {
+                ProductSpec productSpec = new ProductSpec().setProductId(productId).setSpecName(specParams.getSpecName());
+                allProductSpecRecode.add(productSpec);
+            }
+        }
+
+        productService.batchAdd(productList);
+        // 先把所有产品规格批量添加进入，因为它的id是自增长的，无法直接定义他的id。所以后面设计 id 最好不好自增长
+        productSpecService.batchAdd(allProductSpecRecode);
+        // 构建(产品id产品规格名称) -> 产品规格 id 映射
+        Map<String, Integer> productSpecNameMap = new HashMap<>();
+        for (ProductSpec productSpec : allProductSpecRecode) {
+            productSpecNameMap.put(productSpec.getProductId() + productSpec.getSpecName(), productSpec.getId());
+        }
+        // 产品 id 集合
+        Set<String> productIdSet = new HashSet<>();
+        for (Product product : productList) {
+            productIdSet.add(product.getId());
+        }
+
+        // 再添加产品规格值
+        for (ProductAddParams params : addParamsList) {
+            // 产品名称
+            String productName = params.getName();
+            // 产品 id
+            String productId = productNameMap.get(productName);
+
+            //添加产品规格
+            List<ProductSpecParams> productSpecParamsList = params.getProductSpecParamsList();
+            for (ProductSpecParams specParams : productSpecParamsList) {
+                // 规格名称
+                String specName = specParams.getSpecName();
+                // 查找对应的产品规格的 id
+                Integer productSpecId = productSpecNameMap.get(productId + specName);
+
+                //添加产品规格值
+                List<ProductSpecValueParams> specValueList = specParams.getSpecValueList();
+                List<ProductSpecValue> productSpecValueList = specValueList.stream().map(e -> new ProductSpecValue().
+                        setProductSpecId(productSpecId).
+                        setSpecValueImage(e.getImageValue()).
+                        setSpecValue(e.getValue())).collect(Collectors.toList());
+                allProductSpecValueRecode.addAll(productSpecValueList);
+            }
+        }
+        // 批量添加规格值
+        productSpecValueService.batchAdd(allProductSpecValueRecode);
+        // 构建规格值id 映射
+        // 产品id规格名称规格值 -> 规格值id
+        Map<String, Integer> productSpecValueNameMap = new HashMap<>();
+        List<ProductSpecValueNameWrapperVo> productSpecValueNameWrapperVoList = productSpecValueService.listProductSpecValueNameWrapperVo(productIdSet);
+        for (ProductSpecValueNameWrapperVo vo : productSpecValueNameWrapperVoList) {
+            String mapKey = vo.getProductId() + vo.getProductSpecName();
+            if (StringUtils.isNotEmpty(vo.getProductSpecValue())) {
+                mapKey += vo.getProductSpecValue();
+            }
+            if (StringUtils.isNotEmpty(vo.getProductSpecImageValue())) {
+                mapKey += vo.getProductSpecImageValue();
+            }
+            productSpecValueNameMap.put(mapKey, vo.getProductSpecValueId());
+        }
+
+
+        //添加商品
+        for (ProductAddParams params : addParamsList) {
+            // 产品名称
+            String productName = params.getName();
+            // 产品 id
+            String productId = productNameMap.get(productName);
+
+            List<GoodAddParams> goodList = params.getGoodList();
+            for (GoodAddParams goodAddParams : goodList) {
+                //商品id
+                String goodId = String.valueOf(IDGenerateFactory.GOOD_ID_UTIL.nextId());
+                Goods goods = new Goods().setId(goodId).
+                        setProductId(productId).
+                        setPrice(goodAddParams.getPrice()).
+                        setVipPrice(goodAddParams.getVipPrice()).
+                        setMarketPrice(goodAddParams.getMarketPrice()).
+                        setGoodNo(goodAddParams.getGoodNo()).
+                        setCreateTime(currentTime).
+                        setUpdateTime(currentTime).
+                        setDeleteStatus(BooleanConstant.NO_INTEGER).
+                        setStockCount(goodAddParams.getStockCount()).
+                        setGoodImage(goodAddParams.getGoodImage());
+
+                //规格名称
+                goods.setDefaultSkuName(goodAddParams.releaseSkuName());
+                goodsList.add(goods);
+
+                //添加这个商品的规格属性
+                List<GoodSpecParams> goodSpecParamsList = goodAddParams.getGoodSpecParamsList();
+                for (GoodSpecParams goodSpecParams : goodSpecParamsList) {
+                    //查询这个规格所对应的的前面的产品规格值的id  比较名字相同的就是
+                    String specValueMapKey = productId + goodSpecParams.getSpecName();
+                    if (StringUtils.isNotEmpty(goodSpecParams.getSpecValue())) {
+                        specValueMapKey += goodSpecParams.getSpecValue();
+                    }
+                    if (StringUtils.isNotEmpty(goodSpecParams.getSpecImageValue())) {
+                        specValueMapKey += goodSpecParams.getSpecImageValue();
+                    }
+                    Integer productSpecValueId = productSpecValueNameMap.get(specValueMapKey);
+                    GoodSpec goodSpec = new GoodSpec().setGoodId(goodId).setSpecValueId(productSpecValueId);
+                    goodSpecList.add(goodSpec);
+                }
+
+                // 开始处理标签价格数据
+                List<GoodLabelPriceAddParams> goodLabelPriceParamsList = goodAddParams.getGoodLabelPriceList();
+                if (Lists.isNotEmpty(goodLabelPriceParamsList)) {
+                    for (GoodLabelPriceAddParams goodLabelPriceAddParams : goodLabelPriceParamsList) {
+                        GoodLabelPrice goodLabelPrice = new GoodLabelPrice(goodId, goodLabelPriceAddParams.getLabelName(), goodLabelPriceAddParams.getGoodPrice(), currentTime);
+                        goodLabelPriceList.add(goodLabelPrice);
+                    }
+                }
+
+            }
+        }
+
+
+        //批量插入商品 商品规格
+        goodsService.batchAdd(goodsList);
+        goodSpecService.batchAdd(goodSpecList);
+
+        // 批量添加标签价格
+        goodLabelPriceService.batchAdd(goodLabelPriceList);
+
+        return Result.success("操作成功", productNameMap);
+    }
+
     /**
      * 修改商品
      * 需要判断是不是把某个商品规格删除了

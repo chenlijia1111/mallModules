@@ -109,4 +109,11 @@ public interface ProductServiceI {
      */
     Set<String> listShopIdSetByGoodIdSet(Set<String> goodIdSet);
 
+    /**
+     * 批量添加
+     * @param list
+     * @return
+     */
+    Result batchAdd(List<Product> list);
+
 }

@@ -1,5 +1,6 @@
 package com.github.chenlijia1111.commonModule.dao;
 
+import com.github.chenlijia1111.commonModule.common.responseVo.product.ProductSpecValueNameWrapperVo;
 import com.github.chenlijia1111.commonModule.entity.ProductSpec;
 import com.github.chenlijia1111.commonModule.entity.ProductSpecValue;
 import org.apache.ibatis.annotations.Param;
@@ -39,5 +40,12 @@ public interface ProductSpecValueMapper extends Mapper<ProductSpecValue> {
      * @return java.util.List<com.github.chenlijia1111.commonModule.entity.ProductSpecValue>
      **/
     List<ProductSpecValue> listBySpecIdSet(@Param("specIdSet") Set<Integer> specIdSet);
+
+    /**
+     * 查询产品id的所有规格值对象映射
+     * @param productIdSet
+     * @return
+     */
+    List<ProductSpecValueNameWrapperVo> listProductSpecValueNameWrapperVo(@Param("productIdSet") Set<String> productIdSet);
 
 }

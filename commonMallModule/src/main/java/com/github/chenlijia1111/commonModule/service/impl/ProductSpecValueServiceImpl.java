@@ -1,15 +1,19 @@
 package com.github.chenlijia1111.commonModule.service.impl;
 
 import com.github.chenlijia1111.commonModule.common.pojo.CommonMallConstants;
+import com.github.chenlijia1111.commonModule.common.responseVo.product.ProductSpecValueNameWrapperVo;
+import com.github.chenlijia1111.commonModule.dao.ProductSpecValueMapper;
+import com.github.chenlijia1111.commonModule.entity.ProductSpecValue;
 import com.github.chenlijia1111.commonModule.service.ProductSpecValueServiceI;
 import com.github.chenlijia1111.utils.common.Result;
 import com.github.chenlijia1111.utils.list.Lists;
-import com.github.chenlijia1111.commonModule.dao.ProductSpecValueMapper;
-import com.github.chenlijia1111.commonModule.entity.ProductSpecValue;
+import com.github.chenlijia1111.utils.list.Sets;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * 产品规格值
@@ -69,5 +73,17 @@ public class ProductSpecValueServiceImpl implements ProductSpecValueServiceI {
         return Result.success("操作成功");
     }
 
-
+    /**
+     * 查询产品id的所有规格值对象映射
+     *
+     * @param productIdSet
+     * @return
+     */
+    @Override
+    public List<ProductSpecValueNameWrapperVo> listProductSpecValueNameWrapperVo(Set<String> productIdSet) {
+        if (Sets.isNotEmpty(productIdSet)) {
+            return productSpecValueMapper.listProductSpecValueNameWrapperVo(productIdSet);
+        }
+        return new ArrayList<>();
+    }
 }

@@ -353,4 +353,18 @@ public class ProductServiceImpl implements ProductServiceI {
         }
         return new HashSet<>();
     }
+
+    /**
+     * 批量添加
+     * @param list
+     * @return
+     */
+    @Override
+    public Result batchAdd(List<Product> list) {
+        if (Lists.isNotEmpty(list)){
+            int i = productMapper.insertList(list);
+            return i > 0 ? Result.success("操作成功") : Result.failure("操作失败");
+        }
+        return Result.success();
+    }
 }

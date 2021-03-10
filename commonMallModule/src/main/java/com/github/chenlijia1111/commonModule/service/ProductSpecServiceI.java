@@ -49,4 +49,11 @@ public interface ProductSpecServiceI {
      * @return java.util.List<com.github.chenlijia1111.commonModule.common.responseVo.product.ProductSpecVo>
      **/
     List<ProductSpecVo> listProductSpecVoByProductIdSet(Set<String> productIdSet);
+
+    /**
+     * 批量添加
+     * @param list
+     * @return
+     */
+    Result batchAdd(List<ProductSpec> list);
 }

@@ -114,5 +114,17 @@ public class ProductSpecServiceImpl implements ProductSpecServiceI {
         return Lists.newArrayList();
     }
 
-
+    /**
+     * 批量添加
+     * @param list
+     * @return
+     */
+    @Override
+    public Result batchAdd(List<ProductSpec> list) {
+        if (Lists.isNotEmpty(list)){
+            int i = productSpecMapper.insertList(list);
+            return i > 0 ? Result.success("操作成功") : Result.failure("操作失败");
+        }
+        return Result.success();
+    }
 }

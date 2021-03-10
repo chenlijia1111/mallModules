@@ -4,6 +4,7 @@ import com.github.chenlijia1111.commonModule.common.responseVo.product.ProductSp
 import com.github.chenlijia1111.commonModule.entity.ProductSpec;
 import org.apache.ibatis.annotations.Param;
 import tk.mybatis.mapper.common.Mapper;
+import tk.mybatis.mapper.common.special.InsertListMapper;
 
 import java.util.List;
 import java.util.Set;
@@ -14,7 +15,7 @@ import java.util.Set;
  * @since 2019-11-01 13:46:43
  * @version 1.0
  **/
-public interface ProductSpecMapper extends Mapper<ProductSpec> {
+public interface ProductSpecMapper extends Mapper<ProductSpec>, InsertListMapper<ProductSpec> {
 
     /**
      * 批量删除

@@ -34,4 +34,20 @@
       #{specId}
     </foreach>
   </select>
+
+  <select id="listProductSpecValueNameWrapperVo"
+            resultType="com.github.chenlijia1111.commonModule.common.responseVo.product.ProductSpecValueNameWrapperVo">
+    SELECT
+    s_product_spec_value.id productSpecValueId,s_product_spec_value.spec_value productSpecValue,
+    s_product_spec_value.spec_value_image productSpecImageValue,
+    s_product_spec.id productSpecId,s_product_spec.spec_name productSpecName,s_product.id productId,
+    s_product.name productName
+    FROM s_product_spec_value,
+      s_product_spec,s_product
+    WHERE s_product_spec_value.product_spec_id = s_product_spec.id
+    AND s_product_spec.product_id = s_product.id
+    <foreach collection="productIdSet" item="productId" open="AND s_product.id IN (" close=")" separator=",">
+      #{productId}
+    </foreach>
+  </select>
 </mapper>
