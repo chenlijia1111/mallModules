@@ -36,7 +36,7 @@
         <jackson-databind.version>2.9.10.3</jackson-databind.version>
         <mybatis-generator-core.version>1.4.0</mybatis-generator-core.version>
         <jjwt.version>0.9.1</jjwt.version>
-        <jsoup.version>1.13.1</jsoup.version>
+        <jsoup.version>1.14.2</jsoup.version>
 
         <spring-tx.version>5.2.1.RELEASE</spring-tx.version>
         <spring-web.version>5.2.1.RELEASE</spring-web.version>

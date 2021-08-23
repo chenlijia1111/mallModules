@@ -15,7 +15,7 @@
 
     <properties>
         <java.version>1.8</java.version>
-        <jsoup.version>1.13.1</jsoup.version>
+        <jsoup.version>1.14.2</jsoup.version>
     </properties>
     <dependencies>
         <!--工具类-->
