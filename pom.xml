@@ -39,7 +39,7 @@
         <jsoup.version>1.13.1</jsoup.version>
 
         <spring-tx.version>5.2.1.RELEASE</spring-tx.version>
-        <spring-web.version>5.2.1.RELEASE</spring-web.version>
+        <spring-web.version>6.0.0</spring-web.version>
     </properties>
 
     <!--jar包版本统一维护，子项目不需要引版本号-->
